@@ -256,13 +256,15 @@ function malRampen(T, th, kp, versatz) {
     };
     if (th.rampenStil === 'stein') {
       // Steinrinne mit Wasser darin
-      pfad(c, p); c.strokeStyle = 'rgba(70,56,36,0.9)'; c.lineWidth = 36; c.stroke();
-      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 16; c.stroke();
-      streben('rgba(30,22,12,0.6)', 2, 22);
-      for (const q of kanten) { pfad(c, q); c.strokeStyle = '#c9a46a'; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = voll; c.lineWidth = 1; c.stroke(); }
+      const st = th.steinRampe;
+      pfad(c, p); c.strokeStyle = st.grund; c.lineWidth = 36; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.55)`; c.lineWidth = 16; c.stroke();
+      pfad(c, p); c.strokeStyle = 'rgba(255,255,255,0.25)'; c.lineWidth = 3; c.stroke();
+      streben(st.streben, 2, 22);
+      for (const q of kanten) { pfad(c, q); c.strokeStyle = st.rand; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = '#ffffff'; c.lineWidth = 0.8; c.stroke(); }
     } else if (th.rampenStil === 'glas') {
       // Glasröhre
-      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.12)`; c.lineWidth = 34; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.2)`; c.lineWidth = 34; c.stroke();
       pfad(c, p); c.strokeStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 12; c.stroke();
       for (const q of kanten) { pfad(c, q); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 6; c.stroke(); pfad(c, q); c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 1.5; c.stroke(); }
       c.fillStyle = 'rgba(255,255,255,0.35)';
@@ -301,7 +303,7 @@ function malBall(th, kp) {
   const c = document.createElement('canvas');
   c.width = c.height = gr;
   const g = c.getContext('2d');
-  const m = gr / 2, r = gr / 2 - 2;
+  const m = gr / 2, r = gr / 2 - 3;
   // Grundkörper: dunkler Stahl
   let v = g.createRadialGradient(m - r * 0.35, m - r * 0.4, r * 0.05, m, m, r);
   [0, 0.18, 0.5, 0.85, 1].forEach((p, i) => v.addColorStop(p, kb.stops[i]));
@@ -327,16 +329,20 @@ function malBall(th, kp) {
   // Glanzpunkt
   g.fillStyle = '#ffffff';
   g.beginPath(); g.ellipse(m - r * 0.36, m - r * 0.42, r * 0.22, r * 0.15, -0.6, 0, Math.PI * 2); g.fill();
-  g.strokeStyle = 'rgba(0,0,0,0.5)';
-  g.lineWidth = Math.max(1, r * 0.06);
+  // klare Kontur: dunkler Ring und darum ein feiner heller Saum
+  g.strokeStyle = 'rgba(8,10,22,0.9)';
+  g.lineWidth = Math.max(1.2, r * 0.1);
   g.beginPath(); g.arc(m, m, r - g.lineWidth / 2, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,0.85)';
+  g.lineWidth = Math.max(1, r * 0.06);
+  g.beginPath(); g.arc(m, m, r + g.lineWidth / 2 + 0.5, 0, Math.PI * 2); g.stroke();
   c.mitte = m;
   return c;
 }
 
 function zeichneKugel(c, b, groesse = 1) {
   // Im Bild hat die Kugel den Radius (Breite/2 - 2); das Bild wird passend skaliert
-  const halb = PH.ballR * groesse * (ballBild.width / 2) / (ballBild.width / 2 - 2);
+  const halb = PH.ballR * groesse * (ballBild.width / 2) / (ballBild.width / 2 - 3);
   c.drawImage(ballBild, b.x - halb, b.y - halb, halb * 2, halb * 2);
 }
 
@@ -378,6 +384,11 @@ function zeichneFlipper(c, f, th) {
   c.strokeStyle = `rgba(${fl.glow},${0.5 + aktiv * 0.5})`;
   c.lineWidth = 1.2;
   c.beginPath(); c.moveTo(4, -f.r0 * 0.25); c.lineTo(L - 6, -f.r1 * 0.2); c.stroke();
+  if (fl.streifen) {
+    c.strokeStyle = fl.streifen; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(10, f.r0 * 0.35); c.lineTo(L - 10, f.r1 * 0.3); c.stroke();
+    c.fillStyle = fl.streifen; c.beginPath(); c.arc(L, 0, 2.2, 0, Math.PI * 2); c.fill();
+  }
   c.fillStyle = '#0b0e1c';
   c.beginPath(); c.arc(0, 0, 4.5, 0, Math.PI * 2); c.fill();
   c.strokeStyle = '#e8f0ff'; c.lineWidth = 1.5; c.stroke();
@@ -421,6 +432,44 @@ function malBumper(c, bu, th, zeit) {
     c.fillStyle = hell > 0.2 ? '#fff6c0' : B.ring;
     c.beginPath(); c.ellipse(x, y, r * 0.5, r * 0.26, 0, 0, Math.PI * 2); c.fill();
     c.fillStyle = '#2a1e10'; c.beginPath(); c.arc(x, y, r * 0.17, 0, Math.PI * 2); c.fill();
+  } else if (B.stil === 'reaktor') {
+    // weiß-türkiser Reaktorkern mit Metallring und Speichen
+    g = c.createRadialGradient(x, y, 1, x, y, r);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, hell > 0.3 ? '#ffffff' : '#b8fff4'); g.addColorStop(0.7, B.glow); g.addColorStop(1, '#0a3a44');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#e8fbff'; c.lineWidth = 3; c.beginPath(); c.arc(x, y, r - 1.5, 0, Math.PI * 2); c.stroke();
+    c.save(); c.translate(x, y); c.rotate(zeit * 0.8);
+    c.strokeStyle = 'rgba(10,58,68,0.7)'; c.lineWidth = 2;
+    for (let k = 0; k < 3; k++) { c.rotate(Math.PI * 2 / 3); c.beginPath(); c.moveTo(r * 0.3, 0); c.lineTo(r * 0.85, 0); c.stroke(); }
+    c.restore();
+  } else if (B.stil === 'maske') {
+    // steinerne Maske mit leuchtenden Edelstein-Augen
+    g = c.createRadialGradient(x - r * 0.3, y - r * 0.3, 2, x, y, r);
+    g.addColorStop(0, B.kappe[0]); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : B.ring; c.lineWidth = 3; c.beginPath(); c.arc(x, y, r - 1.5, 0, Math.PI * 2); c.stroke();
+    for (const sx of [-1, 1]) { c.fillStyle = hell > 0.2 ? '#ffffff' : B.auge; c.beginPath(); c.ellipse(x + sx * r * 0.36, y - r * 0.15, r * 0.2, r * 0.12, 0, 0, Math.PI * 2); c.fill(); }
+    c.fillStyle = B.ring; c.fillRect(x - r * 0.08, y - r * 0.05, r * 0.16, r * 0.4);
+    c.fillStyle = 'rgba(20,40,34,0.8)'; c.fillRect(x - r * 0.35, y + r * 0.45, r * 0.7, r * 0.12);
+  } else if (B.stil === 'edelstein') {
+    // leuchtender goldgefasster Edelstein
+    c.fillStyle = '#ffc857'; vieleck(c, x, y, r, 8, null, Math.PI / 8); c.fill();
+    g = c.createLinearGradient(x - r, y - r, x + r, y + r);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : '#b0fff0'); g.addColorStop(0.5, '#20d9c2'); g.addColorStop(1, '#0a6a5a');
+    c.fillStyle = g; vieleck(c, x, y, r * 0.78, 8, null, Math.PI / 8); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(x - r * 0.5, y - r * 0.2); c.lineTo(x, y - r * 0.6); c.lineTo(x + r * 0.5, y - r * 0.2); c.lineTo(x, y + r * 0.6); c.closePath(); c.stroke();
+  } else if (B.stil === 'muschel') {
+    // Perlmuschel: Schale mit Rippen, Perle in der Mitte
+    g = c.createRadialGradient(x, y - r * 0.4, 2, x, y, r);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(160,80,110,0.5)'; c.lineWidth = 1.5;
+    for (let k = -3; k <= 3; k++) { c.beginPath(); c.moveTo(x, y + r * 0.6); c.lineTo(x + k * r * 0.3, y - r * 0.85); c.stroke(); }
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : '#20e0d0'; c.lineWidth = 2.5; c.beginPath(); c.arc(x, y, r - 1.2, 0, Math.PI * 2); c.stroke();
+    g = c.createRadialGradient(x - 3, y - 3, 1, x, y, r * 0.32);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, hell > 0.3 ? '#fff6c0' : '#d8e8f8');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y + r * 0.1, r * 0.3, 0, Math.PI * 2); c.fill();
   } else if (B.stil === 'qualle') {
     g = c.createRadialGradient(x, y - r * 0.3, 2, x, y, r);
     g.addColorStop(0, hell > 0.3 ? '#ffffff' : 'rgba(230,255,255,0.95)'); g.addColorStop(0.6, 'rgba(127,240,255,0.75)'); g.addColorStop(1, 'rgba(26,106,138,0.85)');
@@ -554,17 +603,31 @@ function zeichneTeile(c, zeit, T, th, live) {
     c.fillStyle = p.blitz > 0.2 ? '#ffffff' : F.zweit; c.beginPath(); c.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2); c.fill();
   }
 
-  // Fallziele
+  // Fallziele (im Dschungel als Tempelsiegel)
   for (const z of T.fallziele) {
     if (z.unten) { c.fillStyle = '#05050c'; c.fillRect(z.x - 14, z.y - 2, 28, 4); continue; }
+    if (th.ziele === 'rune') {
+      c.fillStyle = '#5a7a6c'; c.fillRect(z.x - 14, z.y - 5, 28, 10);
+      c.strokeStyle = F.gold; c.lineWidth = 1.5; c.strokeRect(z.x - 14, z.y - 5, 28, 10);
+      c.fillStyle = z.blitz > 0 ? '#ffffff' : F.gold; c.beginPath(); c.arc(z.x, z.y, 3, 0, Math.PI * 2); c.fill();
+      continue;
+    }
     c.fillStyle = '#fff8d0';
     c.fillRect(z.x - 14, z.y - 4, 28, 8);
     c.fillStyle = F.gold;
     c.fillRect(z.x - 13, z.y - 1, 26, 5);
   }
-  // Stehziele
+  // Stehziele (im Dschungel als Runentafeln)
   for (const z of T.stehziele) {
     c.lineCap = 'round';
+    if (th.ziele === 'rune') {
+      c.strokeStyle = z.an ? F.gold : '#4a6a5c'; c.lineWidth = 9;
+      c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
+      c.strokeStyle = z.an || z.blitz > 0 ? '#ffffff' : F.gold; c.lineWidth = 1.5;
+      const mx = (z.ax + z.bx) / 2, my = (z.ay + z.by) / 2;
+      c.beginPath(); c.moveTo(mx - 3, my - 5); c.lineTo(mx + 3, my); c.lineTo(mx - 3, my + 5); c.stroke();
+      continue;
+    }
     c.strokeStyle = z.an ? '#ffffff' : 'rgba(255,255,255,0.35)';
     c.lineWidth = 8;
     c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
@@ -621,14 +684,16 @@ function vorschau(levelIndex, breite) {
   const schluessel = levelIndex + ':' + breite;
   if (vorschauCache.has(schluessel)) return vorschauCache.get(schluessel);
   const lv = levelIndex < 0 ? null : LEVEL[levelIndex];
-  const th = THEMEN[lv ? lv.welt : 'klassik'];
+  const th = themaFuer(levelIndex);
   const T = baueTisch(lv ? lv.tisch : KLASSIK_PLAN);
   const kp = breite / TB;
   const grund = malUnten(T, th, kp, 0);
   const deckel = malRampen(T, th, kp, 0);
   const c = grund.getContext('2d');
   c.setTransform(kp, 0, 0, kp, 0, 0);
+  c.save(); tischUmriss(c); c.clip();
   th.ambient(c, 1.3);
+  c.restore();
   zeichneTeile(c, 0, T, th, false);
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.drawImage(deckel, 0, 0);
@@ -670,13 +735,16 @@ function zeichne(zeit) {
   if (!s || !unten) return;
   const th = s.thema;
   let wx = 0, wy = 0;
-  if (s.wackeln > 0) { wx = (Math.random() - 0.5) * s.wackeln * 14; wy = (Math.random() - 0.5) * s.wackeln * 14; }
+  // bewusst kein Wackeln des Bildes: die Kugel bleibt immer ruhig im Blick
   ctx.setTransform(1, 0, 0, 1, Math.round((ox + wx * k) * dpr), Math.round((oy + wy * k) * dpr));
   ctx.drawImage(unten, 0, 0);
   ctx.setTransform(k * dpr, 0, 0, k * dpr, (ox + wx * k) * dpr, (oy + wy * k + HUDH * k) * dpr);
   const c = ctx;
 
+  // bewegter Hintergrund nur innerhalb des Tisches
+  c.save(); tischUmriss(c); c.clip();
   th.ambient(c, zeit);
+  c.restore();
   zeichneTeile(c, zeit, s.T, th, true);
 
   const baelle = s.welt.baelle;
@@ -736,11 +804,7 @@ function zeichne(zeit) {
 
   // Funken, Wellen, Punkte
   c.globalCompositeOperation = 'lighter';
-  for (const w of s.wellen) {
-    const a = 1 - w.zeit / 0.45;
-    c.strokeStyle = w.farbe; c.globalAlpha = a; c.lineWidth = 3 * a;
-    c.beginPath(); c.arc(w.x, w.y, w.r * (0.4 + w.zeit / 0.45), 0, Math.PI * 2); c.stroke();
-  }
+  for (const w of s.wellen) malWelle(c, w);
   c.globalAlpha = 1;
   for (const t of s.teilchen) malTeilchen(c, t);
   c.globalAlpha = 1;
@@ -887,4 +951,49 @@ function zeichneHud(zeit) {
     if (rest > 0) c.fillText(Math.ceil(rest) + 's', xx, y + 22);
     c.globalAlpha = 1;
   });
+}
+
+// Treffer-Rückmeldung: kurz und deutlich, nie über der Kugel stehen bleibend
+function malWelle(c, w) {
+  const a = 1 - w.zeit / 0.45;
+  if (a <= 0) return;
+  c.globalAlpha = a;
+  c.strokeStyle = w.farbe;
+  const r = w.r * (0.4 + w.zeit / 0.45);
+  if (w.art === 'blitz') {
+    // elektrischer Lichtimpuls: Zickzack-Strahlen
+    const z = zufall(Math.floor(w.saat + w.zeit * 30));
+    c.lineWidth = 2;
+    for (let k = 0; k < 5; k++) {
+      const wi = k / 5 * Math.PI * 2 + w.saat;
+      c.beginPath(); c.moveTo(w.x + Math.cos(wi) * w.r * 0.5, w.y + Math.sin(wi) * w.r * 0.5);
+      for (let s = 1; s <= 3; s++) { const rr = w.r * 0.5 + s * 9; c.lineTo(w.x + Math.cos(wi + (z() - 0.5) * 0.5) * rr, w.y + Math.sin(wi + (z() - 0.5) * 0.5) * rr); }
+      c.stroke();
+    }
+  } else if (w.art === 'rune') {
+    // goldene Rune leuchtet kurz auf
+    c.strokeStyle = '#ffc857'; c.lineWidth = 2.5;
+    c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.moveTo(w.x, w.y - r * 0.6); c.lineTo(w.x + r * 0.5, w.y + r * 0.4); c.lineTo(w.x - r * 0.5, w.y + r * 0.4); c.closePath(); c.stroke();
+  } else if (w.art === 'blasen') {
+    // farbiger Wellenring
+    c.lineWidth = 3 * a; c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#ff718d'; c.lineWidth = 2 * a; c.beginPath(); c.arc(w.x, w.y, r * 0.7, 0, Math.PI * 2); c.stroke();
+  } else if (w.art === 'funken') {
+    c.lineWidth = 3 * a; c.strokeStyle = '#ffd447';
+    c.beginPath(); c.arc(w.x, w.y, r * 0.8, 0, Math.PI * 2); c.stroke();
+  } else {
+    c.lineWidth = 3 * a; c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+
+// Umriss der Spielfläche (für Zuschnitte)
+function tischUmriss(c) {
+  c.beginPath();
+  c.moveTo(20, TH + 10);
+  c.lineTo(20, 330);
+  c.arc(270, 330, 250, Math.PI, 0);
+  c.lineTo(520, TH + 10);
+  c.closePath();
 }

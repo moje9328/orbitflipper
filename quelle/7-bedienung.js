@@ -156,14 +156,31 @@ let gewaehlteWelt = 'weltraum';
 function weltLevel(welt) { return LEVEL.map((l, i) => [l, i]).filter(([l]) => l.welt === welt); }
 function sterneVon(welt) { return weltLevel(welt).reduce((n, [l]) => n + (daten.sterne[l.id] || 0), 0); }
 
-function bildElement(levelIndex, breite) {
-  // Vorschau als <img>, damit sie wie ein normales Bild skaliert
+function bildElement(levelIndex, breite, gesperrt) {
+  // Vorschau als <img>, gerendert mit demselben Zeichner und denselben Designdaten wie das Spiel
+  const rahmen = document.createElement('span');
+  rahmen.className = 'bildRahmen';
   const img = document.createElement('img');
   img.alt = '';
   img.width = breite;
-  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.82); } catch (e) {}
-  return img;
+  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.85); } catch (e) {}
+  rahmen.appendChild(img);
+  if (gesperrt) {
+    const s = document.createElement('span');
+    s.className = 'schloss';
+    s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#f2b84b" stroke="#1d1505" stroke-width="1.2" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>';
+    rahmen.appendChild(s);
+  }
+  return rahmen;
 }
+// Farbe der Welt für Rahmen, Tönung und Schein der Karte
+function weltFarben(el, hex) {
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  el.style.setProperty('--welt', hex);
+  el.style.setProperty('--weltTon', `rgba(${r},${g},${b},0.28)`);
+  el.style.setProperty('--weltSchein', `rgba(${r},${g},${b},0.18)`);
+}
+const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>GESPERRT';
 
 function baueWelten() {
   const liste = $('weltListe');
@@ -176,12 +193,15 @@ function baueWelten() {
     const knopf = document.createElement('button');
     knopf.type = 'button';
     knopf.className = 'weltKarte' + (frei ? '' : ' zu');
-    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
-    knopf.append(bildElement(ersterIndex, 112));
+    weltFarben(knopf, WELT_DESIGN[w.id].rand);
+    knopf.append(bildElement(ersterIndex, 112, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
+    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = 'WELT ' + (WELTEN.indexOf(w) + 1);
     const name = document.createElement('strong'); name.textContent = w.name.toUpperCase();
-    const text = document.createElement('span'); text.textContent = frei ? w.text : '🔒 Schaff zuerst das letzte Level der Welt davor.';
+    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + ' Schaff zuerst das letzte Level der Welt davor.';
+    if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
+    info.prepend(nr);
     const merkmal = document.createElement('span'); merkmal.className = 'weltMerkmal'; merkmal.textContent = THEMEN[w.id].physik.text;
     const sterne = document.createElement('span'); sterne.className = 'sterneZeile'; sterne.textContent = '★ ' + sterneVon(w.id) + ' / ' + weltLevel(w.id).length * 3;
     info.append(name, text, merkmal, sterne);
@@ -208,13 +228,14 @@ function baueLevel() {
     const knopf = document.createElement('button');
     knopf.type = 'button';
     knopf.className = 'levelKarte' + (frei ? '' : ' zu');
-    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
-    knopf.append(bildElement(i, 84));
+    weltFarben(knopf, themaFuer(i).rand);
+    knopf.append(bildElement(i, 84, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
     const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
     const auf = document.createElement('span');
-    auf.textContent = frei ? l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') : '🔒 Schaff zuerst das Level davor.';
+    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : ' – Schaff zuerst das Level davor.');
+    if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     const st = daten.sterne[l.id] || 0;
     const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
     zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');

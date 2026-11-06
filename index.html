@@ -177,19 +177,26 @@
   /* Welt- und Levelauswahl: Karten wie auf der Pixelhafen-Seite, mit echtem Vorschaubild des Tischs */
   .tafel.breit { width: min(560px, 100%); }
   .auswahl { display: grid; gap: 12px; margin: 16px 0 0; }
+  /* Jede Karte trägt die Farbe ihrer Welt: Rahmen, Tönung und Akzent */
   .weltKarte, .levelKarte {
     display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px; width: 100%; padding: 10px;
     color: var(--text); text-align: left; cursor: pointer;
-    background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px;
+    background: linear-gradient(135deg, var(--weltTon, transparent), var(--surface-2) 70%);
+    border: 2px solid var(--welt, var(--line)); border-radius: 14px;
+    box-shadow: 0 0 18px var(--weltSchein, transparent);
     font: inherit;
   }
   .weltKarte:hover:not(:disabled), .levelKarte:hover:not(:disabled) { border-color: var(--accent); }
-  .weltKarte img, .levelKarte img { display: block; height: auto; border-radius: 10px; background: #000; box-shadow: 0 0 0 2px var(--welt, var(--line)); }
-  .weltKarte img { width: 112px; }
-  .levelKarte img { width: 84px; }
+  .bildRahmen { position: relative; display: block; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15); }
+  .bildRahmen img { display: block; height: auto; background: #000; }
+  .weltKarte .bildRahmen img { width: 112px; }
+  .levelKarte .bildRahmen img { width: 84px; }
+  /* Gesperrt: Vorschau bleibt farbig, nur leicht abgedunkelt, mit gut sichtbarem Schloss */
   .weltKarte.zu, .levelKarte.zu { cursor: default; }
-  .weltKarte.zu img, .levelKarte.zu img { filter: grayscale(0.85) brightness(0.55); }
-  .weltKarte.zu .weltInfo, .levelKarte.zu .weltInfo { opacity: 0.6; }
+  .schloss { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(rgba(10, 10, 16, 0.15), rgba(10, 10, 16, 0.55)); }
+  .schloss svg { width: 34px; height: 34px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7)); }
+  .gesperrt { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 3px 9px; color: #1d1505; background: var(--accent); border-radius: 999px; font: 8px/1.6 var(--retro); }
+  .weltNr { justify-self: start; color: var(--welt); font: 8px/1.4 var(--retro); }
   .weltInfo { display: grid; gap: 6px; min-width: 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
   .weltInfo strong { color: var(--text); font: 12px/1.4 var(--retro); }
   .weltMerkmal { justify-self: start; padding: 3px 9px; color: var(--text); background: var(--surface); border-radius: 999px; font-size: 13px; }
@@ -1260,121 +1267,7 @@ function zufall(saat) {
   };
 }
 
-// --------------------------- Gemeinsame Farbnamen ---------------------------
-// f.haupt: Punkte und Hauptlicht, f.zweit: zweites Licht, gold/gruen/pink: Ziele
-
-const THEMEN = {
-  // ------------------------------------------------------------------ KLASSIK
-  klassik: {
-    name: 'Klassik', rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
-    f: { haupt: '#38f3ff', zweit: '#a066ff', gold: '#ffd84a', gruen: '#4dff9a', pink: '#ff4fd8', text: '#eef2ff', bumper: '#b48cff' },
-    schiene: { glow: 'rgba(56,243,255,0.18)', dunkel: '#2b3150', hell: '#a9b6d8', kante: '#eaf2ff' },
-    gummi: ['rgba(255,79,216,0.25)', '#f2e8ff'],
-    schleuder: ['#2c3456', '#141830', '#d9e2ff', '#3d4666'],
-    blech: ['#20263e', '#0d1020', 'rgba(160,180,230,0.35)'],
-    rampen: [{ rgb: '56,243,255', voll: '#38f3ff' }, { rgb: '176,102,255', voll: '#b066ff' }], rampenStil: 'neon',
-    bumper: { stil: 'klassik', glow: '#7a4dff', ring: '#38f3ff', kappe: ['#e3d3ff', '#9a63ff', '#3b1a8a'] },
-    flipper: { stops: ['#f4f8ff', '#a9b5cf', '#4a5470', '#1d2236'], kante: '#38f3ff', glow: '56,243,255' },
-    ball: { stops: ['#ffffff', '#dfe7f5', '#7d889f', '#2a3042', '#151a26'], unten: '56,243,255', seite: '176,102,255', licht: '#4a7dff', spur: '80,200,255' },
-    teilchen: 'quadrat',
-    male(c) { malKlassikKunst(c); },
-    ambient() {},
-    klang: { welle: 'square', hoch: 1 }
-  },
-
-  // ------------------------------------------------------------------ WELTRAUM
-  weltraum: {
-    name: 'Weltraum', rand: '#3d7bff', grund: ['#02030c', '#040818', '#02020a'],
-    f: { haupt: '#7fd4ff', zweit: '#ffc35a', gold: '#ffe27a', gruen: '#6dffc4', pink: '#ff7ad9', text: '#eef4ff', bumper: '#9fd0ff' },
-    schiene: { glow: 'rgba(110,190,255,0.22)', dunkel: '#1d2740', hell: '#c4d4f0', kante: '#ffffff' },
-    gummi: ['rgba(255,195,90,0.3)', '#fff2d6'],
-    schleuder: ['#1e2a48', '#0b1124', '#e6eeff', '#33415f'],
-    blech: ['#18213a', '#080c18', 'rgba(170,200,255,0.35)'],
-    rampen: [{ rgb: '127,212,255', voll: '#7fd4ff' }, { rgb: '255,195,90', voll: '#ffc35a' }], rampenStil: 'neon',
-    bumper: { stil: 'planet', glow: '#4f8dff', ring: '#ffe0a0', farben: [['#ffb36b', '#c2552a', '#3a1206'], ['#8fd8ff', '#2a6cc2', '#0a1a3a'], ['#d9b3ff', '#7a3fc2', '#1e0a3a'], ['#9dffcf', '#2aa274', '#06301e']] },
-    flipper: { stops: ['#ffffff', '#c6d3ec', '#55688f', '#1a2238'], kante: '#7fd4ff', glow: '127,212,255' },
-    ball: { stops: ['#ffffff', '#e8f0ff', '#8a97b4', '#2a3350', '#121a2c'], unten: '127,212,255', seite: '255,195,90', licht: '#5d8cff', spur: '140,210,255' },
-    teilchen: 'stern',
-    male(c) { malWeltraum(c); },
-    ambient(c, zeit) { funkelSterne(c, zeit); },
-    klang: { welle: 'triangle', hoch: 1.15 }
-  },
-
-  // ------------------------------------------------------------------ CYBERPUNK
-  cyber: {
-    name: 'Cyberpunk', rand: '#ff2ea6', grund: ['#120420', '#0b0318', '#05020c'],
-    f: { haupt: '#ff3db4', zweit: '#2ef9ff', gold: '#fff13a', gruen: '#3dff8e', pink: '#ff3db4', text: '#fff0fb', bumper: '#ff6fd0' },
-    schiene: { glow: 'rgba(255,61,180,0.35)', dunkel: '#1a0b24', hell: '#ff8ad6', kante: '#ffe3f5' },
-    gummi: ['rgba(46,249,255,0.35)', '#d9feff'],
-    schleuder: ['#1d0b2c', '#0b0414', '#2ef9ff', '#3a1650'],
-    blech: ['#1c0a2a', '#08030f', 'rgba(255,61,180,0.45)'],
-    rampen: [{ rgb: '46,249,255', voll: '#2ef9ff' }, { rgb: '255,241,58', voll: '#fff13a' }], rampenStil: 'neon',
-    bumper: { stil: 'holo', glow: '#ff3db4', ring: '#2ef9ff', kappe: ['#ffd1f0', '#ff3db4', '#4a0a3a'] },
-    flipper: { stops: ['#5a5d70', '#24262f', '#101118', '#05050a'], kante: '#ff3db4', glow: '255,61,180' },
-    ball: { stops: ['#ffffff', '#f0e6ff', '#8f86a8', '#2c2440', '#120c1c'], unten: '255,61,180', seite: '46,249,255', licht: '#ff3db4', spur: '255,90,200' },
-    teilchen: 'quadrat',
-    male(c) { malCyber(c); },
-    ambient(c, zeit) { cyberRegen(c, zeit); },
-    klang: { welle: 'square', hoch: 1.3 }
-  },
-
-  // ------------------------------------------------------------------ DSCHUNGEL
-  dschungel: {
-    name: 'Dschungeltempel', rand: '#c9a23a', grund: ['#17241a', '#132014', '#0a120b'],
-    f: { haupt: '#ffd25a', zweit: '#5fe0ff', gold: '#ffd25a', gruen: '#7dff6a', pink: '#ff8a5c', text: '#fff6dc', bumper: '#ffd25a' },
-    schiene: { glow: 'rgba(255,210,90,0.18)', dunkel: '#3a2814', hell: '#9b7340', kante: '#ffd98a' },
-    gummi: ['rgba(125,255,106,0.25)', '#e8ffd6'],
-    schleuder: ['#5a4a32', '#2c2418', '#ffd98a', '#4a3b24'],
-    blech: ['#4a3d2a', '#1c160e', 'rgba(255,210,120,0.45)'],
-    rampen: [{ rgb: '95,224,255', voll: '#5fe0ff' }, { rgb: '255,210,90', voll: '#ffd25a' }], rampenStil: 'stein',
-    bumper: { stil: 'stein', glow: '#ffc14a', ring: '#ffd25a', kappe: ['#c9b48e', '#7d6a4c', '#3a2e1e'] },
-    flipper: { stops: ['#e2b778', '#a8743c', '#6a4520', '#2e1c0a'], kante: '#ffd25a', glow: '255,210,90' },
-    ball: { stops: ['#ffffff', '#fff3d6', '#b8a27a', '#4a3a24', '#1c140a'], unten: '125,255,106', seite: '255,210,90', licht: '#ffd25a', spur: '255,220,120' },
-    teilchen: 'blatt',
-    male(c) { malDschungel(c); },
-    ambient(c, zeit) { dschungelLeben(c, zeit); },
-    klang: { welle: 'sine', hoch: 0.9, holz: true }
-  },
-
-  // ------------------------------------------------------------------ UNTERWASSER
-  wasser: {
-    name: 'Unterwasser', rand: '#2ad6c8', grund: ['#06324a', '#04223a', '#03131f'],
-    f: { haupt: '#5ff6e8', zweit: '#ff8fc8', gold: '#ffe08a', gruen: '#7dffc6', pink: '#ff8fc8', text: '#e9fffd', bumper: '#9ffff3' },
-    schiene: { glow: 'rgba(95,246,232,0.2)', dunkel: '#3a2a1a', hell: '#c98a4a', kante: '#ffd2a0' },
-    gummi: ['rgba(255,143,200,0.3)', '#ffe6f2'],
-    schleuder: ['#1a4a5a', '#0a2430', '#ffd2a0', '#2a5a6a'],
-    blech: ['#c9a87a', '#7a5f3a', 'rgba(255,230,190,0.5)'],
-    rampen: [{ rgb: '170,250,255', voll: '#aafaff' }, { rgb: '255,170,220', voll: '#ffaadc' }], rampenStil: 'glas',
-    bumper: { stil: 'qualle', glow: '#5ff6e8', ring: '#ffffff', kappe: ['#e6ffff', '#7ff0ff', '#1a6a8a'] },
-    flipper: { stops: ['#ffffff', '#ffe0ec', '#e2a6c0', '#8a5a72'], kante: '#ff8fc8', glow: '255,143,200' },
-    ball: { stops: ['#ffffff', '#fff6fb', '#d8dbe8', '#8a8fb0', '#4a4f70'], unten: '95,246,232', seite: '255,143,200', licht: '#7ff0ff', spur: '180,255,250' },
-    teilchen: 'blase',
-    male(c) { malWasser(c); },
-    ambient(c, zeit) { wasserLeben(c, zeit); },
-    klang: { welle: 'sine', hoch: 1.05, blub: true }
-  },
-
-  // ------------------------------------------------------------------ VULKAN
-  vulkan: {
-    name: 'Vulkan', rand: '#ff5a1a', grund: ['#1c0e0a', '#140906', '#0a0403'],
-    f: { haupt: '#ff9a2a', zweit: '#ffd84a', gold: '#ffe066', gruen: '#b6ff4a', pink: '#ff4a3a', text: '#fff1e6', bumper: '#ff8a2a' },
-    schiene: { glow: 'rgba(255,110,30,0.3)', dunkel: '#1a1412', hell: '#5a4a44', kante: '#ff9a5a' },
-    gummi: ['rgba(255,90,26,0.35)', '#ffd9b8'],
-    schleuder: ['#2a1a16', '#120a08', '#ff9a2a', '#3a221a'],
-    blech: ['#2a1c18', '#0e0806', 'rgba(255,120,40,0.45)'],
-    rampen: [{ rgb: '255,140,40', voll: '#ff8c28' }, { rgb: '255,216,74', voll: '#ffd84a' }], rampenStil: 'lava',
-    bumper: { stil: 'magma', glow: '#ff6a1a', ring: '#ff9a2a', kappe: ['#ffe8a0', '#ff6a1a', '#3a0c04'] },
-    flipper: { stops: ['#6a5a56', '#3a2e2a', '#1e1614', '#0a0605'], kante: '#ff8a2a', glow: '255,120,40' },
-    ball: { stops: ['#ffffff', '#f2ece8', '#9a8f8a', '#3a302c', '#161010'], unten: '255,120,40', seite: '255,216,74', licht: '#ff7a2a', spur: '255,150,60' },
-    teilchen: 'glut',
-    male(c) { malVulkan(c); },
-    ambient(c, zeit) { vulkanGlut(c, zeit); },
-    klang: { welle: 'sawtooth', hoch: 0.75, grollen: true }
-  }
-};
-
-// Deko, Animationen und Eigenschaften den Themen zuordnen (werden weiter unten definiert)
-function themaExtras(id) { const th = THEMEN[id]; th.deko = (c, T) => DEKO[id](c, T); const alt = th.ambient; th.ambient = (c, z) => { alt(c, z); BELEBT_EXTRA[id](c, z); }; th.physik = WELT_PHYSIK[id]; }
+// Aussehen der Welten und Level: siehe 4c-design.js
 
 const WELTEN = [
   { id: 'weltraum', name: 'Weltraum', text: 'Station Orbita zwischen Ringplaneten und Energiebahnen.' },
@@ -1487,8 +1380,464 @@ function tischName(id) {
 }
 
 // =====================================================================
-//  HINTERGRÜNDE DER WELTEN (einmal vorgemalt, liegen unter allem)
+//  WELT-EIGENSCHAFTEN: Jede Welt spielt sich ein bisschen anders
 // =====================================================================
+const WELT_PHYSIK = {
+  klassik: { schwere: 1, zaeh: 0, bumperKick: 1, schleuderKick: 1 },
+  weltraum: { schwere: 0.9, zaeh: 0, bumperKick: 1, schleuderKick: 1, text: 'Weniger Schwerkraft: Die Kugel fliegt länger.' },
+  cyber: { schwere: 1, zaeh: 0, bumperKick: 1.18, schleuderKick: 1, text: 'Überladene Neon-Bumper schießen härter.' },
+  dschungel: { schwere: 1, zaeh: 0.05, bumperKick: 0.92, schleuderKick: 1.2, text: 'Schwere Steinbumper, kräftige Holzschleudern.' },
+  wasser: { schwere: 0.86, zaeh: 0.2, bumperKick: 1, schleuderKick: 1, text: 'Im Wasser schwebt die Kugel langsamer.' },
+  vulkan: { schwere: 1.06, zaeh: 0, bumperKick: 1.12, schleuderKick: 1.08, text: 'Steiler Hang und glühend heiße Bumper.' }
+};
+
+// =====================================================================
+//  DESIGN DER WELTEN UND LEVEL (zentrale Stelle für alles Aussehen)
+//
+//  WELT_DESIGN:  Grundpalette, Materialien und Grundmalerei je Welt.
+//  LEVEL_DESIGN: je Level ein eigenes Hauptmotiv, eigene Farbgewichtung und
+//                Lichtstimmung, die Welt bleibt erkennbar.
+//  themaFuer():  setzt beides zusammen. Spiel UND Vorschaubilder benutzen es,
+//                deshalb sehen beide immer gleich aus.
+//
+//  Reihenfolge beim Malen (siehe malUnten in 6-grafik.js):
+//  Grundfarbe -> Weltmalerei -> Levelmotiv -> Wände, Schleudern, Schilder.
+//  Kugel, Bumper, Ziele und Flipper liegen immer darüber.
+// =====================================================================
+
+const WENIG_BEWEGUNG = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- kleine Malhilfen ----------
+function flaecheVerlauf(c, y0, y1, stops) {
+  const v = c.createLinearGradient(0, y0, 0, y1);
+  stops.forEach((f, i) => v.addColorStop(i / (stops.length - 1), f));
+  c.fillStyle = v;
+  c.fillRect(0, y0, TB, y1 - y0);
+}
+function fleck(c, x, y, r, farbe, staerke) {
+  const v = c.createRadialGradient(x, y, 0, x, y, r);
+  v.addColorStop(0, farbe); v.addColorStop(1, farbe.length === 7 ? farbe + '00' : 'rgba(0,0,0,0)');
+  c.globalAlpha = staerke; c.fillStyle = v;
+  c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+  c.globalAlpha = 1;
+}
+function vieleck(c, x, y, r, ecken, zz, drehung = 0) {
+  c.beginPath();
+  for (let k = 0; k < ecken; k++) {
+    const w = drehung + k / ecken * Math.PI * 2, rr = r * (zz ? 0.75 + zz() * 0.3 : 1);
+    c[k ? 'lineTo' : 'moveTo'](x + Math.cos(w) * rr, y + Math.sin(w) * rr);
+  }
+  c.closePath();
+}
+function planetMalen(c, x, y, r, hell, mitte, dunkel, ring) {
+  const v = c.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
+  v.addColorStop(0, hell); v.addColorStop(0.55, mitte); v.addColorStop(1, dunkel);
+  c.fillStyle = v; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+  if (ring) { c.strokeStyle = ring; c.lineWidth = r * 0.12; c.beginPath(); c.ellipse(x, y, r * 1.7, r * 0.42, -0.35, 0, Math.PI * 2); c.stroke(); }
+}
+function sterne(c, saat, anzahl, farbe = '255,255,255') {
+  const z = zufall(saat);
+  for (let i = 0; i < anzahl; i++) {
+    const x = z() * TB, y = 60 + z() * TH, g = z();
+    c.fillStyle = `rgba(${farbe},${0.25 + g * 0.6})`;
+    const s = g > 0.93 ? 2.2 : 1.2;
+    c.fillRect(x, y, s, s);
+  }
+}
+function blatt(c, x, y, laenge, breite, winkel, farbe, ader) {
+  c.save(); c.translate(x, y); c.rotate(winkel);
+  c.fillStyle = farbe;
+  c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(laenge * 0.5, -breite, laenge, 0); c.quadraticCurveTo(laenge * 0.5, breite, 0, 0); c.fill();
+  if (ader) { c.strokeStyle = ader; c.lineWidth = 1.2; c.beginPath(); c.moveTo(0, 0); c.lineTo(laenge * 0.9, 0); c.stroke(); }
+  c.restore();
+}
+function bluete(c, x, y, r, farbe, mitte) {
+  c.fillStyle = farbe;
+  for (let k = 0; k < 5; k++) { const w = k / 5 * Math.PI * 2; c.beginPath(); c.ellipse(x + Math.cos(w) * r * 0.7, y + Math.sin(w) * r * 0.7, r * 0.6, r * 0.38, w, 0, Math.PI * 2); c.fill(); }
+  c.fillStyle = mitte; c.beginPath(); c.arc(x, y, r * 0.35, 0, Math.PI * 2); c.fill();
+}
+function koralle(c, x, y, groesse, farbe, saat) {
+  const z = zufall(saat);
+  c.strokeStyle = farbe; c.lineCap = 'round';
+  const ast = (x, y, w, l, tiefe) => {
+    if (tiefe === 0) { c.fillStyle = farbe; c.beginPath(); c.arc(x, y, 3.5, 0, Math.PI * 2); c.fill(); return; }
+    const x2 = x + Math.cos(w) * l, y2 = y + Math.sin(w) * l;
+    c.lineWidth = tiefe * 2.4; c.beginPath(); c.moveTo(x, y); c.lineTo(x2, y2); c.stroke();
+    ast(x2, y2, w - 0.42 - z() * 0.25, l * 0.74, tiefe - 1);
+    ast(x2, y2, w + 0.42 + z() * 0.25, l * 0.74, tiefe - 1);
+  };
+  ast(x, y, -Math.PI / 2 + (z() - 0.5) * 0.3, groesse, 4);
+}
+function qualleMalen(c, x, y, r, farbe, zeit = 0) {
+  const v = c.createRadialGradient(x, y - r * 0.3, 1, x, y, r);
+  v.addColorStop(0, 'rgba(255,255,255,0.75)'); v.addColorStop(0.5, farbe); v.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = v; c.beginPath(); c.arc(x, y, r, Math.PI, 0); c.quadraticCurveTo(x, y + r * 0.35, x - r, y); c.fill();
+  c.strokeStyle = farbe; c.lineWidth = 2; c.lineCap = 'round';
+  for (let k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(x + k * r * 0.3, y + 2); c.quadraticCurveTo(x + k * r * 0.3 + Math.sin(zeit * 2 + k) * 6, y + r * 0.9, x + k * r * 0.25, y + r * 1.7); c.stroke(); }
+}
+function zieht(zeit, periode, versatz = 0) { return ((zeit + versatz) % periode) / periode; }
+
+// Namensschild auf dem linken Abdeckblech, Symbol auf dem rechten
+function schild(c, text, farbe, grund, symbol) {
+  c.save();
+  c.fillStyle = grund;
+  rund(c, 64, 868, 80, 40, 6); c.fill();
+  c.strokeStyle = farbe; c.lineWidth = 1.5; c.stroke();
+  c.fillStyle = farbe; c.font = '7px ' + SCHRIFT; c.textAlign = 'center';
+  const zeilen = text.split('\n');
+  zeilen.forEach((z, i) => c.fillText(z, 104, 885 + i * 11 - (zeilen.length - 1) * 4, 72));
+  c.translate(spiegel(104), 888);
+  c.fillStyle = grund;
+  rund(c, -40, -20, 80, 40, 6); c.fill();
+  c.strokeStyle = farbe; c.stroke();
+  symbol(c);
+  c.restore();
+}
+// Muster in den Schleudern
+function schleuderMuster(c, T, f) {
+  for (const sl of T.schleudern) {
+    const mx = (sl.A[0] + sl.B[0] + sl.C[0]) / 3, my = (sl.A[1] + sl.B[1] + sl.C[1]) / 3;
+    c.save();
+    c.beginPath(); c.moveTo(...sl.A); c.lineTo(...sl.B); c.lineTo(...sl.C); c.closePath(); c.clip();
+    f(c, mx, my, sl.seite === 'links' ? 1 : -1);
+    c.restore();
+  }
+}
+
+// =====================================================================
+//  WELTEN
+// =====================================================================
+
+const WELT_DESIGN = {
+  // ------------------------------------------------------------ KLASSIK (unverändert)
+  klassik: {
+    name: 'Klassik', rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
+    f: { haupt: '#38f3ff', zweit: '#a066ff', gold: '#ffd84a', gruen: '#4dff9a', pink: '#ff4fd8', text: '#eef2ff', bumper: '#b48cff' },
+    schiene: { glow: 'rgba(56,243,255,0.18)', dunkel: '#2b3150', hell: '#a9b6d8', kante: '#eaf2ff' },
+    gummi: ['rgba(255,79,216,0.25)', '#f2e8ff'],
+    schleuder: ['#2c3456', '#141830', '#d9e2ff', '#3d4666'],
+    blech: ['#20263e', '#0d1020', 'rgba(160,180,230,0.35)'],
+    rampen: [{ rgb: '56,243,255', voll: '#38f3ff' }, { rgb: '176,102,255', voll: '#b066ff' }], rampenStil: 'neon',
+    bumper: { stil: 'klassik', glow: '#7a4dff', ring: '#38f3ff', kappe: ['#e3d3ff', '#9a63ff', '#3b1a8a'] },
+    flipper: { stops: ['#f4f8ff', '#a9b5cf', '#4a5470', '#1d2236'], kante: '#38f3ff', glow: '56,243,255' },
+    ball: { stops: ['#ffffff', '#dfe7f5', '#7d889f', '#2a3042', '#151a26'], unten: '56,243,255', seite: '176,102,255', licht: '#4a7dff', spur: '80,200,255' },
+    teilchen: 'quadrat', ziele: 'standard', treffer: 'ring',
+    male(c) { malKlassikKunst(c); },
+    ambient() {},
+    deko() {},
+    klang: { welle: 'square', hoch: 1 }
+  },
+
+  // ------------------------------------------------------------ WELTRAUM: Station Orbita
+  weltraum: {
+    name: 'Weltraum', rand: '#4fa8ff', grund: ['#1b2272', '#151253', '#0b0b33'],
+    f: { haupt: '#4fe3ff', zweit: '#ffc94a', gold: '#ffd86a', gruen: '#6dffc4', pink: '#ff7ad9', text: '#eef4ff', bumper: '#9fdcff' },
+    schiene: { glow: 'rgba(79,227,255,0.28)', dunkel: '#1d2a5a', hell: '#bfe9ff', kante: '#ffffff' },
+    gummi: ['rgba(255,201,74,0.35)', '#fff2d6'],
+    schleuder: ['#2a3a8a', '#141c52', '#bfe9ff', '#3a4a9a'],
+    blech: ['#26307a', '#121640', 'rgba(191,233,255,0.5)'],
+    rampen: [{ rgb: '79,227,255', voll: '#4fe3ff' }, { rgb: '255,201,74', voll: '#ffc94a' }], rampenStil: 'glas',
+    bumper: { stil: 'planet', glow: '#4f8dff', ring: '#ffe0a0', farben: [['#ffc58a', '#e0662a', '#4a1606'], ['#a8ecff', '#2a7ce0', '#0a1a4a'], ['#e6c2ff', '#8a4ae0', '#22105a'], ['#b6ffe0', '#22b884', '#06402a']] },
+    flipper: { stops: ['#ffffff', '#cfe6ff', '#5f7ab8', '#1c2652'], kante: '#4fe3ff', glow: '79,227,255', streifen: '#ffc94a' },
+    ball: { stops: ['#ffffff', '#f2f7ff', '#a8b4d0', '#3d4a70', '#141c34'], unten: '79,227,255', seite: '255,201,74', licht: '#8fd0ff', spur: '140,220,255' },
+    teilchen: 'stern', ziele: 'standard', treffer: 'ring',
+    male(c, T, th) {
+      // Nebelflächen in Violett, Blau und Türkis geben Farbtiefe
+      fleck(c, 110, 300, 230, th.nebel[0], 0.55);
+      fleck(c, 420, 560, 240, th.nebel[1], 0.5);
+      fleck(c, 240, 860, 220, th.nebel[2], 0.45);
+      sterne(c, 11, 240);
+      // orbitale Energiespuren
+      c.strokeStyle = 'rgba(79,227,255,0.22)'; c.lineWidth = 2;
+      for (const [rx, ry, w] of [[260, 90, -0.3], [200, 60, 0.4]]) { c.beginPath(); c.ellipse(MITTE, 560, rx, ry, w, 0, Math.PI * 2); c.stroke(); }
+      c.strokeStyle = 'rgba(255,201,74,0.25)';
+      c.beginPath(); c.ellipse(MITTE, 560, 230, 120, 0.1, 0, Math.PI * 2); c.stroke();
+    },
+    ambient(c, zeit) {
+      funkelSterne(c, zeit);
+      // ein Mond zieht oben vorbei, ein Satellit blinkt
+      const a = zieht(zeit, 46), x = -60 + a * 660, y = 150 - Math.sin(a * Math.PI) * 40;
+      c.globalAlpha = 0.55; planetMalen(c, x, y, 24, '#ffffff', '#b8c4e8', '#4a5480'); c.globalAlpha = 1;
+      const b = zieht(zeit, 23, 7), sx = 540 - b * 600, sy = 380 + b * 60;
+      c.fillStyle = 'rgba(220,235,255,0.7)'; c.fillRect(sx - 6, sy - 1, 12, 2); c.fillRect(sx - 1, sy - 3, 2, 6);
+      if (Math.sin(zeit * 8) > 0.6) { c.fillStyle = '#ffc94a'; c.fillRect(sx + 6, sy - 1, 2, 2); }
+    },
+    deko(c, T, th) {
+      schild(c, 'STATION\nORBITA', th.f.haupt, '#141c52', g => {
+        planetMalen(g, 0, 0, 10, '#ffd8a0', '#e07a2a', '#5a1a06', '#ffe0a0');
+      });
+      schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = 'rgba(191,233,255,0.45)'; g.lineWidth = 1; for (let k = -40; k < 60; k += 9) { g.beginPath(); g.moveTo(x - 40, y + k); g.lineTo(x + 40, y + k); g.stroke(); } g.fillStyle = th.f.zweit; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); });
+    },
+    klang: { welle: 'triangle', hoch: 1.15 }
+  },
+
+  // ------------------------------------------------------------ CYBERPUNK: Neon City
+  cyber: {
+    name: 'Cyberpunk', rand: '#ff2bd6', grund: ['#2c0b4a', '#200838', '#0c1446'],
+    f: { haupt: '#00e5ff', zweit: '#ff2bd6', gold: '#ffe84a', gruen: '#3dff9a', pink: '#ff2bd6', text: '#fff0fb', bumper: '#ff6fe0' },
+    schiene: { glow: 'rgba(255,43,214,0.38)', dunkel: '#1e0a30', hell: '#ff7ae6', kante: '#ffe3f8' },
+    gummi: ['rgba(0,229,255,0.4)', '#d9fdff'],
+    schleuder: ['#2a0c46', '#120624', '#00e5ff', '#4a1a70'],
+    blech: ['#2a0c46', '#0c0620', 'rgba(255,43,214,0.6)'],
+    rampen: [{ rgb: '0,229,255', voll: '#00e5ff' }, { rgb: '255,43,214', voll: '#ff2bd6' }], rampenStil: 'neon',
+    bumper: { stil: 'holo', glow: '#ff2bd6', ring: '#00e5ff', kappe: ['#ffd1f6', '#ff2bd6', '#4a0a3a'] },
+    flipper: { stops: ['#6a6e8a', '#2a2c3c', '#14151f', '#06060c'], kante: '#ff2bd6', glow: '255,43,214', streifen: '#00e5ff' },
+    ball: { stops: ['#ffffff', '#f6f0ff', '#a69ec4', '#3a3058', '#141024'], unten: '255,43,214', seite: '0,229,255', licht: '#ff7ae6', spur: '255,120,230' },
+    teilchen: 'quadrat', ziele: 'standard', treffer: 'blitz',
+    male(c, T, th) {
+      // Horizont-Glühen und perspektivischer Rasterboden
+      fleck(c, MITTE, 470, 320, th.licht || '#ff2bd6', 0.42);
+      fleck(c, 80, 760, 200, '#8b5cff', 0.35);
+      fleck(c, 460, 760, 200, '#00e5ff', 0.25);
+      c.strokeStyle = 'rgba(255,43,214,0.45)'; c.lineWidth = 1.4;
+      for (let i = 0; i < 13; i++) { const y = 480 + Math.pow(i / 12, 1.7) * 480; c.beginPath(); c.moveTo(0, y); c.lineTo(TB, y); c.stroke(); }
+      c.strokeStyle = 'rgba(0,229,255,0.35)';
+      for (let i = -9; i <= 9; i++) { c.beginPath(); c.moveTo(MITTE + i * 16, 480); c.lineTo(MITTE + i * 120, TH + 20); c.stroke(); }
+      // Stadtsilhouette mit leuchtenden Fenstern vor dem Horizont
+      const z = zufall(22);
+      let x = 6;
+      while (x < TB) {
+        const b = 24 + z() * 40, h = 90 + z() * 200;
+        c.fillStyle = '#12062a';
+        c.fillRect(x, 480 - h, b, h);
+        c.fillStyle = 'rgba(255,43,214,0.5)'; c.fillRect(x, 480 - h, b, 2);
+        for (let fy = 480 - h + 8; fy < 474; fy += 10) for (let fx = x + 4; fx < x + b - 4; fx += 8) {
+          if (z() < 0.32) { c.fillStyle = ['rgba(255,43,214,0.7)', 'rgba(0,229,255,0.65)', 'rgba(255,232,74,0.55)', 'rgba(139,92,255,0.7)'][Math.floor(z() * 4)]; c.fillRect(fx, fy, 4, 5); }
+        }
+        x += b + 3 + z() * 8;
+      }
+      // Leiterbahnen an den Seiten
+      c.strokeStyle = 'rgba(0,229,255,0.45)'; c.lineWidth = 2;
+      for (const s of [1, -1]) {
+        const X = v => s === 1 ? v : TB - v;
+        for (const p of [[[30, 520], [60, 550], [60, 640]], [[30, 680], [50, 700], [50, 760]]]) {
+          c.beginPath(); p.forEach(([px, py], i) => c[i ? 'lineTo' : 'moveTo'](X(px), py)); c.stroke();
+          const [ex, ey] = p[p.length - 1]; c.fillStyle = '#00e5ff'; c.beginPath(); c.arc(X(ex), ey, 3, 0, Math.PI * 2); c.fill();
+        }
+      }
+    },
+    ambient(c, zeit) {
+      // fliegende Autos und feiner Regen
+      for (const [y, p, v, f] of [[250, 9, 0, '#ffe84a'], [330, 13, 3, '#00e5ff'], [205, 17, 8, '#ff2bd6']]) {
+        const a = zieht(zeit, p, v), x = v % 2 ? 560 - a * 600 : -20 + a * 600;
+        c.fillStyle = f; c.globalAlpha = 0.8; c.fillRect(x, y, 5, 2); c.fillRect(x + 8, y, 5, 2);
+        c.globalAlpha = 0.18; c.fillRect(x - (v % 2 ? -14 : 30), y, 30, 2); c.globalAlpha = 1;
+      }
+      c.strokeStyle = 'rgba(200,220,255,0.12)'; c.lineWidth = 1; c.beginPath();
+      for (let i = 0; i < 34; i++) { const x = (i * 53.7) % TB, y = 80 + ((zeit * 520 + i * 97) % 860); c.moveTo(x, y); c.lineTo(x - 3, y + 14); }
+      c.stroke();
+    },
+    deko(c, T, th) {
+      schild(c, 'NEON\nCITY', th.f.zweit, '#1e0838', g => {
+        g.strokeStyle = '#00e5ff'; g.lineWidth = 2;
+        for (const [x, h] of [[-14, 18], [-4, 26], [6, 14], [14, 22]]) g.strokeRect(x - 4, 12 - h, 8, h);
+      });
+      schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = '#ff2bd6'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x - 6 * s, y - 22); g.lineTo(x + 8 * s, y + 4); g.lineTo(x - 8 * s, y + 8); g.lineTo(x + 4 * s, y + 26); g.stroke(); });
+    },
+    klang: { welle: 'square', hoch: 1.3 }
+  },
+
+  // ------------------------------------------------------------ DSCHUNGELTEMPEL
+  dschungel: {
+    name: 'Dschungeltempel', rand: '#19c878', grund: ['#0f5a42', '#0c4a4c', '#07303a'],
+    f: { haupt: '#19c878', zweit: '#20d9c2', gold: '#ffc857', gruen: '#7dff6a', pink: '#ff6f91', text: '#f4fff2', bumper: '#ffc857' },
+    schiene: { glow: 'rgba(255,200,87,0.28)', dunkel: '#2c4a3c', hell: '#b8a46a', kante: '#ffe2a0' },
+    gummi: ['rgba(25,200,120,0.35)', '#e8ffe0'],
+    schleuder: ['#3d6a5a', '#1e3a34', '#ffc857', '#2a4a40'],
+    blech: ['#3a6a5a', '#173430', 'rgba(255,200,87,0.6)'],
+    rampen: [{ rgb: '32,217,194', voll: '#20d9c2' }, { rgb: '255,200,87', voll: '#ffc857' }], rampenStil: 'stein',
+    steinRampe: { grund: 'rgba(70,96,84,0.92)', rand: '#ffc857', streben: 'rgba(20,40,34,0.6)' },
+    bumper: { stil: 'maske', glow: '#20d9c2', ring: '#ffc857', kappe: ['#9ab8a8', '#5a7a6c', '#2a3e36'], auge: '#20d9c2' },
+    flipper: { stops: ['#ffd9a0', '#c88a46', '#7a4c22', '#3a220e'], kante: '#ffc857', glow: '255,200,87', streifen: '#20d9c2' },
+    ball: { stops: ['#ffffff', '#fffaf0', '#c8c4b4', '#4a4a40', '#181a14'], unten: '32,217,194', seite: '255,200,87', licht: '#fff2b0', spur: '255,230,150' },
+    teilchen: 'blatt', ziele: 'rune', treffer: 'rune',
+    male(c, T, th) {
+      // große, ruhige Steinplatten in Grün-Petrol mit hellen Kanten
+      const z = zufall(33);
+      for (let y = 70; y < TH + 20; y += 64) {
+        let x = -z() * 50;
+        while (x < TB) {
+          const b = 70 + z() * 50;
+          c.fillStyle = z() < 0.5 ? th.platte[0] : th.platte[1];
+          rund(c, x + 3, y + 3, b - 6, 58, 6); c.fill();
+          c.strokeStyle = 'rgba(200,255,220,0.12)'; c.lineWidth = 2; c.stroke();
+          x += b;
+        }
+      }
+      fleck(c, MITTE, 520, 300, th.licht || '#19c878', 0.32);
+      // Ranken und große Blätter entlang des Rands
+      c.strokeStyle = '#0d6a3a'; c.lineWidth = 5; c.lineCap = 'round';
+      for (const [x0, y0, x1, y1, x2, y2] of [[22, 330, 74, 440, 30, 560], [518, 340, 456, 450, 500, 570], [36, 150, 110, 170, 150, 110], [504, 150, 430, 170, 390, 110]]) {
+        c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(x1, y1, x2, y2); c.stroke();
+        for (let t = 0.1; t < 1; t += 0.16) {
+          const x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * x1 + t * t * x2, y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * y1 + t * t * y2;
+          blatt(c, x, y, 22, 8, t * 6 + (x0 < 270 ? 0 : Math.PI), t * 10 % 2 < 1 ? '#19c878' : '#12a060', 'rgba(0,60,30,0.5)');
+        }
+      }
+      for (const [x, y, f] of [[48, 560, '#ff6f91'], [492, 560, '#ff8a5c'], [140, 120, '#ff6f91'], [400, 118, '#ffb0d0']]) bluete(c, x, y, 9, f, '#ffc857');
+    },
+    ambient(c, zeit) {
+      // fallende Blätter und Glühwürmchen
+      for (let i = 0; i < 4; i++) {
+        const a = zieht(zeit, 14 + i * 3, i * 5);
+        blatt(c, 80 + i * 110 + Math.sin(a * 12 + i) * 20, 90 + a * 820, 14, 5, Math.sin(a * 9 + i) * 1.4, 'rgba(60,220,120,0.55)');
+      }
+      c.globalCompositeOperation = 'lighter';
+      for (const [x, y, p] of GLUEHWUERMCHEN) leuchte(c, x + Math.sin(zeit * 0.7 + p) * 14, y + Math.cos(zeit * 0.5 + p) * 10, 10, '#ffe066', 0.3 + 0.3 * Math.sin(zeit * 2 + p));
+      c.globalCompositeOperation = 'source-over';
+    },
+    deko(c, T, th) {
+      schild(c, 'TEMPEL\nDER AHNEN', th.f.gold, '#173430', g => {
+        g.fillStyle = '#ffc857'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#20d9c2'; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 2); g.fill();
+      });
+      schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = '#ffc857'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 8, y - 14); g.lineTo(x, y - 22); g.lineTo(x + 8, y - 14); g.moveTo(x - 8, y); g.lineTo(x, y - 8); g.lineTo(x + 8, y); g.stroke(); });
+    },
+    klang: { welle: 'sine', hoch: 0.9, holz: true }
+  },
+
+  // ------------------------------------------------------------ UNTERWASSER: Atlantis
+  wasser: {
+    name: 'Unterwasser', rand: '#20e0d0', grund: ['#2ab4e0', '#167cd0', '#0c55a8'],
+    f: { haupt: '#20e0d0', zweit: '#ff718d', gold: '#ffe08a', gruen: '#7dffc6', pink: '#c27bff', text: '#f0ffff', bumper: '#c8fbff' },
+    schiene: { glow: 'rgba(255,255,255,0.25)', dunkel: '#3a5a8a', hell: '#e8f4ff', kante: '#ffffff' },
+    gummi: ['rgba(255,113,141,0.4)', '#ffe8ee'],
+    schleuder: ['#2a8ad0', '#145aa0', '#fff4e8', '#3a9ae0'],
+    blech: ['#e8c890', '#b88a50', 'rgba(255,250,230,0.7)'],
+    rampen: [{ rgb: '32,224,208', voll: '#20e0d0' }, { rgb: '255,113,141', voll: '#ff718d' }], rampenStil: 'glas',
+    bumper: { stil: 'muschel', glow: '#20e0d0', ring: '#ffffff', kappe: ['#fff6fb', '#ffd0e0', '#d88aa8'] },
+    flipper: { stops: ['#ffffff', '#fbeef6', '#d8c4e0', '#8a7aa8'], kante: '#20e0d0', glow: '32,224,208', streifen: '#20e0d0' },
+    ball: { stops: ['#ffffff', '#fffaff', '#d6d8e6', '#6a6e90', '#24284a'], unten: '255,113,141', seite: '32,224,208', licht: '#ffffff', spur: '220,255,255' },
+    teilchen: 'blase', ziele: 'standard', treffer: 'blasen',
+    male(c, T, th) {
+      // Lichtstrahlen und Lichtmuster auf dem Grund
+      c.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 6; i++) {
+        const x = 30 + i * 92;
+        const v = c.createLinearGradient(0, 80, 0, 720);
+        v.addColorStop(0, 'rgba(255,255,255,0.16)'); v.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = v; c.beginPath(); c.moveTo(x, 80); c.lineTo(x + 36, 80); c.lineTo(x + 140, 720); c.lineTo(x + 70, 720); c.closePath(); c.fill();
+      }
+      c.strokeStyle = 'rgba(255,255,255,0.09)'; c.lineWidth = 2;
+      const z = zufall(44);
+      for (let i = 0; i < 70; i++) { const x = z() * TB, y = 300 + z() * 600; c.beginPath(); c.ellipse(x, y, 16 + z() * 14, 6 + z() * 5, z() * 3, 0, Math.PI * 2); c.stroke(); }
+      c.globalCompositeOperation = 'source-over';
+      // warmer Sand unten
+      flaecheVerlauf(c, 760, TH + 20, ['rgba(255,214,150,0)', 'rgba(255,214,150,0.45)']);
+      // Korallen und Wasserpflanzen am Rand
+      koralle(c, 36, 650, 30, '#ff718d', 1);
+      koralle(c, 480, 655, 30, '#ffb34a', 2);
+      koralle(c, 30, 960, 26, '#c27bff', 3);
+      koralle(c, 500, 962, 28, '#ff718d', 4);
+      c.strokeStyle = '#1fbf8a'; c.lineWidth = 4; c.lineCap = 'round';
+      for (const [x, y] of [[60, 960], [80, 955], [440, 958], [462, 962]]) { c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + 16, y - 50, x - 4, y - 90); c.stroke(); }
+    },
+    ambient(c, zeit) {
+      // Luftblasen und ein Fischschwarm
+      c.strokeStyle = 'rgba(255,255,255,0.55)'; c.lineWidth = 1.2;
+      for (const [x, y0, r, v] of BLASEN) { const y = TH - ((y0 + zeit * v) % 880); c.beginPath(); c.arc(x + Math.sin(zeit * 1.5 + y0) * 4, y, r, 0, Math.PI * 2); c.stroke(); }
+      const a = zieht(zeit, 24), rechts = Math.floor(zeit / 24) % 2 === 0;
+      const bx = rechts ? -80 + a * 700 : 620 - a * 700, by = 640 + Math.sin(a * 6) * 30, r = rechts ? 1 : -1;
+      c.fillStyle = 'rgba(255,224,120,0.7)';
+      for (let k = 0; k < 7; k++) {
+        const x = bx + (k % 3) * 14 * -r - k * 4, y = by + (k % 4) * 9 - 12;
+        c.beginPath(); c.ellipse(x, y, 6, 3, 0, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.moveTo(x - 5 * r, y); c.lineTo(x - 10 * r, y - 3); c.lineTo(x - 10 * r, y + 3); c.closePath(); c.fill();
+      }
+    },
+    deko(c, T, th) {
+      schild(c, 'ATLANTIS', '#0a6aa8', '#fff4e0', g => {
+        g.fillStyle = '#ff718d';
+        g.beginPath(); g.moveTo(0, 12); for (let k = 0; k <= 6; k++) { const w = Math.PI + k / 6 * Math.PI; g.lineTo(Math.cos(w) * 16, Math.sin(w) * 14 + 6); } g.closePath(); g.fill();
+        g.fillStyle = '#ffffff'; g.beginPath(); g.arc(0, 4, 4, 0, Math.PI * 2); g.fill();
+      });
+      schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = 'rgba(255,255,255,0.6)'; g.lineWidth = 1.5; for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + 20 * s, y + 30, 14 + k * 8, Math.PI, Math.PI * 1.5); g.stroke(); } });
+    },
+    klang: { welle: 'sine', hoch: 1.05, blub: true }
+  },
+
+  // ------------------------------------------------------------ VULKAN: Glutkern
+  vulkan: {
+    name: 'Vulkan', rand: '#ff6a00', grund: ['#5a1630', '#3e1222', '#26181e'],
+    f: { haupt: '#ff6a00', zweit: '#ffd447', gold: '#ffd447', gruen: '#b6ff4a', pink: '#ff3040', text: '#fff1e6', bumper: '#ff8a2a' },
+    schiene: { glow: 'rgba(255,106,0,0.4)', dunkel: '#2a2026', hell: '#6a5a60', kante: '#ffb070' },
+    gummi: ['rgba(255,48,64,0.4)', '#ffd9c8'],
+    schleuder: ['#3a2a30', '#1a1216', '#ff6a00', '#4a2a2a'],
+    blech: ['#3a2a30', '#140c10', 'rgba(255,106,0,0.7)'],
+    rampen: [{ rgb: '255,106,0', voll: '#ff6a00' }, { rgb: '255,212,71', voll: '#ffd447' }], rampenStil: 'lava',
+    bumper: { stil: 'magma', glow: '#ff6a00', ring: '#ff9a2a', kappe: ['#fff2b0', '#ff6a00', '#3a0c04'] },
+    flipper: { stops: ['#9a8e94', '#55494e', '#2a2226', '#100a0c'], kante: '#ff6a00', glow: '255,106,0', streifen: '#ffd447' },
+    ball: { stops: ['#ffffff', '#fff6ee', '#bcb0aa', '#4a3c3a', '#181012'], unten: '255,106,0', seite: '255,212,71', licht: '#ffe0b0', spur: '255,170,80' },
+    teilchen: 'glut', ziele: 'standard', treffer: 'funken',
+    male(c, T, th) {
+      // große Basaltplatten mit glühenden Fugen dazwischen
+      fleck(c, MITTE, 470, 330, '#ff3040', 0.32);
+      fleck(c, 90, 920, 160, '#ff6a00', 0.55);
+      fleck(c, 450, 920, 160, '#ff6a00', 0.55);
+      fleck(c, 440, 220, 180, '#6a2a8a', 0.35);
+      const z = zufall(55);
+      vulkanRisse.length = 0;
+      for (let y = 90, reihe = 0; y < TH + 40; y += 84, reihe++) {
+        for (let x = (reihe % 2) * 49 - 49; x < TB + 50; x += 98) {
+          // Fuge (glühend), dann die große dunkle Basaltplatte darauf
+          c.fillStyle = th.fuge;
+          vieleck(c, x, y, 55, 6, null, Math.PI / 6); c.fill();
+          const v = c.createLinearGradient(x, y - 48, x, y + 48);
+          v.addColorStop(0, th.platte[1]); v.addColorStop(0.6, th.platte[0]); v.addColorStop(1, '#6a2416');
+          c.fillStyle = v;
+          vieleck(c, x, y, 50, 6, null, Math.PI / 6); c.fill();
+          if (z() < 0.3 && y < 800) vulkanRisse.push([[x - 26, y - 8], [x - 6, y + 4], [x + 8, y - 12], [x + 28, y + 6]]);
+        }
+      }
+      c.lineCap = 'round';
+      for (const p of vulkanRisse) { pfad(c, p); c.strokeStyle = 'rgba(255,212,71,0.75)'; c.lineWidth = 2.5; c.stroke(); }
+      // warme Lichtreflexe der Lava auf dem Gestein
+      c.globalCompositeOperation = 'lighter';
+      fleck(c, MITTE, 760, 300, '#ff3a00', 0.32);
+      fleck(c, 120, 420, 170, '#ff6a00', 0.18);
+      fleck(c, 420, 420, 170, '#ff3040', 0.18);
+      c.globalCompositeOperation = 'source-over';
+      // warmes Licht von unten
+      flaecheVerlauf(c, 700, TH + 20, ['rgba(255,80,0,0)', 'rgba(255,80,0,0.35)']);
+    },
+    ambient(c, zeit) {
+      // Risse glühen auf, Glut steigt
+      c.globalCompositeOperation = 'lighter';
+      vulkanRisse.forEach((p, i) => {
+        const a = 0.15 + 0.15 * Math.sin(zeit * 1.6 + i * 1.3);
+        pfad(c, p); c.strokeStyle = `rgba(255,140,40,${a})`; c.lineWidth = 6; c.stroke();
+      });
+      for (let i = 0; i < 18; i++) {
+        const x = (i * 71.3) % 480 + 30 + Math.sin(zeit + i) * 8, y = TH - ((zeit * (40 + (i % 5) * 12) + i * 61) % 860);
+        c.fillStyle = `rgba(255,${130 + (i % 3) * 40},40,0.7)`; c.fillRect(x, y, 2, 2);
+      }
+      c.globalCompositeOperation = 'source-over';
+    },
+    deko(c, T, th) {
+      schild(c, 'GLUT-\nKERN', th.f.gold, '#26121a', g => {
+        g.fillStyle = '#ff6a00';
+        g.beginPath(); g.moveTo(0, -16); g.quadraticCurveTo(12, 0, 6, 12); g.lineTo(-6, 12); g.quadraticCurveTo(-12, 0, 0, -16); g.fill();
+        g.fillStyle = '#ffd447'; g.beginPath(); g.moveTo(0, -4); g.quadraticCurveTo(6, 4, 3, 12); g.lineTo(-3, 12); g.quadraticCurveTo(-6, 4, 0, -4); g.fill();
+      });
+      schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = '#ff6a00'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x - 14, y - 20); g.lineTo(x - 2, y - 4); g.lineTo(x - 8, y + 6); g.lineTo(x + 6, y + 20); g.stroke(); });
+    },
+    klang: { welle: 'sawtooth', hoch: 0.75, grollen: true }
+  }
+};
+const vulkanRisse = [];
+const STERNE_FUNKEL = Array.from({ length: 26 }, (_, i) => { const z = zufall(100 + i); return [z() * TB, 80 + z() * 820, z() * 6]; });
+function funkelSterne(c, zeit) {
+  c.globalCompositeOperation = 'lighter';
+  for (const [x, y, p] of STERNE_FUNKEL) {
+    const a = Math.max(0, Math.sin(zeit * 1.7 + p * 3)) * 0.8;
+    if (a < 0.05) continue;
+    c.fillStyle = `rgba(220,240,255,${a})`;
+    c.fillRect(x - 3, y - 0.5, 6, 1); c.fillRect(x - 0.5, y - 3, 1, 6);
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+const GLUEHWUERMCHEN = Array.from({ length: 10 }, (_, i) => { const z = zufall(200 + i); return [80 + z() * 380, 140 + z() * 600, z() * 6]; });
+const BLASEN = Array.from({ length: 14 }, (_, i) => { const z = zufall(300 + i); return [30 + z() * 470, z() * 900, 2 + z() * 4, 30 + z() * 40]; });
 
 function malKlassikKunst(c) {
   c.strokeStyle = 'rgba(80, 120, 255, 0.07)';
@@ -1518,504 +1867,311 @@ function malKlassikKunst(c) {
   c.fillText('ORBIT', MITTE, 640);
 }
 
-function malWeltraum(c) {
-  const z = zufall(11);
-  // Nebel
-  c.globalCompositeOperation = 'lighter';
-  leuchte(c, 150, 300, 260, '#2a1a7a', 0.5);
-  leuchte(c, 400, 620, 240, '#0a4a6a', 0.45);
-  leuchte(c, 260, 860, 200, '#4a1a5a', 0.35);
-  c.globalCompositeOperation = 'source-over';
-  // Sterne
-  for (let i = 0; i < 260; i++) {
-    const x = z() * TB, y = 60 + z() * TH, g = z();
-    c.fillStyle = `rgba(255,255,255,${0.15 + g * 0.55})`;
-    c.fillRect(x, y, g > 0.92 ? 2 : 1.2, g > 0.92 ? 2 : 1.2);
-  }
-  // großer Ringplanet unten links
-  c.save();
-  c.globalAlpha = 0.55;
-  let v = c.createRadialGradient(70, 700, 10, 110, 740, 120);
-  v.addColorStop(0, '#3a5a9a'); v.addColorStop(0.7, '#14244a'); v.addColorStop(1, '#060a18');
-  c.fillStyle = v; c.beginPath(); c.arc(110, 740, 110, 0, Math.PI * 2); c.fill();
-  c.strokeStyle = 'rgba(255,210,150,0.45)'; c.lineWidth = 6;
-  c.beginPath(); c.ellipse(110, 740, 175, 34, -0.35, 0, Math.PI * 2); c.stroke();
-  // kleiner, blasser Planet ganz am Rand (darf nicht wie ein Bumper aussehen)
-  c.globalAlpha = 0.22;
-  v = c.createRadialGradient(470, 860, 4, 476, 866, 30);
-  v.addColorStop(0, '#ff9a6a'); v.addColorStop(1, '#4a1408');
-  c.fillStyle = v; c.beginPath(); c.arc(476, 866, 26, 0, Math.PI * 2); c.fill();
-  c.restore();
-  // Energiebahnen
-  c.globalCompositeOperation = 'lighter';
-  c.strokeStyle = 'rgba(127,212,255,0.12)'; c.lineWidth = 3;
-  for (const p of [[[60, 860], [160, 650], [252, 560]], [[444, 860], [344, 650], [252, 560]]]) { pfad(c, p); c.stroke(); }
-  c.globalCompositeOperation = 'source-over';
-}
-
-function malCyber(c) {
-  const z = zufall(22);
-  // Hochhäuser als Silhouetten mit Fenstern, nach oben hin dunkler
-  for (let reihe = 0; reihe < 2; reihe++) {
-    let x = 10;
-    while (x < TB) {
-      const b = 26 + z() * 46, h = 120 + z() * 220 - reihe * 60;
-      const unten = reihe === 0 ? 470 : 380;
-      c.fillStyle = reihe === 0 ? '#14081f' : '#0d0517';
-      c.fillRect(x, unten - h, b, h);
-      for (let fy = unten - h + 8; fy < unten - 6; fy += 10) for (let fx = x + 4; fx < x + b - 4; fx += 8) {
-        if (z() < 0.3) { c.fillStyle = ['rgba(255,61,180,0.35)', 'rgba(46,249,255,0.3)', 'rgba(255,241,58,0.25)'][Math.floor(z() * 3)]; c.fillRect(fx, fy, 4, 5); }
-      }
-      x += b + 4 + z() * 10;
-    }
-  }
-  // Synthwave-Boden
-  c.strokeStyle = 'rgba(255,61,180,0.18)'; c.lineWidth = 1.2;
-  for (let i = 0; i < 12; i++) { const y = 480 + Math.pow(i / 11, 1.6) * 480; c.beginPath(); c.moveTo(0, y); c.lineTo(TB, y); c.stroke(); }
-  for (let i = -8; i <= 8; i++) { c.beginPath(); c.moveTo(MITTE + i * 18, 480); c.lineTo(MITTE + i * 110, TH + 20); c.stroke(); }
-  // Holo-Werbetafeln
-  c.save();
-  c.font = '14px ' + SCHRIFT; c.textAlign = 'center';
-  for (const [x, y, w, txt, f] of [[110, 300, -0.12, 'NEON', '#2ef9ff'], [395, 330, 0.1, '24/7', '#fff13a'], [252, 720, 0, 'ORBIT CITY', '#ff3db4']]) {
-    c.save(); c.translate(x, y); c.rotate(w);
-    c.globalAlpha = 0.22; c.fillStyle = f;
-    c.fillText(txt, 0, 0);
-    c.globalAlpha = 0.12; c.strokeStyle = f; c.lineWidth = 1;
-    c.strokeRect(-c.measureText(txt).width / 2 - 8, -20, c.measureText(txt).width + 16, 28);
-    c.restore();
-  }
-  c.restore();
-  c.globalCompositeOperation = 'lighter';
-  leuchte(c, MITTE, 470, 280, '#5a0a4a', 0.5);
-  c.globalCompositeOperation = 'source-over';
-}
-
-function malDschungel(c) {
-  const z = zufall(33);
-  // Steinplatten
-  for (let y = 60; y < TH + 20; y += 34) {
-    let x = -z() * 40;
-    while (x < TB) {
-      const b = 40 + z() * 40;
-      const h = 30 + z() * 8;
-      const g = 28 + Math.floor(z() * 18);
-      c.fillStyle = `rgb(${g + 6},${g + 14},${g})`;
-      rund(c, x + 1.5, y + 1.5, b - 3, h - 3, 4); c.fill();
-      if (z() < 0.35) { c.fillStyle = 'rgba(80,140,50,0.35)'; c.beginPath(); c.ellipse(x + z() * b, y + z() * h, 10 + z() * 14, 6 + z() * 6, 0, 0, Math.PI * 2); c.fill(); }
-      x += b;
-    }
-  }
-  // Wasserfall oben links und Becken
-  const wv = c.createLinearGradient(0, 100, 0, 400);
-  wv.addColorStop(0, 'rgba(120,220,255,0.45)'); wv.addColorStop(1, 'rgba(60,160,220,0.15)');
-  c.fillStyle = wv; c.fillRect(126, 100, 40, 300);
-  c.fillStyle = 'rgba(70,170,220,0.35)'; c.beginPath(); c.ellipse(146, 410, 50, 18, 0, 0, Math.PI * 2); c.fill();
-  // Glyphen-Ring in der Mitte (antike Mechanik)
-  c.save(); c.translate(MITTE, 560);
-  c.strokeStyle = 'rgba(255,210,90,0.28)'; c.lineWidth = 3;
-  c.beginPath(); c.arc(0, 0, 70, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.arc(0, 0, 48, 0, Math.PI * 2); c.stroke();
-  for (let i = 0; i < 16; i++) { c.rotate(Math.PI / 8); c.fillStyle = 'rgba(255,210,90,0.3)'; c.fillRect(52, -4, 14, 8); }
-  c.fillStyle = 'rgba(255,210,90,0.22)'; c.beginPath(); c.moveTo(0, -24); c.lineTo(20, 12); c.lineTo(-20, 12); c.closePath(); c.fill();
-  c.restore();
-  // Ranken an den Rändern
-  c.strokeStyle = 'rgba(60,120,40,0.75)'; c.lineWidth = 4; c.lineCap = 'round';
-  for (const [x0, y0, x1, y1, x2, y2] of [[20, 340, 70, 420, 30, 520], [520, 360, 460, 450, 500, 560], [40, 140, 120, 160, 160, 110], [500, 150, 420, 170, 380, 110]]) {
-    c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(x1, y1, x2, y2); c.stroke();
-    for (let t = 0.1; t < 1; t += 0.18) {
-      const x = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * x1 + t * t * x2, y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * y1 + t * t * y2;
-      c.fillStyle = 'rgba(90,170,60,0.75)'; c.beginPath(); c.ellipse(x + 6, y, 8, 4, t * 5, 0, Math.PI * 2); c.fill();
-    }
-  }
-}
-
-function malWasser(c) {
-  const z = zufall(44);
-  // Lichtstrahlen von oben
-  c.globalCompositeOperation = 'lighter';
-  for (let i = 0; i < 6; i++) {
-    const x = 40 + i * 90 + z() * 30;
-    const v = c.createLinearGradient(0, 80, 0, 700);
-    v.addColorStop(0, 'rgba(160,255,250,0.10)'); v.addColorStop(1, 'rgba(160,255,250,0)');
-    c.fillStyle = v;
-    c.beginPath(); c.moveTo(x, 80); c.lineTo(x + 40, 80); c.lineTo(x + 140, 700); c.lineTo(x + 60, 700); c.closePath(); c.fill();
-  }
-  c.globalCompositeOperation = 'source-over';
-  // Sand unten
-  const sv = c.createLinearGradient(0, 760, 0, TH);
-  sv.addColorStop(0, 'rgba(201,168,122,0)'); sv.addColorStop(1, 'rgba(201,168,122,0.35)');
-  c.fillStyle = sv; c.fillRect(0, 760, TB, 220);
-  // Säulen der versunkenen Stadt
-  c.fillStyle = 'rgba(120,190,200,0.16)';
-  for (const [x, y, h] of [[120, 220, 140], [384, 220, 140], [200, 540, 90], [304, 540, 90]]) {
-    c.fillRect(x - 10, y, 20, h); c.fillRect(x - 16, y - 8, 32, 8); c.fillRect(x - 16, y + h, 32, 8);
-  }
-  c.strokeStyle = 'rgba(120,190,200,0.16)'; c.lineWidth = 5;
-  c.beginPath(); c.arc(MITTE, 230, 132, Math.PI, 0); c.stroke();
-  // Korallen an den Rändern
-  const koralle = (x, y, f, gr) => {
-    c.strokeStyle = f; c.lineCap = 'round';
-    const ast = (x, y, w, l, tiefe) => {
-      if (tiefe === 0) return;
-      const x2 = x + Math.cos(w) * l, y2 = y + Math.sin(w) * l;
-      c.lineWidth = tiefe * 1.6; c.beginPath(); c.moveTo(x, y); c.lineTo(x2, y2); c.stroke();
-      ast(x2, y2, w - 0.45 - z() * 0.2, l * 0.72, tiefe - 1);
-      ast(x2, y2, w + 0.45 + z() * 0.2, l * 0.72, tiefe - 1);
-    };
-    ast(x, y, -Math.PI / 2 + (z() - 0.5) * 0.4, gr, 4);
-  };
-  koralle(40, 640, 'rgba(255,120,150,0.55)', 30);
-  koralle(470, 650, 'rgba(255,170,90,0.55)', 30);
-  koralle(110, 950, 'rgba(255,143,200,0.5)', 26);
-  koralle(400, 955, 'rgba(255,120,150,0.5)', 26);
-  // Seegras
-  c.strokeStyle = 'rgba(70,170,110,0.4)'; c.lineWidth = 3;
-  for (let i = 0; i < 10; i++) {
-    const x = 30 + z() * 460, y = 880 + z() * 70;
-    c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + 14, y - 40, x - 4, y - 70); c.stroke();
-  }
-}
-
-function malVulkan(c) {
-  const z = zufall(55);
-  // Gesteinsbrocken
-  for (let i = 0; i < 70; i++) {
-    const x = z() * TB, y = 60 + z() * TH, r = 12 + z() * 30, g = 22 + Math.floor(z() * 16);
-    c.fillStyle = `rgb(${g + 8},${g},${g - 4})`;
-    c.beginPath();
-    for (let k = 0; k < 7; k++) { const w = k / 7 * Math.PI * 2; const rr = r * (0.7 + z() * 0.3); c[k ? 'lineTo' : 'moveTo'](x + Math.cos(w) * rr, y + Math.sin(w) * rr); }
-    c.closePath(); c.fill();
-  }
-  // Lavarisse
-  c.lineCap = 'round'; c.lineJoin = 'round';
-  vulkanRisse.length = 0;
-  // Risse nur an den Rändern, damit das Spielfeld in der Mitte ruhig bleibt
-  for (let i = 0; i < 9; i++) {
-    let x = i % 2 ? 30 + z() * 60 : 414 + z() * 60, y = 140 + z() * 700;
-    const p = [[x, y]];
-    for (let k = 0; k < 6; k++) { x = begrenzt(x + (z() - 0.5) * 50, 24, 516); if (x > 100 && x < 404) x = x < MITTE ? 100 : 404; y += (z() - 0.3) * 50; p.push([x, y]); }
-    vulkanRisse.push(p);
-    pfad(c, p); c.strokeStyle = 'rgba(255,90,20,0.25)'; c.lineWidth = 8; c.stroke();
-    pfad(c, p); c.strokeStyle = 'rgba(255,170,60,0.75)'; c.lineWidth = 2; c.stroke();
-  }
-  // Lavaseen unten
-  c.globalCompositeOperation = 'lighter';
-  leuchte(c, 80, 930, 120, '#ff4a0a', 0.55);
-  leuchte(c, 430, 930, 120, '#ff4a0a', 0.55);
-  leuchte(c, MITTE, 420, 240, '#5a1404', 0.6);
-  c.globalCompositeOperation = 'source-over';
-}
-const vulkanRisse = [];
-
 // =====================================================================
-//  BELEBUNG (jedes Bild, sparsam und blass, damit das Spielfeld klar bleibt)
+//  HAUPTMOTIVE DER LEVEL (unten in der Mitte und im freien Feld, hinter allem)
 // =====================================================================
 
-const STERNE_FUNKEL = Array.from({ length: 26 }, (_, i) => { const z = zufall(100 + i); return [z() * TB, 80 + z() * 820, z() * 6]; });
-function funkelSterne(c, zeit) {
-  c.globalCompositeOperation = 'lighter';
-  for (const [x, y, p] of STERNE_FUNKEL) {
-    const a = Math.max(0, Math.sin(zeit * 1.7 + p * 3)) * 0.8;
-    if (a < 0.05) continue;
-    c.fillStyle = `rgba(200,230,255,${a})`;
-    c.fillRect(x - 3, y - 0.5, 6, 1); c.fillRect(x - 0.5, y - 3, 1, 6);
-  }
-  // Sternschnuppe alle paar Sekunden
-  const t = zeit % 7;
-  if (t < 0.8) {
-    const x = 60 + t * 500, y = 120 + t * 160;
-    const v = c.createLinearGradient(x - 70, y - 22, x, y);
-    v.addColorStop(0, 'rgba(255,255,255,0)'); v.addColorStop(1, 'rgba(255,255,255,0.7)');
-    c.strokeStyle = v; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(x - 70, y - 22); c.lineTo(x, y); c.stroke();
-  }
-  c.globalCompositeOperation = 'source-over';
-}
-
-function cyberRegen(c, zeit) {
-  c.strokeStyle = 'rgba(180,220,255,0.10)'; c.lineWidth = 1;
-  c.beginPath();
-  for (let i = 0; i < 40; i++) {
-    const x = (i * 53.7) % TB, y = 80 + ((zeit * 520 + i * 97) % 860);
-    c.moveTo(x, y); c.lineTo(x - 3, y + 16);
-  }
-  c.stroke();
-  // Laufende Abtastlinie
-  const y = 80 + (zeit * 90) % 880;
-  c.fillStyle = 'rgba(46,249,255,0.05)';
-  c.fillRect(20, y, 500, 3);
-}
-
-const GLUEHWUERMCHEN = Array.from({ length: 10 }, (_, i) => { const z = zufall(200 + i); return [80 + z() * 380, 140 + z() * 600, z() * 6]; });
-function dschungelLeben(c, zeit) {
-  // fließendes Wasser im Wasserfall
-  c.strokeStyle = 'rgba(220,250,255,0.35)'; c.lineWidth = 1.5;
-  c.beginPath();
-  for (let i = 0; i < 7; i++) {
-    const x = 130 + i * 5.5, y = 100 + ((zeit * 160 + i * 41) % 290);
-    c.moveTo(x, y); c.lineTo(x, y + 16);
-  }
-  c.stroke();
-  c.globalCompositeOperation = 'lighter';
-  for (const [x, y, p] of GLUEHWUERMCHEN) {
-    const a = 0.25 + 0.35 * Math.sin(zeit * 2 + p);
-    leuchte(c, x + Math.sin(zeit * 0.7 + p) * 14, y + Math.cos(zeit * 0.5 + p) * 10, 10, '#d8ff6a', a);
-  }
-  c.globalCompositeOperation = 'source-over';
-}
-
-const BLASEN = Array.from({ length: 14 }, (_, i) => { const z = zufall(300 + i); return [30 + z() * 470, z() * 900, 2 + z() * 4, 30 + z() * 40]; });
-function wasserLeben(c, zeit) {
-  // Quallen im Hintergrund
-  for (let i = 0; i < 2; i++) {
-    const x = 150 + i * 220 + Math.sin(zeit * 0.3 + i * 2) * 40;
-    const y = 640 - ((zeit * 12 + i * 300) % 520);
-    c.fillStyle = i ? 'rgba(255,143,200,0.12)' : 'rgba(160,240,255,0.12)';
-    c.beginPath(); c.arc(x, y, 22, Math.PI, 0); c.closePath(); c.fill();
-    c.strokeStyle = c.fillStyle; c.lineWidth = 2;
-    for (let k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(x + k * 8, y); c.quadraticCurveTo(x + k * 8 + Math.sin(zeit * 2 + k) * 6, y + 20, x + k * 7, y + 40); c.stroke(); }
-  }
-  // Luftblasen steigen auf
-  c.strokeStyle = 'rgba(220,255,255,0.35)'; c.lineWidth = 1;
-  for (const [x, y0, r, v] of BLASEN) {
-    const y = TH - ((y0 + zeit * v) % 880);
-    c.beginPath(); c.arc(x + Math.sin(zeit * 1.5 + y0) * 4, y, r, 0, Math.PI * 2); c.stroke();
-  }
-}
-
-function vulkanGlut(c, zeit) {
-  c.globalCompositeOperation = 'lighter';
-  vulkanRisse.forEach((p, i) => {
-    const a = 0.12 + 0.12 * Math.sin(zeit * 1.6 + i * 1.3);
-    pfad(c, p);
-    c.strokeStyle = `rgba(255,120,30,${a})`;
-    c.lineWidth = 7; c.stroke();
-  });
-  // aufsteigende Glut
-  for (let i = 0; i < 18; i++) {
-    const x = (i * 71.3) % 480 + 30 + Math.sin(zeit + i) * 8;
-    const y = TH - ((zeit * (40 + (i % 5) * 12) + i * 61) % 860);
-    c.fillStyle = `rgba(255,${120 + (i % 3) * 40},40,0.55)`;
-    c.fillRect(x, y, 2, 2);
-  }
-  c.globalCompositeOperation = 'source-over';
-}
-
-// =====================================================================
-//  WELT-EIGENSCHAFTEN: Jede Welt spielt sich ein bisschen anders
-// =====================================================================
-const WELT_PHYSIK = {
-  klassik: { schwere: 1, zaeh: 0, bumperKick: 1, schleuderKick: 1 },
-  weltraum: { schwere: 0.9, zaeh: 0, bumperKick: 1, schleuderKick: 1, text: 'Weniger Schwerkraft: Die Kugel fliegt länger.' },
-  cyber: { schwere: 1, zaeh: 0, bumperKick: 1.18, schleuderKick: 1, text: 'Überladene Neon-Bumper schießen härter.' },
-  dschungel: { schwere: 1, zaeh: 0.05, bumperKick: 0.92, schleuderKick: 1.2, text: 'Schwere Steinbumper, kräftige Holzschleudern.' },
-  wasser: { schwere: 0.86, zaeh: 0.2, bumperKick: 1, schleuderKick: 1, text: 'Im Wasser schwebt die Kugel langsamer.' },
-  vulkan: { schwere: 1.06, zaeh: 0, bumperKick: 1.12, schleuderKick: 1.08, text: 'Steiler Hang und glühend heiße Bumper.' }
-};
-
-// =====================================================================
-//  GROSSE MOTIVE, SCHILDER UND VERZIERUNGEN (einmal vorgemalt)
-// =====================================================================
-
-// Namensschild auf dem linken Abdeckblech, Symbol auf dem rechten
-function schild(c, text, farbe, grund, symbol) {
-  c.save();
-  c.fillStyle = grund;
-  rund(c, 64, 868, 80, 40, 6); c.fill();
-  c.strokeStyle = farbe; c.lineWidth = 1.5; c.stroke();
-  c.fillStyle = farbe; c.font = '7px ' + SCHRIFT; c.textAlign = 'center';
-  const zeilen = text.split('\n');
-  zeilen.forEach((z, i) => c.fillText(z, 104, 885 + i * 11 - (zeilen.length - 1) * 4, 72));
-  c.translate(spiegel(104), 888);
-  c.fillStyle = grund;
-  rund(c, -40, -20, 80, 40, 6); c.fill();
-  c.strokeStyle = farbe; c.stroke();
-  symbol(c);
-  c.restore();
-}
-// Muster in den Schleudern
-function schleuderMuster(c, T, f) {
-  for (const sl of T.schleudern) {
-    const mx = (sl.A[0] + sl.B[0] + sl.C[0]) / 3, my = (sl.A[1] + sl.B[1] + sl.C[1]) / 3;
-    c.save();
-    c.beginPath(); c.moveTo(...sl.A); c.lineTo(...sl.B); c.lineTo(...sl.C); c.closePath(); c.clip();
-    f(c, mx, my, sl.seite === 'links' ? 1 : -1);
-    c.restore();
-  }
-}
-
-const DEKO = {
-  klassik() {},
-  weltraum(c, T) {
-    // Raumstation unten in der Mitte: Ring, Speichen, Module
-    c.save(); c.translate(MITTE, 905);
-    c.globalAlpha = 0.55;
-    c.strokeStyle = '#9fc8ff'; c.lineWidth = 3;
-    c.beginPath(); c.ellipse(0, 0, 62, 20, 0, 0, Math.PI * 2); c.stroke();
-    c.fillStyle = '#1d2a48'; c.fillRect(-10, -34, 20, 52);
-    c.strokeStyle = '#c4d4f0'; c.lineWidth = 1.5; c.strokeRect(-10, -34, 20, 52);
-    c.fillStyle = '#7fd4ff';
-    for (let i = 0; i < 4; i++) c.fillRect(-4, -28 + i * 11, 8, 4);
-    c.fillStyle = '#2a4a8a'; c.fillRect(-58, -6, 34, 12); c.fillRect(24, -6, 34, 12);
-    c.strokeStyle = '#c4d4f0'; c.strokeRect(-58, -6, 34, 12); c.strokeRect(24, -6, 34, 12);
-    c.restore();
-    schild(c, 'STATION\nORBITA', '#7fd4ff', '#0f1830', g => {
-      g.fillStyle = '#ffb36b'; g.beginPath(); g.arc(0, 0, 10, 0, Math.PI * 2); g.fill();
-      g.strokeStyle = '#ffe0a0'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, 18, 5, -0.35, 0, Math.PI * 2); g.stroke();
-    });
-    schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = 'rgba(127,212,255,0.5)'; g.lineWidth = 1; for (let k = -40; k < 60; k += 9) { g.beginPath(); g.moveTo(x - 40, y + k); g.lineTo(x + 40, y + k); g.stroke(); } g.fillStyle = '#ffc35a'; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); });
-  },
-  cyber(c, T) {
-    // großes Neonschild unten: ORBIT CITY
-    c.save();
-    c.translate(MITTE, 915);
-    c.globalAlpha = 0.85;
-    c.strokeStyle = '#ff3db4'; c.lineWidth = 2.5;
-    rund(c, -62, -22, 124, 40, 8); c.stroke();
-    c.globalAlpha = 0.25; c.lineWidth = 8; c.stroke();
-    c.globalAlpha = 0.9;
-    c.font = '10px ' + SCHRIFT; c.textAlign = 'center'; c.fillStyle = '#2ef9ff';
-    c.fillText('ORBIT', 0, -4); c.fillStyle = '#fff13a'; c.fillText('CITY', 0, 10);
-    c.restore();
-    schild(c, 'NEON\nCITY', '#ff3db4', '#1a0626', g => {
-      g.strokeStyle = '#2ef9ff'; g.lineWidth = 2;
-      for (const [x, h] of [[-14, 18], [-4, 26], [6, 14], [14, 22]]) g.strokeRect(x - 4, 12 - h, 8, h);
-    });
-    schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = '#2ef9ff'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 6 * s, y - 22); g.lineTo(x + 8 * s, y + 10); g.lineTo(x - 8 * s, y + 18); g.stroke(); });
-  },
-  dschungel(c, T) {
-    // Stufentempel unten in der Mitte
+const MOTIVE = {
+  // ---- Weltraum
+  raumhafen(c, th) {
+    // Startplatz mit Leuchtbahnen und Rakete, blau-cyan
     c.save(); c.translate(MITTE, 960);
-    const stufen = [[120, 18], [96, 18], [72, 18], [48, 18]];
-    let y = 0;
-    stufen.forEach(([b, h], i) => {
-      y -= h;
-      c.fillStyle = ['#4a3d26', '#54452c', '#5e4e32', '#685838'][i];
-      c.fillRect(-b / 2, y, b, h);
-      c.strokeStyle = 'rgba(255,210,120,0.5)'; c.lineWidth = 1; c.strokeRect(-b / 2, y, b, h);
-    });
-    c.fillStyle = '#1a140a'; c.fillRect(-9, y - 2, 18, 14);
-    c.fillStyle = '#ffd25a'; c.beginPath(); c.arc(0, y - 10, 5, 0, Math.PI * 2); c.fill();
+    c.fillStyle = 'rgba(40,120,220,0.55)'; c.beginPath(); c.moveTo(-120, 0); c.lineTo(-60, -110); c.lineTo(60, -110); c.lineTo(120, 0); c.fill();
+    c.strokeStyle = 'rgba(79,227,255,0.8)'; c.lineWidth = 2;
+    for (let k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(k * 50, 0); c.lineTo(k * 24, -110); c.stroke(); }
+    c.fillStyle = '#ffc94a'; for (let i = 1; i < 6; i++) { c.fillRect(-60 + i * 2 - 2, -i * 20, 4, 4); c.fillRect(56 - i * 2, -i * 20, 4, 4); }
+    c.fillStyle = '#e8f6ff'; c.beginPath(); c.moveTo(0, -150); c.quadraticCurveTo(14, -128, 12, -96); c.lineTo(-12, -96); c.quadraticCurveTo(-14, -128, 0, -150); c.fill();
+    c.fillStyle = '#ff7a4a'; c.beginPath(); c.moveTo(-12, -100); c.lineTo(-22, -86); c.lineTo(-10, -92); c.fill(); c.beginPath(); c.moveTo(12, -100); c.lineTo(22, -86); c.lineTo(10, -92); c.fill();
+    c.fillStyle = '#4fe3ff'; c.beginPath(); c.arc(0, -126, 4, 0, Math.PI * 2); c.fill();
     c.restore();
-    schild(c, 'TEMPEL\nDER AHNEN', '#ffd25a', '#2a2216', g => {
-      g.fillStyle = '#ffd25a'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#2a1e10'; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 2); g.fill();
-    });
-    schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = 'rgba(255,210,90,0.7)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - 8, y - 14); g.lineTo(x, y - 22); g.lineTo(x + 8, y - 14); g.moveTo(x - 8, y); g.lineTo(x, y - 8); g.lineTo(x + 8, y); g.stroke(); });
+    planetMalen(c, 470, 250, 46, '#b8f4ff', '#2a8ae0', '#0a2a6a', 'rgba(79,227,255,0.6)');
   },
-  wasser(c, T) {
-    // Kuppel von Atlantis unten in der Mitte
-    c.save(); c.translate(MITTE, 960);
-    c.fillStyle = 'rgba(170,250,255,0.18)';
-    c.beginPath(); c.arc(0, -10, 70, Math.PI, 0); c.fill();
-    c.strokeStyle = 'rgba(220,255,255,0.7)'; c.lineWidth = 2;
-    c.beginPath(); c.arc(0, -10, 70, Math.PI, 0); c.stroke();
-    for (const x of [-48, -24, 0, 24, 48]) { c.fillStyle = 'rgba(230,250,255,0.55)'; c.fillRect(x - 4, -60 + Math.abs(x) * 0.5, 8, 50 - Math.abs(x) * 0.5); }
-    c.fillStyle = '#ffd2a0'; c.beginPath(); c.moveTo(0, -96); c.lineTo(5, -80); c.lineTo(-5, -80); c.closePath(); c.fill();
-    c.restore();
-    schild(c, 'ATLANTIS', '#5ff6e8', '#0a3040', g => {
-      g.fillStyle = '#ffe0ec';
-      g.beginPath(); g.moveTo(0, 12); for (let k = 0; k <= 6; k++) { const w = Math.PI + k / 6 * Math.PI; g.lineTo(Math.cos(w) * 16, Math.sin(w) * 14 + 6); } g.closePath(); g.fill();
-      g.strokeStyle = '#d88aaa'; g.lineWidth = 1; for (let k = 1; k < 6; k++) { const w = Math.PI + k / 6 * Math.PI; g.beginPath(); g.moveTo(0, 12); g.lineTo(Math.cos(w) * 16, Math.sin(w) * 14 + 6); g.stroke(); }
-    });
-    schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = 'rgba(255,210,160,0.6)'; g.lineWidth = 1.5; for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + 20 * s, y + 30, 14 + k * 8, Math.PI, Math.PI * 1.5); g.stroke(); } });
-  },
-  vulkan(c, T) {
-    // Vulkankegel unten mit Lavastrom
-    c.save(); c.translate(MITTE, 962);
-    c.fillStyle = '#2a1a14';
-    c.beginPath(); c.moveTo(-110, 0); c.lineTo(-26, -86); c.lineTo(26, -86); c.lineTo(110, 0); c.closePath(); c.fill();
-    c.strokeStyle = 'rgba(255,120,40,0.5)'; c.lineWidth = 1.5; c.stroke();
-    c.globalCompositeOperation = 'lighter';
-    c.fillStyle = 'rgba(255,90,20,0.55)';
-    c.beginPath(); c.ellipse(0, -86, 26, 6, 0, 0, Math.PI * 2); c.fill();
-    c.strokeStyle = 'rgba(255,150,40,0.75)'; c.lineWidth = 4;
-    c.beginPath(); c.moveTo(-6, -84); c.quadraticCurveTo(-24, -50, -14, -20); c.quadraticCurveTo(-6, -6, -30, 0); c.stroke();
-    c.restore();
-    schild(c, 'GLUT-\nKERN', '#ff9a2a', '#1e100a', g => {
-      g.fillStyle = '#ff6a1a';
-      g.beginPath(); g.moveTo(0, -16); g.quadraticCurveTo(12, 0, 6, 12); g.lineTo(-6, 12); g.quadraticCurveTo(-12, 0, 0, -16); g.fill();
-      g.fillStyle = '#ffe066'; g.beginPath(); g.moveTo(0, -4); g.quadraticCurveTo(6, 4, 3, 12); g.lineTo(-3, 12); g.quadraticCurveTo(-6, 4, 0, -4); g.fill();
-    });
-    schleuderMuster(c, T, (g, x, y) => { g.globalCompositeOperation = 'lighter'; g.strokeStyle = 'rgba(255,120,30,0.8)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 14, y - 20); g.lineTo(x - 2, y - 4); g.lineTo(x - 8, y + 6); g.lineTo(x + 6, y + 20); g.stroke(); });
-  }
-};
-
-// =====================================================================
-//  VORBEIZIEHENDE ANIMATIONEN (blass, hinter der Kugel)
-// =====================================================================
-function zieht(zeit, periode, versatz = 0) { return ((zeit + versatz) % periode) / periode; }
-
-const BELEBT_EXTRA = {
-  klassik() {},
-  weltraum(c, zeit) {
-    // ein Mond zieht langsam oben vorbei, ein Satellit blinkt
-    const a = zieht(zeit, 46);
-    const x = -60 + a * 660, y = 150 + Math.sin(a * Math.PI) * -40;
-    const v = c.createRadialGradient(x - 8, y - 8, 2, x, y, 30);
-    v.addColorStop(0, 'rgba(230,236,255,0.55)'); v.addColorStop(1, 'rgba(90,100,140,0.25)');
-    c.fillStyle = v; c.beginPath(); c.arc(x, y, 26, 0, Math.PI * 2); c.fill();
-    const b = zieht(zeit, 23, 7), sx = 540 - b * 600, sy = 380 + b * 60;
-    c.fillStyle = 'rgba(200,220,255,0.6)'; c.fillRect(sx - 6, sy - 1, 12, 2); c.fillRect(sx - 1, sy - 3, 2, 6);
-    if (Math.sin(zeit * 8) > 0.6) { c.fillStyle = '#ff5a5a'; c.fillRect(sx + 6, sy - 1, 2, 2); }
-  },
-  cyber(c, zeit) {
-    // fliegende Autos: Lichterpaare ziehen quer über die Stadt
-    for (const [y, p, v, f] of [[250, 9, 0, '#fff13a'], [330, 13, 4, '#2ef9ff'], [205, 17, 9, '#ff3db4']]) {
-      const a = zieht(zeit, p, v), x = v % 2 ? 560 - a * 600 : -20 + a * 600;
-      c.fillStyle = f; c.globalAlpha = 0.7;
-      c.fillRect(x, y, 5, 2); c.fillRect(x + 8, y, 5, 2);
-      c.globalAlpha = 0.15; c.fillRect(x - (v % 2 ? -14 : 30), y, 30, 2);
-      c.globalAlpha = 1;
+  asteroiden(c, th) {
+    // kupferne Asteroiden auf goldenen Bahnen
+    const z = zufall(77);
+    c.strokeStyle = 'rgba(255,201,74,0.4)'; c.lineWidth = 3; c.setLineDash([10, 8]);
+    for (const [rx, ry] of [[250, 70], [220, 130]]) { c.beginPath(); c.ellipse(MITTE, 700, rx, ry, -0.15, 0, Math.PI * 2); c.stroke(); }
+    c.setLineDash([]);
+    for (const [x, y, r] of [[60, 620, 26], [470, 560, 32], [90, 780, 18], [440, 790, 22], [200, 900, 20], [330, 930, 28], [40, 240, 22], [500, 300, 18]]) {
+      const v = c.createRadialGradient(x - r * 0.4, y - r * 0.4, 2, x, y, r);
+      v.addColorStop(0, '#ffc08a'); v.addColorStop(0.6, '#c06a30'); v.addColorStop(1, '#4a1e0c');
+      c.fillStyle = v; vieleck(c, x, y, r, 8, z); c.fill();
+      c.fillStyle = 'rgba(60,20,8,0.5)'; c.beginPath(); c.arc(x + r * 0.2, y + r * 0.1, r * 0.22, 0, Math.PI * 2); c.fill();
     }
-    // Laufschrift unter dem Neonschild
-    c.save();
-    c.beginPath(); c.rect(190, 932, 124, 12); c.clip();
-    c.font = '7px ' + SCHRIFT; c.fillStyle = 'rgba(255,61,180,0.75)';
-    const text = 'BUMPER  ·  RAMPEN  ·  JACKPOT  ·  ';
-    const x = 314 - (zeit * 30) % 260;
-    c.fillText(text, x, 941); c.fillText(text, x + 260, 941);
-    c.restore();
   },
-  dschungel(c, zeit) {
-    // Blätter fallen langsam und drehen sich
+  station(c, th) {
+    // weiß-türkise Raumstation mit Andockarmen
+    c.save(); c.translate(MITTE, 900);
+    c.strokeStyle = 'rgba(232,251,255,0.85)'; c.lineWidth = 6;
+    c.beginPath(); c.ellipse(0, 0, 90, 26, 0, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#2fd6c8'; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#e8fbff'; c.fillRect(-14, -50, 28, 74);
+    c.fillStyle = '#2fd6c8'; for (let i = 0; i < 5; i++) c.fillRect(-8, -44 + i * 13, 16, 6);
+    c.fillStyle = 'rgba(47,214,200,0.75)'; c.fillRect(-150, -10, 54, 20); c.fillRect(96, -10, 54, 20);
+    c.strokeStyle = '#e8fbff'; c.lineWidth = 1.5; c.strokeRect(-150, -10, 54, 20); c.strokeRect(96, -10, 54, 20);
+    for (const s of [-1, 1]) { c.strokeStyle = '#e8fbff'; c.lineWidth = 3; c.beginPath(); c.moveTo(s * 14, -40); c.lineTo(s * 60, -70); c.stroke(); c.fillStyle = '#ffc94a'; c.beginPath(); c.arc(s * 62, -72, 5, 0, Math.PI * 2); c.fill(); }
+    c.restore();
+    planetMalen(c, 60, 250, 30, '#d8fff8', '#2fd6c8', '#0a4a5a');
+  },
+  schwarzesloch(c, th) {
+    // violette und magentafarbene Akkretionsringe, orangefarbener heißer Rand
+    c.save(); c.translate(MITTE, 880);
+    for (const [rx, ry, f] of [[170, 46, 'rgba(139,60,255,0.45)'], [140, 36, 'rgba(255,60,200,0.55)'], [110, 28, 'rgba(255,140,40,0.7)']]) {
+      c.strokeStyle = f; c.lineWidth = 12; c.beginPath(); c.ellipse(0, 0, rx, ry, -0.12, 0, Math.PI * 2); c.stroke();
+    }
+    c.fillStyle = '#05020c'; c.beginPath(); c.arc(0, 0, 34, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#ffb04a'; c.lineWidth = 2.5; c.beginPath(); c.arc(0, 0, 36, 0, Math.PI * 2); c.stroke();
+    c.restore();
+    fleck(c, MITTE, 880, 220, '#c040ff', 0.35);
+  },
+
+  // ---- Cyberpunk
+  neonmarkt(c, th) {
+    // Marktstände mit gestreiften Neon-Markisen
+    const farben = ['#ff2bd6', '#00e5ff', '#ffe84a', '#8b5cff'];
     for (let i = 0; i < 4; i++) {
-      const a = zieht(zeit, 14 + i * 3, i * 5);
-      const x = 80 + i * 110 + Math.sin(a * 12 + i) * 20, y = 90 + a * 820;
-      c.save(); c.translate(x, y); c.rotate(Math.sin(a * 9 + i) * 1.2);
-      c.fillStyle = 'rgba(110,190,70,0.45)';
-      c.beginPath(); c.ellipse(0, 0, 7, 3, 0, 0, Math.PI * 2); c.fill();
+      const x = 60 + i * 120, y = 870;
+      c.fillStyle = '#1a0830'; c.fillRect(x - 40, y, 80, 90);
+      for (let k = 0; k < 6; k++) { c.fillStyle = k % 2 ? farben[i] : '#ffffff'; c.beginPath(); c.moveTo(x - 46 + k * 15.3, y); c.lineTo(x - 46 + (k + 1) * 15.3, y); c.lineTo(x - 46 + (k + 1) * 15.3, y + 14); c.lineTo(x - 46 + k * 15.3, y + 14); c.fill(); }
+      c.strokeStyle = farben[(i + 1) % 4]; c.lineWidth = 2; c.strokeRect(x - 28, y + 24, 56, 18);
+    }
+    c.font = '11px ' + SCHRIFT; c.textAlign = 'center';
+    for (const [x, y, t, f, w] of [[120, 300, 'NUDELN', '#ffe84a', -0.1], [400, 340, 'ARCADE', '#00e5ff', 0.1], [MITTE, 760, '24/7', '#ff2bd6', 0]]) {
+      c.save(); c.translate(x, y); c.rotate(w);
+      const b = c.measureText(t).width + 18;
+      c.fillStyle = 'rgba(20,6,40,0.75)'; rund(c, -b / 2, -16, b, 24, 5); c.fill();
+      c.strokeStyle = f; c.lineWidth = 2; c.stroke();
+      c.fillStyle = f; c.fillText(t, 0, 0);
       c.restore();
     }
   },
-  wasser(c, zeit) {
-    // Fischschwarm zieht vorbei
-    const a = zieht(zeit, 24);
-    const rechts = Math.floor((zeit) / 24) % 2 === 0;
-    const bx = rechts ? -80 + a * 700 : 620 - a * 700, by = 640 + Math.sin(a * 6) * 30;
-    c.fillStyle = 'rgba(255,224,140,0.45)';
-    for (let k = 0; k < 7; k++) {
-      const x = bx + (k % 3) * 14 * (rechts ? -1 : 1) - k * 4, y = by + (k % 4) * 9 - 12 + Math.sin(zeit * 4 + k) * 2;
-      const r = rechts ? 1 : -1;
-      c.beginPath(); c.ellipse(x, y, 6, 3, 0, 0, Math.PI * 2); c.fill();
-      c.beginPath(); c.moveTo(x - 5 * r, y); c.lineTo(x - 10 * r, y - 3); c.lineTo(x - 10 * r, y + 3); c.closePath(); c.fill();
+  datenautobahn(c, th) {
+    // Lichtspuren einer Datenautobahn, alles in Cyan
+    c.lineCap = 'round';
+    for (let k = 0; k < 9; k++) {
+      const x0 = 40 + k * 58;
+      c.strokeStyle = k % 3 === 1 ? 'rgba(255,43,214,0.6)' : 'rgba(0,229,255,0.7)'; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(MITTE + (x0 - MITTE) * 0.2, 560); c.lineTo(x0, TH + 10); c.stroke();
     }
+    c.strokeStyle = 'rgba(0,229,255,0.5)'; c.lineWidth = 2;
+    for (let y = 120; y < 460; y += 40) { c.beginPath(); c.moveTo(70, y); c.lineTo(110, y); c.lineTo(130, y + 20); c.stroke(); c.beginPath(); c.moveTo(470, y + 10); c.lineTo(430, y + 10); c.lineTo(410, y + 30); c.stroke(); }
+    c.fillStyle = '#00e5ff'; c.font = '9px ' + SCHRIFT; c.textAlign = 'center'; c.fillText('0101 DATA 1010', MITTE, 940);
   },
-  vulkan(c, zeit) {
-    // Lava fließt den Kegel hinunter, ab und zu leuchtet der Krater auf
-    c.globalCompositeOperation = 'lighter';
-    c.setLineDash([6, 10]);
-    c.lineDashOffset = -zeit * 30;
-    c.strokeStyle = 'rgba(255,200,80,0.6)'; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(MITTE - 6, 878); c.quadraticCurveTo(MITTE - 24, 912, MITTE - 14, 942); c.quadraticCurveTo(MITTE - 6, 956, MITTE - 30, 962); c.stroke();
-    c.setLineDash([]);
-    const glut = Math.max(0, Math.sin(zeit * 0.9)) ** 6;
-    if (glut > 0.02) leuchte(c, MITTE, 876, 70, '#ff5a1a', glut * 0.8);
-    c.globalCompositeOperation = 'source-over';
+  hologrammturm(c, th) {
+    // hoher Turm mit violettem Hologramm
+    c.fillStyle = '#160830'; c.fillRect(MITTE - 30, 640, 60, 330);
+    c.strokeStyle = '#8b5cff'; c.lineWidth = 2; c.strokeRect(MITTE - 30, 640, 60, 330);
+    c.fillStyle = 'rgba(0,229,255,0.7)'; for (let y = 660; y < 960; y += 18) c.fillRect(MITTE - 20, y, 40, 4);
+    c.fillStyle = 'rgba(139,92,255,0.35)';
+    c.beginPath(); c.moveTo(MITTE, 560); c.lineTo(MITTE + 70, 640); c.lineTo(MITTE - 70, 640); c.closePath(); c.fill();
+    c.strokeStyle = '#c4a8ff'; c.lineWidth = 2; c.stroke();
+    c.beginPath(); c.moveTo(MITTE, 560); c.lineTo(MITTE, 640); c.stroke();
+  },
+  hack(c, th) {
+    // Terminalfenster mit Codezeilen, gelbes Warnsymbol
+    for (const [x, y, b, h, f] of [[40, 860, 150, 90, '#00e5ff'], [350, 850, 150, 100, '#ff2bd6']]) {
+      c.fillStyle = 'rgba(8,4,24,0.85)'; c.fillRect(x, y, b, h);
+      c.strokeStyle = f; c.lineWidth = 2; c.strokeRect(x, y, b, h);
+      c.fillStyle = f; c.fillRect(x, y, b, 10);
+      const z = zufall(x);
+      for (let k = 0; k < 6; k++) { c.fillStyle = k % 3 === 2 ? '#ffe84a' : f; c.globalAlpha = 0.8; c.fillRect(x + 8, y + 18 + k * 11, 30 + z() * (b - 50), 4); }
+      c.globalAlpha = 1;
+    }
+    c.save(); c.translate(MITTE, 920);
+    c.fillStyle = '#ffe84a'; c.beginPath(); c.moveTo(0, -34); c.lineTo(30, 18); c.lineTo(-30, 18); c.closePath(); c.fill();
+    c.fillStyle = '#1a0830'; c.fillRect(-3, -16, 6, 20); c.fillRect(-3, 8, 6, 6);
+    c.restore();
+  },
+
+  // ---- Dschungel
+  ranken(c, th) {
+    // dichter Rankenvorhang mit großen Blättern
+    for (let i = 0; i < 9; i++) {
+      const x = 30 + i * 60;
+      c.strokeStyle = '#0d7a44'; c.lineWidth = 4;
+      c.beginPath(); c.moveTo(x, 70); c.quadraticCurveTo(x + 20, 170, x - 6, 250 + (i % 3) * 30); c.stroke();
+      for (let k = 0; k < 4; k++) blatt(c, x + (k % 2 ? 6 : -6), 100 + k * 40, 20, 7, k % 2 ? 0.6 : 2.5, k % 2 ? '#19c878' : '#2ee08e');
+    }
+    for (const [x, y, w] of [[MITTE - 80, 930, -2.4], [MITTE + 80, 930, -0.7], [MITTE, 900, -1.57]]) blatt(c, x, y, 90, 28, w, '#19c878', '#0a5a30');
+    bluete(c, MITTE, 880, 14, '#ff6f91', '#ffc857');
+  },
+  wasserfall(c, th) {
+    // großer türkiser Wasserfall in ein Becken
+    const v = c.createLinearGradient(0, 90, 0, 700);
+    v.addColorStop(0, 'rgba(120,250,240,0.55)'); v.addColorStop(1, 'rgba(32,217,194,0.3)');
+    c.fillStyle = v; c.fillRect(MITTE - 46, 90, 92, 610);
+    c.strokeStyle = 'rgba(255,255,255,0.45)'; c.lineWidth = 2;
+    for (let k = 0; k < 8; k++) { c.beginPath(); c.moveTo(MITTE - 40 + k * 11, 90); c.lineTo(MITTE - 40 + k * 11, 700); c.stroke(); }
+    c.fillStyle = 'rgba(32,217,194,0.55)'; c.beginPath(); c.ellipse(MITTE, 900, 150, 50, 0, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.5)'; c.beginPath(); c.ellipse(MITTE, 900, 120, 36, 0, 0, Math.PI * 2); c.stroke();
+  },
+  kammer(c, th) {
+    // goldenes Relief einer Tempelkammer mit Fackeln
+    c.fillStyle = 'rgba(255,200,87,0.22)';
+    c.fillRect(70, 840, 400, 120);
+    c.strokeStyle = '#ffc857'; c.lineWidth = 3;
+    for (let k = 0; k < 4; k++) c.strokeRect(90 + k * 20, 850 + k * 14, 360 - k * 40, 110 - k * 14);
+    c.fillStyle = '#ffc857';
+    for (let i = 0; i < 8; i++) { const x = 110 + i * 46; c.fillRect(x, 855, 8, 8); c.fillRect(x - 4, 863, 16, 4); }
+    for (const x of [60, 480]) { c.fillStyle = '#5a3a1a'; c.fillRect(x - 3, 840, 6, 40); fleck(c, x, 834, 26, '#ffc857', 0.9); c.fillStyle = '#ff8a3a'; c.beginPath(); c.ellipse(x, 834, 5, 9, 0, 0, Math.PI * 2); c.fill(); }
+  },
+  goetzenauge(c, th) {
+    // riesige Steinmaske mit türkis leuchtenden Augen
+    c.save(); c.translate(MITTE, 910);
+    c.fillStyle = '#5a7a6c'; rund(c, -90, -70, 180, 130, 30); c.fill();
+    c.strokeStyle = '#ffc857'; c.lineWidth = 3; rund(c, -90, -70, 180, 130, 30); c.stroke();
+    for (const s of [-1, 1]) {
+      c.fillStyle = '#20d9c2'; c.beginPath(); c.ellipse(s * 40, -24, 22, 12, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#e8fffb'; c.beginPath(); c.arc(s * 40, -24, 5, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = '#ffc857'; c.fillRect(-8, -14, 16, 34);
+    c.fillStyle = '#2a3e36'; c.fillRect(-40, 30, 80, 12);
+    c.restore();
+    fleck(c, MITTE - 40, 886, 40, '#20d9c2', 0.6); fleck(c, MITTE + 40, 886, 40, '#20d9c2', 0.6);
+  },
+
+  // ---- Unterwasser
+  riff(c, th) {
+    // großes buntes Korallenriff
+    for (const [x, g, f, z] of [[120, 50, '#ff718d', 11], [200, 40, '#ffb34a', 12], [300, 46, '#c27bff', 13], [390, 54, '#ff718d', 14], [250, 34, '#ffe08a', 15]]) koralle(c, x, 965, g, f, z);
+    for (const [x, y, f] of [[150, 860, '#ffe08a'], [360, 880, '#c27bff']]) { c.fillStyle = f; c.beginPath(); c.ellipse(x, y, 24, 14, 0, Math.PI, 0); c.fill(); }
+  },
+  quallen(c, th) {
+    // leuchtende Quallen in Lila und Pink
+    for (const [x, y, r, f] of [[110, 320, 30, 'rgba(194,123,255,0.65)'], [420, 260, 26, 'rgba(255,113,141,0.6)'], [MITTE, 880, 40, 'rgba(194,123,255,0.7)'], [400, 760, 22, 'rgba(32,224,208,0.6)']]) qualleMalen(c, x, y, r, f);
+  },
+  stadt(c, th) {
+    // Ruinen der versunkenen Stadt in Perlmutt
+    c.save(); c.translate(MITTE, 960);
+    c.fillStyle = 'rgba(255,248,240,0.55)';
+    c.beginPath(); c.arc(0, -10, 80, Math.PI, 0); c.fill();
+    c.strokeStyle = '#ffffff'; c.lineWidth = 3; c.beginPath(); c.arc(0, -10, 80, Math.PI, 0); c.stroke();
+    for (const x of [-56, -28, 0, 28, 56]) { c.fillStyle = 'rgba(255,255,255,0.75)'; c.fillRect(x - 5, -64 + Math.abs(x) * 0.5, 10, 54 - Math.abs(x) * 0.5); }
+    c.restore();
+    for (const [x, y, h] of [[90, 600, 120], [450, 600, 120]]) { c.fillStyle = 'rgba(255,248,240,0.45)'; c.fillRect(x - 12, y, 24, h); c.fillRect(x - 18, y - 8, 36, 8); c.fillRect(x - 18, y + h, 36, 8); }
+  },
+  graben(c, th) {
+    // tiefer Graben mit biolumineszenten Punkten (bleibt blau, nicht schwarz)
+    c.fillStyle = 'rgba(10,40,120,0.5)';
+    c.beginPath(); c.moveTo(20, 700); c.quadraticCurveTo(140, 760, 160, TH + 10); c.lineTo(20, TH + 10); c.fill();
+    c.beginPath(); c.moveTo(520, 700); c.quadraticCurveTo(400, 760, 380, TH + 10); c.lineTo(520, TH + 10); c.fill();
+    const z = zufall(91);
+    for (let i = 0; i < 60; i++) { const x = z() * TB, y = 500 + z() * 460; fleck(c, x, y, 5 + z() * 6, z() < 0.5 ? '#c27bff' : '#20e0d0', 0.85); }
+    qualleMalen(c, MITTE, 890, 32, 'rgba(32,224,208,0.65)');
+  },
+
+  // ---- Vulkan
+  aschefeld(c, th) {
+    // ferner Vulkan mit Aschewolken in Violett-Grau
+    c.fillStyle = 'rgba(120,90,130,0.5)';
+    for (const [x, y, r] of [[120, 160, 60], [200, 130, 70], [330, 140, 64], [420, 170, 56]]) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); }
+    c.save(); c.translate(MITTE, 960);
+    c.fillStyle = '#3a2a34'; c.beginPath(); c.moveTo(-170, 0); c.lineTo(-30, -120); c.lineTo(30, -120); c.lineTo(170, 0); c.fill();
+    c.fillStyle = '#ff6a00'; c.beginPath(); c.ellipse(0, -120, 30, 8, 0, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#ffd447'; c.lineWidth = 4; c.beginPath(); c.moveTo(-8, -116); c.quadraticCurveTo(-30, -70, -14, -30); c.quadraticCurveTo(0, -10, -36, 0); c.stroke();
+    c.restore();
+  },
+  lavastrom(c, th) {
+    // breiter Lavafluss quer über das untere Feld
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    const weg = [[20, 600], [140, 660], [120, 760], [260, 820], [380, 800], [520, 900]];
+    pfad(c, weg); c.strokeStyle = 'rgba(255,48,64,0.6)'; c.lineWidth = 46; c.stroke();
+    pfad(c, weg); c.strokeStyle = 'rgba(255,106,0,0.85)'; c.lineWidth = 30; c.stroke();
+    pfad(c, weg); c.strokeStyle = 'rgba(255,212,71,0.8)'; c.lineWidth = 8; c.stroke();
+  },
+  magmakammer(c, th) {
+    // großer roter Magmakern in der Mitte unten
+    fleck(c, MITTE, 900, 200, '#ff3040', 0.7);
+    c.strokeStyle = 'rgba(255,212,71,0.8)'; c.lineWidth = 3;
+    for (const r of [60, 90, 120]) { c.beginPath(); c.arc(MITTE, 920, r, Math.PI * 1.05, Math.PI * 1.95); c.stroke(); }
+    planetMalen(c, MITTE, 930, 40, '#fff2b0', '#ff3040', '#5a0810');
+  },
+  herz(c, th) {
+    // Lava-Tempel: goldene Sonnenscheibe, Säulen und herabfließende Lava
+    c.save(); c.translate(MITTE, 960);
+    c.fillStyle = '#2a1a22'; c.fillRect(-140, -110, 280, 110);
+    c.fillStyle = '#ffd447'; for (const x of [-120, -70, 60, 110]) c.fillRect(x, -100, 12, 100);
+    c.fillStyle = '#3a222a'; c.beginPath(); c.moveTo(-160, -110); c.lineTo(0, -160); c.lineTo(160, -110); c.fill();
+    c.strokeStyle = '#ffd447'; c.lineWidth = 3; c.stroke();
+    planetMalen(c, 0, -60, 34, '#fff6c0', '#ffd447', '#a85a00');
+    c.strokeStyle = '#ff6a00'; c.lineWidth = 6;
+    for (const x of [-30, 30]) { c.beginPath(); c.moveTo(x, -30); c.quadraticCurveTo(x * 1.4, -10, x, 0); c.stroke(); }
+    c.restore();
   }
 };
 
-for (const id of Object.keys(THEMEN)) themaExtras(id);
+// =====================================================================
+//  LEVEL-DESIGNS: eigenes Motiv, eigene Farbgewichtung und Lichtstimmung
+// =====================================================================
+
+const LEVEL_DESIGN = {
+  'w1-1': { motiv: 'raumhafen', grund: ['#1a3a8a', '#13286a', '#0a1240'], nebel: ['#1e6ad0', '#22c0e0', '#3a4ad0'], rand: '#4fe3ff' },
+  'w1-2': { motiv: 'asteroiden', grund: ['#3a1a6a', '#2a1258', '#140a34'], nebel: ['#8a3ad0', '#c06a30', '#5a2aa0'], rand: '#ffc94a',
+    rampen: [{ rgb: '255,201,74', voll: '#ffc94a' }, { rgb: '255,150,80', voll: '#ff9650' }],
+    bumper: { farben: [['#ffd0a0', '#c06a30', '#4a1e0c'], ['#ffe6a0', '#d8962a', '#5a3008'], ['#f0c0ff', '#9a4ae0', '#2a0e5a']] } },
+  'w1-3': { motiv: 'station', grund: ['#164a7a', '#123a64', '#0a2244'], nebel: ['#2fd6c8', '#4fa8ff', '#e8fbff'], rand: '#2fd6c8',
+    bumper: { stil: 'reaktor', glow: '#2fd6c8' } },
+  'w1-4': { motiv: 'schwarzesloch', grund: ['#3a1260', '#2a0c4a', '#14062a'], nebel: ['#c040ff', '#ff40c0', '#ff8a2a'], rand: '#ff40c0',
+    rampen: [{ rgb: '200,90,255', voll: '#c85aff' }, { rgb: '255,140,40', voll: '#ff8c28' }],
+    bumper: { farben: [['#ffd0f0', '#e040c0', '#4a0a3a'], ['#ffe0b0', '#ff8a2a', '#5a2006'], ['#e0c8ff', '#8a40ff', '#22085a']] } },
+
+  'w2-1': { motiv: 'neonmarkt', licht: '#ff2bd6', rand: '#ff2bd6' },
+  'w2-2': { motiv: 'datenautobahn', licht: '#00e5ff', grund: ['#0c2050', '#0a1844', '#060c30'], rand: '#00e5ff',
+    rampen: [{ rgb: '0,229,255', voll: '#00e5ff' }, { rgb: '139,92,255', voll: '#8b5cff' }] },
+  'w2-3': { motiv: 'hologrammturm', licht: '#8b5cff', grund: ['#2a1060', '#1e0a4a', '#0c0a3a'], rand: '#8b5cff',
+    bumper: { glow: '#8b5cff', ring: '#ff2bd6' } },
+  'w2-4': { motiv: 'hack', licht: '#ff2bd6', rand: '#ffe84a',
+    rampen: [{ rgb: '255,232,74', voll: '#ffe84a' }, { rgb: '0,229,255', voll: '#00e5ff' }] },
+
+  'w3-1': { motiv: 'ranken', platte: ['#2e6a52', '#356e5a'], licht: '#19c878', rand: '#19c878' },
+  'w3-2': { motiv: 'wasserfall', platte: ['#2a6066', '#2e6a6a'], grund: ['#0c5a5a', '#0a4a52', '#073840'], licht: '#20d9c2', rand: '#20d9c2' },
+  'w3-3': { motiv: 'kammer', platte: ['#3a5a4a', '#425e4a'], licht: '#ffc857', rand: '#ffc857',
+    bumper: { stil: 'edelstein', glow: '#ffc857' } },
+  'w3-4': { motiv: 'goetzenauge', platte: ['#2c5a58', '#34625a'], licht: '#20d9c2', rand: '#20d9c2' },
+
+  'w4-1': { motiv: 'riff', rand: '#ff718d' },
+  'w4-2': { motiv: 'quallen', grund: ['#3a9ae0', '#2a6ad0', '#1a4ab0'], rand: '#c27bff', bumper: { stil: 'qualle', glow: '#c27bff' } },
+  'w4-3': { motiv: 'stadt', grund: ['#3ac0d8', '#1a8ac8', '#0e5aa8'], rand: '#e8f8ff' },
+  'w4-4': { motiv: 'graben', grund: ['#1a7ad0', '#1050b0', '#0a3888'], rand: '#168bff', bumper: { stil: 'qualle', glow: '#20e0d0' } },
+
+  'w5-1': { motiv: 'aschefeld', platte: ['#3a3040', '#4a3c4e'], fuge: 'rgba(255,120,40,0.35)', grund: ['#4a2a48', '#3a1e36', '#24181e'], rand: '#ff6a00' },
+  'w5-2': { motiv: 'lavastrom', platte: ['#2e262a', '#3a3034'], fuge: 'rgba(255,106,0,0.5)', rand: '#ff6a00' },
+  'w5-3': { motiv: 'magmakammer', platte: ['#3a1e22', '#4a262e'], fuge: 'rgba(255,48,64,0.6)', grund: ['#6a1428', '#4a0e1e', '#26101a'], rand: '#ff3040',
+    rampen: [{ rgb: '255,48,64', voll: '#ff3040' }, { rgb: '255,212,71', voll: '#ffd447' }] },
+  'w5-4': { motiv: 'herz', platte: ['#30262c', '#3e3238'], fuge: 'rgba(255,212,71,0.5)', rand: '#ffd447',
+    rampen: [{ rgb: '255,212,71', voll: '#ffd447' }, { rgb: '255,106,0', voll: '#ff6a00' }] }
+};
+// Grundwerte, falls ein Level eine Angabe nicht selbst setzt
+const WELT_GRUNDWERTE = {
+  weltraum: { nebel: ['#3a2ad0', '#1a7ad0', '#8a3ad0'] },
+  dschungel: { platte: ['#2e6a52', '#2a5e5a'] },
+  vulkan: { platte: ['#2e262a', '#3a3036'], fuge: 'rgba(255,106,0,0.55)' }
+};
+
+// Thema für ein Level zusammensetzen (Welt + Level). Für Spiel und Vorschau dasselbe.
+const themaCache = new Map();
+function themaFuer(levelIndex) {
+  if (themaCache.has(levelIndex)) return themaCache.get(levelIndex);
+  const lv = levelIndex >= 0 ? LEVEL[levelIndex] : null;
+  const welt = lv ? lv.welt : 'klassik';
+  const basis = WELT_DESIGN[welt];
+  const anders = (lv && LEVEL_DESIGN[lv.id]) || {};
+  const th = Object.assign({}, basis, WELT_GRUNDWERTE[welt] || {}, anders);
+  for (const k of ['f', 'bumper', 'flipper', 'ball', 'schiene']) th[k] = Object.assign({}, basis[k], anders[k] || {});
+  th.weltId = welt;
+  th.physik = WELT_PHYSIK[welt];
+  const male = basis.male;
+  th.male = (c, T) => { male(c, T, th); if (th.motiv) MOTIVE[th.motiv](c, th); };
+  const ambient = basis.ambient;
+  th.ambient = (c, zeit) => ambient(c, WENIG_BEWEGUNG ? 0 : zeit, th);
+  const deko = basis.deko;
+  th.deko = (c, T) => deko(c, T, th);
+  themaCache.set(levelIndex, th);
+  return th;
+}
+// Welt-Grundthemen für Menüs (Farben, Namen, Eigenschaften)
+const THEMEN = {};
+for (const id of Object.keys(WELT_DESIGN)) THEMEN[id] = Object.assign({}, WELT_DESIGN[id], { physik: WELT_PHYSIK[id] });
 
 // =====================================================================
 //  MUSIK
@@ -2500,7 +2656,7 @@ function neuesSpiel(modus = { art: 'klassik' }) {
   for (const sl of T.schleudern) sl.t.kick *= physik.schleuderKick;
   s = {
     T, welt: T.welt, stufe: daten.stufe, phase: 'lauf',
-    modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: THEMEN[level ? level.welt : 'klassik'],
+    modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: themaFuer(level ? modus.nr : -1),
     schritt: 0, schrittStand: 0, schrittZeit: 0, schrittPunkte: 0, levelGeschafft: false, sterne: 0,
     punkte: 0, ballNr: 1, extraBaelle: 0,
     multi: 1, bonus: 0, kombo: 0, letzterSchuss: -99, letzteArt: '',
@@ -2543,13 +2699,21 @@ function naechsteMeldung() {
   s.meldung = m ? Object.assign({ zeit: 0 }, m) : null;
 }
 function funken(x, y, farbe, anzahl = 12, tempo = 260) {
+  if (WENIG_BEWEGUNG) anzahl = Math.ceil(anzahl / 3);
   for (let i = 0; i < anzahl; i++) {
     const w = Math.random() * Math.PI * 2, v = tempo * (0.3 + Math.random() * 0.9);
     s.teilchen.push({ x, y, vx: Math.cos(w) * v, vy: Math.sin(w) * v, leben: 0.35 + Math.random() * 0.45, zeit: 0, farbe, groesse: 1.5 + Math.random() * 2.5, form: s.thema.teilchen, dreh: Math.random() * 6 });
   }
   if (s.teilchen.length > 500) s.teilchen.splice(0, s.teilchen.length - 500);
 }
-function welle(x, y, farbe, r = 60) { s.wellen.push({ x, y, farbe, r, zeit: 0 }); }
+function welle(x, y, farbe, r = 60, art = 'ring') { s.wellen.push({ x, y, farbe, r, zeit: 0, art, saat: Math.random() * 1000 }); }
+// Kurze Rückmeldung beim Treffer, je nach Welt: Ring, Stromstoß, Rune, Blasen oder Funken
+function trefferEffekt(x, y, farbe, r) {
+  const art = s.thema.treffer;
+  welle(x, y, farbe, r, art);
+  if (art === 'blasen') funken(x, y, '#ffffff', 5, 120);
+  if (art === 'funken') funken(x, y, s.thema.f.gold, 8, 360);
+}
 function aktiveBaelle() { return s.welt.baelle.filter(b => b.ort !== 'weg'); }
 
 // --------------------------- Aufträge ---------------------------
@@ -2713,7 +2877,7 @@ const regeln = {
     ton.bumper();
     musik.aktion(0.3);
     funken(b.x, b.y, s.thema.f.bumper, 10, 300);
-    welle(bu.x, bu.y, s.thema.bumper.glow, 50);
+    trefferEffekt(bu.x, bu.y, s.thema.bumper.glow, 50);
     ereignis('bumper');
   },
   schleuder(sl, b) {
@@ -2721,6 +2885,7 @@ const regeln = {
     ton.schleuder();
     musik.aktion(0.15);
     funken(b.x, b.y, s.thema.f.haupt, 8, 240);
+    trefferEffekt((sl.A[0] + sl.C[0]) / 2, (sl.A[1] + sl.C[1]) / 2, s.thema.f.haupt, 30);
   },
   pfosten(p, b) {
     punkte(50, p.x, p.y - 18, s.thema.f.zweit);
@@ -3438,13 +3603,15 @@ function malRampen(T, th, kp, versatz) {
     };
     if (th.rampenStil === 'stein') {
       // Steinrinne mit Wasser darin
-      pfad(c, p); c.strokeStyle = 'rgba(70,56,36,0.9)'; c.lineWidth = 36; c.stroke();
-      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 16; c.stroke();
-      streben('rgba(30,22,12,0.6)', 2, 22);
-      for (const q of kanten) { pfad(c, q); c.strokeStyle = '#c9a46a'; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = voll; c.lineWidth = 1; c.stroke(); }
+      const st = th.steinRampe;
+      pfad(c, p); c.strokeStyle = st.grund; c.lineWidth = 36; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.55)`; c.lineWidth = 16; c.stroke();
+      pfad(c, p); c.strokeStyle = 'rgba(255,255,255,0.25)'; c.lineWidth = 3; c.stroke();
+      streben(st.streben, 2, 22);
+      for (const q of kanten) { pfad(c, q); c.strokeStyle = st.rand; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = '#ffffff'; c.lineWidth = 0.8; c.stroke(); }
     } else if (th.rampenStil === 'glas') {
       // Glasröhre
-      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.12)`; c.lineWidth = 34; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.2)`; c.lineWidth = 34; c.stroke();
       pfad(c, p); c.strokeStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 12; c.stroke();
       for (const q of kanten) { pfad(c, q); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 6; c.stroke(); pfad(c, q); c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 1.5; c.stroke(); }
       c.fillStyle = 'rgba(255,255,255,0.35)';
@@ -3483,7 +3650,7 @@ function malBall(th, kp) {
   const c = document.createElement('canvas');
   c.width = c.height = gr;
   const g = c.getContext('2d');
-  const m = gr / 2, r = gr / 2 - 2;
+  const m = gr / 2, r = gr / 2 - 3;
   // Grundkörper: dunkler Stahl
   let v = g.createRadialGradient(m - r * 0.35, m - r * 0.4, r * 0.05, m, m, r);
   [0, 0.18, 0.5, 0.85, 1].forEach((p, i) => v.addColorStop(p, kb.stops[i]));
@@ -3509,16 +3676,20 @@ function malBall(th, kp) {
   // Glanzpunkt
   g.fillStyle = '#ffffff';
   g.beginPath(); g.ellipse(m - r * 0.36, m - r * 0.42, r * 0.22, r * 0.15, -0.6, 0, Math.PI * 2); g.fill();
-  g.strokeStyle = 'rgba(0,0,0,0.5)';
-  g.lineWidth = Math.max(1, r * 0.06);
+  // klare Kontur: dunkler Ring und darum ein feiner heller Saum
+  g.strokeStyle = 'rgba(8,10,22,0.9)';
+  g.lineWidth = Math.max(1.2, r * 0.1);
   g.beginPath(); g.arc(m, m, r - g.lineWidth / 2, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,0.85)';
+  g.lineWidth = Math.max(1, r * 0.06);
+  g.beginPath(); g.arc(m, m, r + g.lineWidth / 2 + 0.5, 0, Math.PI * 2); g.stroke();
   c.mitte = m;
   return c;
 }
 
 function zeichneKugel(c, b, groesse = 1) {
   // Im Bild hat die Kugel den Radius (Breite/2 - 2); das Bild wird passend skaliert
-  const halb = PH.ballR * groesse * (ballBild.width / 2) / (ballBild.width / 2 - 2);
+  const halb = PH.ballR * groesse * (ballBild.width / 2) / (ballBild.width / 2 - 3);
   c.drawImage(ballBild, b.x - halb, b.y - halb, halb * 2, halb * 2);
 }
 
@@ -3560,6 +3731,11 @@ function zeichneFlipper(c, f, th) {
   c.strokeStyle = `rgba(${fl.glow},${0.5 + aktiv * 0.5})`;
   c.lineWidth = 1.2;
   c.beginPath(); c.moveTo(4, -f.r0 * 0.25); c.lineTo(L - 6, -f.r1 * 0.2); c.stroke();
+  if (fl.streifen) {
+    c.strokeStyle = fl.streifen; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(10, f.r0 * 0.35); c.lineTo(L - 10, f.r1 * 0.3); c.stroke();
+    c.fillStyle = fl.streifen; c.beginPath(); c.arc(L, 0, 2.2, 0, Math.PI * 2); c.fill();
+  }
   c.fillStyle = '#0b0e1c';
   c.beginPath(); c.arc(0, 0, 4.5, 0, Math.PI * 2); c.fill();
   c.strokeStyle = '#e8f0ff'; c.lineWidth = 1.5; c.stroke();
@@ -3603,6 +3779,44 @@ function malBumper(c, bu, th, zeit) {
     c.fillStyle = hell > 0.2 ? '#fff6c0' : B.ring;
     c.beginPath(); c.ellipse(x, y, r * 0.5, r * 0.26, 0, 0, Math.PI * 2); c.fill();
     c.fillStyle = '#2a1e10'; c.beginPath(); c.arc(x, y, r * 0.17, 0, Math.PI * 2); c.fill();
+  } else if (B.stil === 'reaktor') {
+    // weiß-türkiser Reaktorkern mit Metallring und Speichen
+    g = c.createRadialGradient(x, y, 1, x, y, r);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, hell > 0.3 ? '#ffffff' : '#b8fff4'); g.addColorStop(0.7, B.glow); g.addColorStop(1, '#0a3a44');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#e8fbff'; c.lineWidth = 3; c.beginPath(); c.arc(x, y, r - 1.5, 0, Math.PI * 2); c.stroke();
+    c.save(); c.translate(x, y); c.rotate(zeit * 0.8);
+    c.strokeStyle = 'rgba(10,58,68,0.7)'; c.lineWidth = 2;
+    for (let k = 0; k < 3; k++) { c.rotate(Math.PI * 2 / 3); c.beginPath(); c.moveTo(r * 0.3, 0); c.lineTo(r * 0.85, 0); c.stroke(); }
+    c.restore();
+  } else if (B.stil === 'maske') {
+    // steinerne Maske mit leuchtenden Edelstein-Augen
+    g = c.createRadialGradient(x - r * 0.3, y - r * 0.3, 2, x, y, r);
+    g.addColorStop(0, B.kappe[0]); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : B.ring; c.lineWidth = 3; c.beginPath(); c.arc(x, y, r - 1.5, 0, Math.PI * 2); c.stroke();
+    for (const sx of [-1, 1]) { c.fillStyle = hell > 0.2 ? '#ffffff' : B.auge; c.beginPath(); c.ellipse(x + sx * r * 0.36, y - r * 0.15, r * 0.2, r * 0.12, 0, 0, Math.PI * 2); c.fill(); }
+    c.fillStyle = B.ring; c.fillRect(x - r * 0.08, y - r * 0.05, r * 0.16, r * 0.4);
+    c.fillStyle = 'rgba(20,40,34,0.8)'; c.fillRect(x - r * 0.35, y + r * 0.45, r * 0.7, r * 0.12);
+  } else if (B.stil === 'edelstein') {
+    // leuchtender goldgefasster Edelstein
+    c.fillStyle = '#ffc857'; vieleck(c, x, y, r, 8, null, Math.PI / 8); c.fill();
+    g = c.createLinearGradient(x - r, y - r, x + r, y + r);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : '#b0fff0'); g.addColorStop(0.5, '#20d9c2'); g.addColorStop(1, '#0a6a5a');
+    c.fillStyle = g; vieleck(c, x, y, r * 0.78, 8, null, Math.PI / 8); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(x - r * 0.5, y - r * 0.2); c.lineTo(x, y - r * 0.6); c.lineTo(x + r * 0.5, y - r * 0.2); c.lineTo(x, y + r * 0.6); c.closePath(); c.stroke();
+  } else if (B.stil === 'muschel') {
+    // Perlmuschel: Schale mit Rippen, Perle in der Mitte
+    g = c.createRadialGradient(x, y - r * 0.4, 2, x, y, r);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(160,80,110,0.5)'; c.lineWidth = 1.5;
+    for (let k = -3; k <= 3; k++) { c.beginPath(); c.moveTo(x, y + r * 0.6); c.lineTo(x + k * r * 0.3, y - r * 0.85); c.stroke(); }
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : '#20e0d0'; c.lineWidth = 2.5; c.beginPath(); c.arc(x, y, r - 1.2, 0, Math.PI * 2); c.stroke();
+    g = c.createRadialGradient(x - 3, y - 3, 1, x, y, r * 0.32);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, hell > 0.3 ? '#fff6c0' : '#d8e8f8');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y + r * 0.1, r * 0.3, 0, Math.PI * 2); c.fill();
   } else if (B.stil === 'qualle') {
     g = c.createRadialGradient(x, y - r * 0.3, 2, x, y, r);
     g.addColorStop(0, hell > 0.3 ? '#ffffff' : 'rgba(230,255,255,0.95)'); g.addColorStop(0.6, 'rgba(127,240,255,0.75)'); g.addColorStop(1, 'rgba(26,106,138,0.85)');
@@ -3736,17 +3950,31 @@ function zeichneTeile(c, zeit, T, th, live) {
     c.fillStyle = p.blitz > 0.2 ? '#ffffff' : F.zweit; c.beginPath(); c.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2); c.fill();
   }
 
-  // Fallziele
+  // Fallziele (im Dschungel als Tempelsiegel)
   for (const z of T.fallziele) {
     if (z.unten) { c.fillStyle = '#05050c'; c.fillRect(z.x - 14, z.y - 2, 28, 4); continue; }
+    if (th.ziele === 'rune') {
+      c.fillStyle = '#5a7a6c'; c.fillRect(z.x - 14, z.y - 5, 28, 10);
+      c.strokeStyle = F.gold; c.lineWidth = 1.5; c.strokeRect(z.x - 14, z.y - 5, 28, 10);
+      c.fillStyle = z.blitz > 0 ? '#ffffff' : F.gold; c.beginPath(); c.arc(z.x, z.y, 3, 0, Math.PI * 2); c.fill();
+      continue;
+    }
     c.fillStyle = '#fff8d0';
     c.fillRect(z.x - 14, z.y - 4, 28, 8);
     c.fillStyle = F.gold;
     c.fillRect(z.x - 13, z.y - 1, 26, 5);
   }
-  // Stehziele
+  // Stehziele (im Dschungel als Runentafeln)
   for (const z of T.stehziele) {
     c.lineCap = 'round';
+    if (th.ziele === 'rune') {
+      c.strokeStyle = z.an ? F.gold : '#4a6a5c'; c.lineWidth = 9;
+      c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
+      c.strokeStyle = z.an || z.blitz > 0 ? '#ffffff' : F.gold; c.lineWidth = 1.5;
+      const mx = (z.ax + z.bx) / 2, my = (z.ay + z.by) / 2;
+      c.beginPath(); c.moveTo(mx - 3, my - 5); c.lineTo(mx + 3, my); c.lineTo(mx - 3, my + 5); c.stroke();
+      continue;
+    }
     c.strokeStyle = z.an ? '#ffffff' : 'rgba(255,255,255,0.35)';
     c.lineWidth = 8;
     c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
@@ -3803,14 +4031,16 @@ function vorschau(levelIndex, breite) {
   const schluessel = levelIndex + ':' + breite;
   if (vorschauCache.has(schluessel)) return vorschauCache.get(schluessel);
   const lv = levelIndex < 0 ? null : LEVEL[levelIndex];
-  const th = THEMEN[lv ? lv.welt : 'klassik'];
+  const th = themaFuer(levelIndex);
   const T = baueTisch(lv ? lv.tisch : KLASSIK_PLAN);
   const kp = breite / TB;
   const grund = malUnten(T, th, kp, 0);
   const deckel = malRampen(T, th, kp, 0);
   const c = grund.getContext('2d');
   c.setTransform(kp, 0, 0, kp, 0, 0);
+  c.save(); tischUmriss(c); c.clip();
   th.ambient(c, 1.3);
+  c.restore();
   zeichneTeile(c, 0, T, th, false);
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.drawImage(deckel, 0, 0);
@@ -3852,13 +4082,16 @@ function zeichne(zeit) {
   if (!s || !unten) return;
   const th = s.thema;
   let wx = 0, wy = 0;
-  if (s.wackeln > 0) { wx = (Math.random() - 0.5) * s.wackeln * 14; wy = (Math.random() - 0.5) * s.wackeln * 14; }
+  // bewusst kein Wackeln des Bildes: die Kugel bleibt immer ruhig im Blick
   ctx.setTransform(1, 0, 0, 1, Math.round((ox + wx * k) * dpr), Math.round((oy + wy * k) * dpr));
   ctx.drawImage(unten, 0, 0);
   ctx.setTransform(k * dpr, 0, 0, k * dpr, (ox + wx * k) * dpr, (oy + wy * k + HUDH * k) * dpr);
   const c = ctx;
 
+  // bewegter Hintergrund nur innerhalb des Tisches
+  c.save(); tischUmriss(c); c.clip();
   th.ambient(c, zeit);
+  c.restore();
   zeichneTeile(c, zeit, s.T, th, true);
 
   const baelle = s.welt.baelle;
@@ -3918,11 +4151,7 @@ function zeichne(zeit) {
 
   // Funken, Wellen, Punkte
   c.globalCompositeOperation = 'lighter';
-  for (const w of s.wellen) {
-    const a = 1 - w.zeit / 0.45;
-    c.strokeStyle = w.farbe; c.globalAlpha = a; c.lineWidth = 3 * a;
-    c.beginPath(); c.arc(w.x, w.y, w.r * (0.4 + w.zeit / 0.45), 0, Math.PI * 2); c.stroke();
-  }
+  for (const w of s.wellen) malWelle(c, w);
   c.globalAlpha = 1;
   for (const t of s.teilchen) malTeilchen(c, t);
   c.globalAlpha = 1;
@@ -4069,6 +4298,51 @@ function zeichneHud(zeit) {
     if (rest > 0) c.fillText(Math.ceil(rest) + 's', xx, y + 22);
     c.globalAlpha = 1;
   });
+}
+
+// Treffer-Rückmeldung: kurz und deutlich, nie über der Kugel stehen bleibend
+function malWelle(c, w) {
+  const a = 1 - w.zeit / 0.45;
+  if (a <= 0) return;
+  c.globalAlpha = a;
+  c.strokeStyle = w.farbe;
+  const r = w.r * (0.4 + w.zeit / 0.45);
+  if (w.art === 'blitz') {
+    // elektrischer Lichtimpuls: Zickzack-Strahlen
+    const z = zufall(Math.floor(w.saat + w.zeit * 30));
+    c.lineWidth = 2;
+    for (let k = 0; k < 5; k++) {
+      const wi = k / 5 * Math.PI * 2 + w.saat;
+      c.beginPath(); c.moveTo(w.x + Math.cos(wi) * w.r * 0.5, w.y + Math.sin(wi) * w.r * 0.5);
+      for (let s = 1; s <= 3; s++) { const rr = w.r * 0.5 + s * 9; c.lineTo(w.x + Math.cos(wi + (z() - 0.5) * 0.5) * rr, w.y + Math.sin(wi + (z() - 0.5) * 0.5) * rr); }
+      c.stroke();
+    }
+  } else if (w.art === 'rune') {
+    // goldene Rune leuchtet kurz auf
+    c.strokeStyle = '#ffc857'; c.lineWidth = 2.5;
+    c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.moveTo(w.x, w.y - r * 0.6); c.lineTo(w.x + r * 0.5, w.y + r * 0.4); c.lineTo(w.x - r * 0.5, w.y + r * 0.4); c.closePath(); c.stroke();
+  } else if (w.art === 'blasen') {
+    // farbiger Wellenring
+    c.lineWidth = 3 * a; c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#ff718d'; c.lineWidth = 2 * a; c.beginPath(); c.arc(w.x, w.y, r * 0.7, 0, Math.PI * 2); c.stroke();
+  } else if (w.art === 'funken') {
+    c.lineWidth = 3 * a; c.strokeStyle = '#ffd447';
+    c.beginPath(); c.arc(w.x, w.y, r * 0.8, 0, Math.PI * 2); c.stroke();
+  } else {
+    c.lineWidth = 3 * a; c.beginPath(); c.arc(w.x, w.y, r, 0, Math.PI * 2); c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+
+// Umriss der Spielfläche (für Zuschnitte)
+function tischUmriss(c) {
+  c.beginPath();
+  c.moveTo(20, TH + 10);
+  c.lineTo(20, 330);
+  c.arc(270, 330, 250, Math.PI, 0);
+  c.lineTo(520, TH + 10);
+  c.closePath();
 }
 
 // =====================================================================
@@ -4229,14 +4503,31 @@ let gewaehlteWelt = 'weltraum';
 function weltLevel(welt) { return LEVEL.map((l, i) => [l, i]).filter(([l]) => l.welt === welt); }
 function sterneVon(welt) { return weltLevel(welt).reduce((n, [l]) => n + (daten.sterne[l.id] || 0), 0); }
 
-function bildElement(levelIndex, breite) {
-  // Vorschau als <img>, damit sie wie ein normales Bild skaliert
+function bildElement(levelIndex, breite, gesperrt) {
+  // Vorschau als <img>, gerendert mit demselben Zeichner und denselben Designdaten wie das Spiel
+  const rahmen = document.createElement('span');
+  rahmen.className = 'bildRahmen';
   const img = document.createElement('img');
   img.alt = '';
   img.width = breite;
-  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.82); } catch (e) {}
-  return img;
+  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.85); } catch (e) {}
+  rahmen.appendChild(img);
+  if (gesperrt) {
+    const s = document.createElement('span');
+    s.className = 'schloss';
+    s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#f2b84b" stroke="#1d1505" stroke-width="1.2" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>';
+    rahmen.appendChild(s);
+  }
+  return rahmen;
 }
+// Farbe der Welt für Rahmen, Tönung und Schein der Karte
+function weltFarben(el, hex) {
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  el.style.setProperty('--welt', hex);
+  el.style.setProperty('--weltTon', `rgba(${r},${g},${b},0.28)`);
+  el.style.setProperty('--weltSchein', `rgba(${r},${g},${b},0.18)`);
+}
+const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>GESPERRT';
 
 function baueWelten() {
   const liste = $('weltListe');
@@ -4249,12 +4540,15 @@ function baueWelten() {
     const knopf = document.createElement('button');
     knopf.type = 'button';
     knopf.className = 'weltKarte' + (frei ? '' : ' zu');
-    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
-    knopf.append(bildElement(ersterIndex, 112));
+    weltFarben(knopf, WELT_DESIGN[w.id].rand);
+    knopf.append(bildElement(ersterIndex, 112, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
+    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = 'WELT ' + (WELTEN.indexOf(w) + 1);
     const name = document.createElement('strong'); name.textContent = w.name.toUpperCase();
-    const text = document.createElement('span'); text.textContent = frei ? w.text : '🔒 Schaff zuerst das letzte Level der Welt davor.';
+    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + ' Schaff zuerst das letzte Level der Welt davor.';
+    if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
+    info.prepend(nr);
     const merkmal = document.createElement('span'); merkmal.className = 'weltMerkmal'; merkmal.textContent = THEMEN[w.id].physik.text;
     const sterne = document.createElement('span'); sterne.className = 'sterneZeile'; sterne.textContent = '★ ' + sterneVon(w.id) + ' / ' + weltLevel(w.id).length * 3;
     info.append(name, text, merkmal, sterne);
@@ -4281,13 +4575,14 @@ function baueLevel() {
     const knopf = document.createElement('button');
     knopf.type = 'button';
     knopf.className = 'levelKarte' + (frei ? '' : ' zu');
-    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
-    knopf.append(bildElement(i, 84));
+    weltFarben(knopf, themaFuer(i).rand);
+    knopf.append(bildElement(i, 84, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
     const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
     const auf = document.createElement('span');
-    auf.textContent = frei ? l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') : '🔒 Schaff zuerst das Level davor.';
+    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : ' – Schaff zuerst das Level davor.');
+    if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     const st = daten.sterne[l.id] || 0;
     const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
     zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');

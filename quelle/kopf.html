@@ -177,19 +177,26 @@
   /* Welt- und Levelauswahl: Karten wie auf der Pixelhafen-Seite, mit echtem Vorschaubild des Tischs */
   .tafel.breit { width: min(560px, 100%); }
   .auswahl { display: grid; gap: 12px; margin: 16px 0 0; }
+  /* Jede Karte trägt die Farbe ihrer Welt: Rahmen, Tönung und Akzent */
   .weltKarte, .levelKarte {
     display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px; width: 100%; padding: 10px;
     color: var(--text); text-align: left; cursor: pointer;
-    background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px;
+    background: linear-gradient(135deg, var(--weltTon, transparent), var(--surface-2) 70%);
+    border: 2px solid var(--welt, var(--line)); border-radius: 14px;
+    box-shadow: 0 0 18px var(--weltSchein, transparent);
     font: inherit;
   }
   .weltKarte:hover:not(:disabled), .levelKarte:hover:not(:disabled) { border-color: var(--accent); }
-  .weltKarte img, .levelKarte img { display: block; height: auto; border-radius: 10px; background: #000; box-shadow: 0 0 0 2px var(--welt, var(--line)); }
-  .weltKarte img { width: 112px; }
-  .levelKarte img { width: 84px; }
+  .bildRahmen { position: relative; display: block; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15); }
+  .bildRahmen img { display: block; height: auto; background: #000; }
+  .weltKarte .bildRahmen img { width: 112px; }
+  .levelKarte .bildRahmen img { width: 84px; }
+  /* Gesperrt: Vorschau bleibt farbig, nur leicht abgedunkelt, mit gut sichtbarem Schloss */
   .weltKarte.zu, .levelKarte.zu { cursor: default; }
-  .weltKarte.zu img, .levelKarte.zu img { filter: grayscale(0.85) brightness(0.55); }
-  .weltKarte.zu .weltInfo, .levelKarte.zu .weltInfo { opacity: 0.6; }
+  .schloss { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(rgba(10, 10, 16, 0.15), rgba(10, 10, 16, 0.55)); }
+  .schloss svg { width: 34px; height: 34px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7)); }
+  .gesperrt { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 3px 9px; color: #1d1505; background: var(--accent); border-radius: 999px; font: 8px/1.6 var(--retro); }
+  .weltNr { justify-self: start; color: var(--welt); font: 8px/1.4 var(--retro); }
   .weltInfo { display: grid; gap: 6px; min-width: 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
   .weltInfo strong { color: var(--text); font: 12px/1.4 var(--retro); }
   .weltMerkmal { justify-self: start; padding: 3px 9px; color: var(--text); background: var(--surface); border-radius: 999px; font-size: 13px; }

@@ -1,6 +1,6 @@
 // Offline-Helfer: Merkt sich alle Dateien des Spiels.
 // Mit Internet wird immer zuerst die neueste Version geladen, ohne Internet die gemerkte.
-const CACHE = 'orbitflipper-v5';
+const CACHE = 'orbitflipper-v6';
 const FILES = [
   './',
   './index.html',

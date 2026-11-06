@@ -25,7 +25,7 @@ function neuesSpiel(modus = { art: 'klassik' }) {
   for (const sl of T.schleudern) sl.t.kick *= physik.schleuderKick;
   s = {
     T, welt: T.welt, stufe: daten.stufe, phase: 'lauf',
-    modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: THEMEN[level ? level.welt : 'klassik'],
+    modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: themaFuer(level ? modus.nr : -1),
     schritt: 0, schrittStand: 0, schrittZeit: 0, schrittPunkte: 0, levelGeschafft: false, sterne: 0,
     punkte: 0, ballNr: 1, extraBaelle: 0,
     multi: 1, bonus: 0, kombo: 0, letzterSchuss: -99, letzteArt: '',
@@ -68,13 +68,21 @@ function naechsteMeldung() {
   s.meldung = m ? Object.assign({ zeit: 0 }, m) : null;
 }
 function funken(x, y, farbe, anzahl = 12, tempo = 260) {
+  if (WENIG_BEWEGUNG) anzahl = Math.ceil(anzahl / 3);
   for (let i = 0; i < anzahl; i++) {
     const w = Math.random() * Math.PI * 2, v = tempo * (0.3 + Math.random() * 0.9);
     s.teilchen.push({ x, y, vx: Math.cos(w) * v, vy: Math.sin(w) * v, leben: 0.35 + Math.random() * 0.45, zeit: 0, farbe, groesse: 1.5 + Math.random() * 2.5, form: s.thema.teilchen, dreh: Math.random() * 6 });
   }
   if (s.teilchen.length > 500) s.teilchen.splice(0, s.teilchen.length - 500);
 }
-function welle(x, y, farbe, r = 60) { s.wellen.push({ x, y, farbe, r, zeit: 0 }); }
+function welle(x, y, farbe, r = 60, art = 'ring') { s.wellen.push({ x, y, farbe, r, zeit: 0, art, saat: Math.random() * 1000 }); }
+// Kurze Rückmeldung beim Treffer, je nach Welt: Ring, Stromstoß, Rune, Blasen oder Funken
+function trefferEffekt(x, y, farbe, r) {
+  const art = s.thema.treffer;
+  welle(x, y, farbe, r, art);
+  if (art === 'blasen') funken(x, y, '#ffffff', 5, 120);
+  if (art === 'funken') funken(x, y, s.thema.f.gold, 8, 360);
+}
 function aktiveBaelle() { return s.welt.baelle.filter(b => b.ort !== 'weg'); }
 
 // --------------------------- Aufträge ---------------------------
@@ -238,7 +246,7 @@ const regeln = {
     ton.bumper();
     musik.aktion(0.3);
     funken(b.x, b.y, s.thema.f.bumper, 10, 300);
-    welle(bu.x, bu.y, s.thema.bumper.glow, 50);
+    trefferEffekt(bu.x, bu.y, s.thema.bumper.glow, 50);
     ereignis('bumper');
   },
   schleuder(sl, b) {
@@ -246,6 +254,7 @@ const regeln = {
     ton.schleuder();
     musik.aktion(0.15);
     funken(b.x, b.y, s.thema.f.haupt, 8, 240);
+    trefferEffekt((sl.A[0] + sl.C[0]) / 2, (sl.A[1] + sl.C[1]) / 2, s.thema.f.haupt, 30);
   },
   pfosten(p, b) {
     punkte(50, p.x, p.y - 18, s.thema.f.zweit);
