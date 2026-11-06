@@ -27,7 +27,7 @@ function spielEnde(sieg = false) {
   s.sieg = sieg;
   if (sieg && s.level) {
     const vorher = daten.sterne[s.level.id] || 0;
-    s.neuFrei = vorher === 0 && levelNr(s.level.id) + 1 < LEVEL.length;
+    s.neuFrei = false;   // alles ist von Anfang an frei
     daten.sterne[s.level.id] = Math.max(vorher, s.sterne);
   }
   merkeRekord();

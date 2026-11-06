@@ -307,7 +307,7 @@
         <li>Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
         <li><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
         <li><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
-        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Ein geschafftes Level schaltet das nächste frei.</li>
+        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Alle Welten und Level kannst du sofort spielen.</li>
       </ul>
       <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
     </section>
@@ -1373,7 +1373,8 @@ function aufgabeText(a) {
 }
 function aufgabeZiel(a) { return a.art === 'folge' ? a.folge.length : a.ziel; }
 function levelNr(id) { return LEVEL.findIndex(l => l.id === id); }
-function levelFrei(i) { return i === 0 || (daten.sterne[LEVEL[i - 1].id] || 0) > 0; }
+// Alle Welten und Level sind von Anfang an frei spielbar (Wunsch des Spielers)
+function levelFrei(i) { return true; }
 function tischName(id) {
   if (id === 'klassik') return 'Klassik';
   const l = LEVEL[levelNr(id)];
@@ -4375,7 +4376,7 @@ function spielEnde(sieg = false) {
   s.sieg = sieg;
   if (sieg && s.level) {
     const vorher = daten.sterne[s.level.id] || 0;
-    s.neuFrei = vorher === 0 && levelNr(s.level.id) + 1 < LEVEL.length;
+    s.neuFrei = false;   // alles ist von Anfang an frei
     daten.sterne[s.level.id] = Math.max(vorher, s.sterne);
   }
   merkeRekord();

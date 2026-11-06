@@ -122,7 +122,8 @@ function aufgabeText(a) {
 }
 function aufgabeZiel(a) { return a.art === 'folge' ? a.folge.length : a.ziel; }
 function levelNr(id) { return LEVEL.findIndex(l => l.id === id); }
-function levelFrei(i) { return i === 0 || (daten.sterne[LEVEL[i - 1].id] || 0) > 0; }
+// Alle Welten und Level sind von Anfang an frei spielbar (Wunsch des Spielers)
+function levelFrei(i) { return true; }
 function tischName(id) {
   if (id === 'klassik') return 'Klassik';
   const l = LEVEL[levelNr(id)];
