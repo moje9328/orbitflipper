@@ -10,7 +10,8 @@ const PH = {
   maxWeg: 3,            // so weit darf sich ein Ball pro Zwischenschritt bewegen
   maxTempo: 2600,       // schneller wird kein Ball
   ballR: 11,
-  schwerkraft: 1250     // Neigung des Tisches, wird je nach Stufe angepasst
+  schwerkraft: 1250,    // Neigung des Tisches, wird je nach Stufe angepasst
+  spielTempo: 1.2       // ganzes Spiel läuft so viel schneller (Wege bleiben gleich)
 };
 
 // Materialien: Abprall (0 = tot, 1 = voll) und Reibung entlang der Fläche
@@ -130,7 +131,7 @@ class Welt {
 
   // Ein fester Physik-Takt
   takt(dt) {
-    dt *= this.zeitlupe;
+    dt *= this.zeitlupe * PH.spielTempo;
     let schnellster = 0;
     for (const b of this.baelle) if (b.ort === 'tisch') schnellster = Math.max(schnellster, Math.hypot(b.vx, b.vy));
     const flipperLaeuft = this.flipper.some(f => f.gedrueckt ? f.w > f.oben : f.w < f.ruhe);

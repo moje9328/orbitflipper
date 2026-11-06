@@ -582,7 +582,7 @@ function logikSchritt(dt) {
   const w = s.welt;
   s.zeit += dt;
   musik.aktualisiere(dt);
-  const sdt = dt * w.zeitlupe;
+  const sdt = dt * w.zeitlupe * PH.spielTempo;
 
   for (let i = spaeter.length - 1; i >= 0; i--) {
     spaeter[i].sek -= dt;
