@@ -506,41 +506,123 @@ const ton = {
   klick() { this.piep(880, 0.05, 0.04, 'square'); }
 };
 
-// Leise Synth-Begleitung im Hintergrund
+// =====================================================================
+//  MUSIK: Ein kleiner Komponist. Jede Welt hat Tonleiter, Tempo und Klangfarben.
+//  Daraus entstehen immer neue Stücke: Akkordfolge, Begleitung und eine eigene
+//  Melodie (Intro, Melodie A, Melodie B, Variation). Etwa alle 30 bis 40 Sekunden
+//  beginnt ein neues Stück, und jedes Level hat seine eigenen.
+// =====================================================================
+
+const FOLGEN = [[0, 5, 3, 4], [0, 3, 4, 4], [5, 3, 0, 4], [0, 4, 5, 3], [0, 2, 5, 4], [5, 4, 3, 4], [0, 5, 1, 4], [3, 4, 0, 0], [0, 6, 5, 4], [0, 3, 0, 4]];
+const RHYTHMEN = [
+  [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+  [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+  [1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+  [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  [1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+  [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0]
+];
+const ARPS = [[0, 2, 4, 7], [7, 4, 2, 0], [0, 4, 2, 4, 7, 4, 2, 4], [0, 7, 2, 4], [0, 2, 4, 2]];
+
+function textZahl(text) { let h = 2166136261; for (const z of text) h = Math.imul(h ^ z.charCodeAt(0), 16777619); return h >>> 0; }
+
+// Ein Stück erfinden. Gleiche Saat ergibt immer dasselbe Stück.
+function erfindeStueck(saat) {
+  const z = zufall(saat);
+  const w = n => Math.floor(z() * n);
+  const folge = FOLGEN[w(FOLGEN.length)];
+  const arp = ARPS[w(ARPS.length)];
+  const tempo = 0.9 + z() * 0.22;
+  // Eine Phrase: 4 Takte zu 16 Schritten, im Takt über dem jeweiligen Akkord
+  const phrase = (rhythmen) => {
+    const noten = new Array(64).fill(null);
+    let ton = folge[0] + 7;
+    for (let takt = 0; takt < 4; takt++) {
+      const r = rhythmen[takt % rhythmen.length];
+      const akk = folge[takt];
+      for (let i = 0; i < 16; i++) {
+        if (!r[i]) continue;
+        if (i === 0 || (i === 8 && z() < 0.5)) ton = akk + [0, 2, 4, 7][w(4)];   // auf Akkordtönen beginnen
+        else ton += [-2, -1, -1, 1, 1, 2, 0][w(7)];
+        ton = Math.max(akk - 2, Math.min(akk + 11, ton));
+        noten[takt * 16 + i] = ton;
+      }
+    }
+    noten[63] = null; noten[60] = folge[3] === 4 ? 4 : 0;   // Ende auf einem ruhigen Ton
+    return noten;
+  };
+  const rA = [RHYTHMEN[w(6)], RHYTHMEN[w(6)]];
+  const rB = [RHYTHMEN[w(6)], RHYTHMEN[w(6)]];
+  const A = phrase(rA), B = phrase(rB);
+  const A2 = A.slice(0, 48).concat(phrase(rA).slice(48));   // Variation: anderer Schluss
+  return { folge, arp, tempo, teile: [null, A, B, A2], bassSprung: z() < 0.5 };
+}
+
 const musik = {
-  schritt: 0, naechste: 0, uhr: null,
-  stueck: null,   // Bass, Melodie und Tempo der aktuellen Welt
+  schritt: 0, naechste: 0, uhr: null, stueck: null, stueckNr: 0, stueckStart: 0, quelle: '',
   starte() {
     this.stoppe();
     if (!ton.ctx) return;
     this.naechste = ton.ctx.currentTime + 0.1;
+    this.schritt = 0;
+    this.stueck = null;
     this.uhr = setInterval(() => this.takt(), 60);
   },
   stoppe() { if (this.uhr) clearInterval(this.uhr); this.uhr = null; },
+  neuesStueck() {
+    // Saat aus Tisch und Stücknummer: jedes Level hat seine eigene Reihe von Stücken
+    if (this.quelle !== s.tisch) { this.quelle = s.tisch; this.stueckNr = Math.floor(Math.random() * 4); }
+    else this.stueckNr++;
+    this.stueck = erfindeStueck(textZahl(s.tisch + ':' + this.stueckNr));
+    this.stueckStart = this.schritt;
+  },
   takt() {
     if (!ton.ctx || ton.ctx.state !== 'running' || !s || s.phase !== 'lauf' || !$('fenster').hidden) {
       if (ton.ctx) this.naechste = ton.ctx.currentTime + 0.05;
       return;
     }
+    const m = s.thema.musik;
+    if (!this.stueck || this.quelle !== s.tisch || this.schritt - this.stueckStart >= 256) this.neuesStueck();
     const jetzt = ton.ctx.currentTime;
-    this.stueck = s.thema.musik;
-    const dauer = this.stueck.takt * (s.multiball ? 0.8 : 1);
+    const dauer = m.takt / this.stueck.tempo * (s.multiball ? 0.8 : 1);
     if (this.naechste < jetzt) this.naechste = jetzt + 0.02;
     while (this.naechste < jetzt + 0.2) {
-      if (daten.musik) this.note(this.schritt, this.naechste - jetzt, dauer);
+      if (daten.musik) this.note(this.schritt - this.stueckStart, this.naechste - jetzt, dauer, m);
       this.schritt++;
       this.naechste += dauer;
+      if (this.schritt - this.stueckStart >= 256) this.neuesStueck();
     }
   },
-  note(nr, start, dauer) {
-    const m = this.stueck;
+  note(k, start, dauer, m) {
+    const st = this.stueck;
     const hz = n => 440 * Math.pow(2, (n - 69) / 12);
-    const b = m.bass[Math.floor(nr / 16) % m.bass.length];
+    // Tonleiterstufe -> Midi-Note
+    const stufe = d => { const L = m.skala.length; const o = Math.floor(d / L); return m.grund + m.skala[((d % L) + L) % L] + 12 * o; };
+    const mild = n => { while (n > 86) n -= 12; return n; };   // nie schrill
+    const teil = Math.floor(k / 64), i = k % 64;
+    const akk = st.folge[Math.floor(i / 16)];
     ton.roh = true;   // Musik nicht von der Effekt-Klangfarbe verändern lassen
-    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, m.bassWelle, start);
-    if (nr % 2 === 0) ton.piep(hz(m.arp[(nr / 2) % 8] + (b - m.bass[0])), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut, m.arpWelle, start);
-    if (m.trommel && nr % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
-    if (m.trommel && nr % 16 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+    // Bass
+    if (i % 4 === 0) ton.piep(hz(stufe(akk) - 12 + (st.bassSprung && i % 8 === 4 ? 12 : 0)), dauer * 3, 0.03, m.bassWelle, start);
+    // Begleitung (Arpeggio), im Intro etwas leiser
+    if (i % 2 === 0) {
+      const a = st.arp[(i / 2) % st.arp.length];
+      ton.piep(hz(mild(stufe(akk + a) + 12)), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut * (teil === 0 ? 0.7 : 1), m.arpWelle, start);
+    }
+    // Melodie
+    const mel = st.teile[teil];
+    if (mel && mel[i] != null) {
+      let lang = 1; while (lang < 4 && i + lang < 64 && mel[i + lang] == null) lang++;
+      const n = hz(mild(stufe(mel[i]) + 12));
+      ton.piep(n, dauer * lang * (m.kurz ? 0.6 : 0.95), m.leadLaut, m.leadWelle, start);
+      if (m.hall) ton.piep(n, dauer * lang, m.leadLaut * 0.35, m.leadWelle, start + dauer * 1.5);
+    }
+    // Schlagzeug (im Multiball immer)
+    if (m.trommel || s.multiball) {
+      if (i % 8 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+      if (i % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
+      if (m.hihat && i % 2 === 1) ton.knall(0.02, 0.015, 9000, start);
+    }
     ton.roh = false;
   }
 };
@@ -935,7 +1017,7 @@ const PFOSTEN_FORMEN = {
   flanke: [[176, 566], [328, 566]],
   seiten: [[132, 356], [372, 356]],
   mitte: [[252, 610]],
-  oben: [[150, 205], [354, 205]]
+  oben: [[138, 238], [366, 238]]
 };
 // Wege der Rampen. Rechts ist (außer bei "innen") das Spiegelbild von links.
 const RAMPEN_WEGE = {
@@ -1001,7 +1083,9 @@ function baueTisch(plan = KLASSIK_PLAN) {
   // ---------- Untere Hälfte: Bahnen, Schleudern, Flipper ----------
   for (const s of [1, -1]) {
     const X = x => s === 1 ? x : spiegel(x);
-    zug([[X(58), 640], [X(58), 770], [X(140), 818]], { r: 3.5 });
+    // Die Innenbahn-Führung trifft den Flipper-Drehpunkt genau tangential (sie endet innerhalb seiner Kappe).
+    // So gibt es keine Stufe, an der eine langsame Kugel liegen bleiben könnte.
+    zug([[X(58), 640], [X(58), 770], [X(154.2), 819]], { r: 3.5 });
     neu(pfosten(X(58), 640, 5, { mat: 'gummi' }));
 
     // Schleuder: Dreieck, die lange Seite schießt den Ball weg
@@ -1242,7 +1326,7 @@ const THEMEN = {
     male(c) { malKlassikKunst(c); },
     ambient() {},
     klang: { welle: 'square', hoch: 1 },
-    musik: { bass: [38, 38, 41, 43, 36, 36, 43, 41], arp: [62, 65, 69, 72, 69, 65, 62, 57], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', arpLaut: 0.008 }
+    musik: { grund: 50, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', leadWelle: 'square', arpLaut: 0.007, leadLaut: 0.011 }
   },
 
   // ------------------------------------------------------------------ WELTRAUM
@@ -1261,7 +1345,7 @@ const THEMEN = {
     male(c) { malWeltraum(c); },
     ambient(c, zeit) { funkelSterne(c, zeit); },
     klang: { welle: 'triangle', hoch: 1.15 },
-    musik: { bass: [36, 36, 43, 41, 39, 39, 41, 43], arp: [72, 79, 84, 79, 75, 79, 82, 79], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', arpLaut: 0.012 }
+    musik: { grund: 48, skala: [0, 2, 4, 6, 7, 9, 11], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', leadWelle: 'triangle', arpLaut: 0.011, leadLaut: 0.016, hall: true }
   },
 
   // ------------------------------------------------------------------ CYBERPUNK
@@ -1280,7 +1364,7 @@ const THEMEN = {
     male(c) { malCyber(c); },
     ambient(c, zeit) { cyberRegen(c, zeit); },
     klang: { welle: 'square', hoch: 1.3 },
-    musik: { bass: [33, 33, 36, 31, 33, 33, 38, 36], arp: [69, 72, 76, 81, 76, 72, 69, 64], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', arpLaut: 0.009, trommel: true }
+    musik: { grund: 45, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', leadWelle: 'sawtooth', arpLaut: 0.008, leadLaut: 0.008, trommel: true, hihat: true }
   },
 
   // ------------------------------------------------------------------ DSCHUNGEL
@@ -1299,7 +1383,7 @@ const THEMEN = {
     male(c) { malDschungel(c); },
     ambient(c, zeit) { dschungelLeben(c, zeit); },
     klang: { welle: 'sine', hoch: 0.9, holz: true },
-    musik: { bass: [40, 40, 43, 45, 40, 40, 47, 45], arp: [64, 67, 69, 71, 74, 71, 69, 67], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', arpLaut: 0.02, trommel: true, kurz: true }
+    musik: { grund: 52, skala: [0, 3, 5, 7, 10], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', leadWelle: 'sine', arpLaut: 0.018, leadLaut: 0.022, trommel: true, kurz: true }
   },
 
   // ------------------------------------------------------------------ UNTERWASSER
@@ -1318,7 +1402,7 @@ const THEMEN = {
     male(c) { malWasser(c); },
     ambient(c, zeit) { wasserLeben(c, zeit); },
     klang: { welle: 'sine', hoch: 1.05, blub: true },
-    musik: { bass: [41, 41, 38, 36, 41, 41, 43, 45], arp: [65, 69, 72, 77, 76, 72, 69, 67], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', arpLaut: 0.018 }
+    musik: { grund: 53, skala: [0, 2, 4, 7, 9], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', leadWelle: 'triangle', arpLaut: 0.016, leadLaut: 0.018, hall: true }
   },
 
   // ------------------------------------------------------------------ VULKAN
@@ -1337,7 +1421,7 @@ const THEMEN = {
     male(c) { malVulkan(c); },
     ambient(c, zeit) { vulkanGlut(c, zeit); },
     klang: { welle: 'sawtooth', hoch: 0.75, grollen: true },
-    musik: { bass: [28, 28, 31, 27, 28, 28, 34, 31], arp: [52, 55, 58, 63, 58, 55, 52, 51], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', arpLaut: 0.012, trommel: true }
+    musik: { grund: 40, skala: [0, 1, 3, 5, 7, 8, 10], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', leadWelle: 'sawtooth', arpLaut: 0.011, leadLaut: 0.009, trommel: true }
   }
 };
 
@@ -2422,8 +2506,9 @@ function logikSchritt(dt) {
     if (b.y > TH + 25) { ballRaus(b); continue; }
     const v = Math.hypot(b.vx, b.vy);
     const imSchuss = b.x > SCHUSS.innen;
-    const aufFlipper = b.y > 760;
-    if (v < 18 && !imSchuss && !aufFlipper) b.ruhig += dt; else b.ruhig = 0;
+    // Auf einem hochgehaltenen Flipper darf eine Kugel ruhig liegen (Absicht des Spielers), sonst nirgends
+    const gehalten = b.y > 740 && s.T.flipper.some(f => f.gedrueckt && Math.hypot(b.x - f.x, b.y - f.y) < 110);
+    if (v < 18 && !imSchuss && !gehalten) b.ruhig += dt; else b.ruhig = 0;
     if (b.ruhig > 2.5) {
       b.ruhig = 0;
       s.letzteRettung = [Math.round(b.x), Math.round(b.y)];
@@ -2604,7 +2689,7 @@ function malUnten(T, th, kp, versatz) {
   for (const sgn of [1, -1]) {
     const X = x => sgn === 1 ? x : spiegel(x);
     c.beginPath();
-    c.moveTo(X(20), 1000); c.lineTo(X(20), 905); c.lineTo(X(58), 905); c.lineTo(X(58), 775); c.lineTo(X(146), 826); c.lineTo(X(146), 1000);
+    c.moveTo(X(20), 1000); c.lineTo(X(20), 905); c.lineTo(X(58), 905); c.lineTo(X(58), 775); c.lineTo(X(150), 822); c.lineTo(X(150), 1000);
     c.closePath();
     const m = c.createLinearGradient(X(20), 820, X(146), 960);
     m.addColorStop(0, th.blech[0]); m.addColorStop(1, th.blech[1]);

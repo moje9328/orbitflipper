@@ -26,7 +26,7 @@ const PFOSTEN_FORMEN = {
   flanke: [[176, 566], [328, 566]],
   seiten: [[132, 356], [372, 356]],
   mitte: [[252, 610]],
-  oben: [[150, 205], [354, 205]]
+  oben: [[138, 238], [366, 238]]
 };
 // Wege der Rampen. Rechts ist (außer bei "innen") das Spiegelbild von links.
 const RAMPEN_WEGE = {
@@ -92,7 +92,9 @@ function baueTisch(plan = KLASSIK_PLAN) {
   // ---------- Untere Hälfte: Bahnen, Schleudern, Flipper ----------
   for (const s of [1, -1]) {
     const X = x => s === 1 ? x : spiegel(x);
-    zug([[X(58), 640], [X(58), 770], [X(140), 818]], { r: 3.5 });
+    // Die Innenbahn-Führung trifft den Flipper-Drehpunkt genau tangential (sie endet innerhalb seiner Kappe).
+    // So gibt es keine Stufe, an der eine langsame Kugel liegen bleiben könnte.
+    zug([[X(58), 640], [X(58), 770], [X(154.2), 819]], { r: 3.5 });
     neu(pfosten(X(58), 640, 5, { mat: 'gummi' }));
 
     // Schleuder: Dreieck, die lange Seite schießt den Ball weg

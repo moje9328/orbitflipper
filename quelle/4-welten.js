@@ -37,7 +37,7 @@ const THEMEN = {
     male(c) { malKlassikKunst(c); },
     ambient() {},
     klang: { welle: 'square', hoch: 1 },
-    musik: { bass: [38, 38, 41, 43, 36, 36, 43, 41], arp: [62, 65, 69, 72, 69, 65, 62, 57], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', arpLaut: 0.008 }
+    musik: { grund: 50, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', leadWelle: 'square', arpLaut: 0.007, leadLaut: 0.011 }
   },
 
   // ------------------------------------------------------------------ WELTRAUM
@@ -56,7 +56,7 @@ const THEMEN = {
     male(c) { malWeltraum(c); },
     ambient(c, zeit) { funkelSterne(c, zeit); },
     klang: { welle: 'triangle', hoch: 1.15 },
-    musik: { bass: [36, 36, 43, 41, 39, 39, 41, 43], arp: [72, 79, 84, 79, 75, 79, 82, 79], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', arpLaut: 0.012 }
+    musik: { grund: 48, skala: [0, 2, 4, 6, 7, 9, 11], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', leadWelle: 'triangle', arpLaut: 0.011, leadLaut: 0.016, hall: true }
   },
 
   // ------------------------------------------------------------------ CYBERPUNK
@@ -75,7 +75,7 @@ const THEMEN = {
     male(c) { malCyber(c); },
     ambient(c, zeit) { cyberRegen(c, zeit); },
     klang: { welle: 'square', hoch: 1.3 },
-    musik: { bass: [33, 33, 36, 31, 33, 33, 38, 36], arp: [69, 72, 76, 81, 76, 72, 69, 64], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', arpLaut: 0.009, trommel: true }
+    musik: { grund: 45, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', leadWelle: 'sawtooth', arpLaut: 0.008, leadLaut: 0.008, trommel: true, hihat: true }
   },
 
   // ------------------------------------------------------------------ DSCHUNGEL
@@ -94,7 +94,7 @@ const THEMEN = {
     male(c) { malDschungel(c); },
     ambient(c, zeit) { dschungelLeben(c, zeit); },
     klang: { welle: 'sine', hoch: 0.9, holz: true },
-    musik: { bass: [40, 40, 43, 45, 40, 40, 47, 45], arp: [64, 67, 69, 71, 74, 71, 69, 67], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', arpLaut: 0.02, trommel: true, kurz: true }
+    musik: { grund: 52, skala: [0, 3, 5, 7, 10], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', leadWelle: 'sine', arpLaut: 0.018, leadLaut: 0.022, trommel: true, kurz: true }
   },
 
   // ------------------------------------------------------------------ UNTERWASSER
@@ -113,7 +113,7 @@ const THEMEN = {
     male(c) { malWasser(c); },
     ambient(c, zeit) { wasserLeben(c, zeit); },
     klang: { welle: 'sine', hoch: 1.05, blub: true },
-    musik: { bass: [41, 41, 38, 36, 41, 41, 43, 45], arp: [65, 69, 72, 77, 76, 72, 69, 67], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', arpLaut: 0.018 }
+    musik: { grund: 53, skala: [0, 2, 4, 7, 9], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', leadWelle: 'triangle', arpLaut: 0.016, leadLaut: 0.018, hall: true }
   },
 
   // ------------------------------------------------------------------ VULKAN
@@ -132,7 +132,7 @@ const THEMEN = {
     male(c) { malVulkan(c); },
     ambient(c, zeit) { vulkanGlut(c, zeit); },
     klang: { welle: 'sawtooth', hoch: 0.75, grollen: true },
-    musik: { bass: [28, 28, 31, 27, 28, 28, 34, 31], arp: [52, 55, 58, 63, 58, 55, 52, 51], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', arpLaut: 0.012, trommel: true }
+    musik: { grund: 40, skala: [0, 1, 3, 5, 7, 8, 10], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', leadWelle: 'sawtooth', arpLaut: 0.011, leadLaut: 0.009, trommel: true }
   }
 };
 

@@ -645,8 +645,9 @@ function logikSchritt(dt) {
     if (b.y > TH + 25) { ballRaus(b); continue; }
     const v = Math.hypot(b.vx, b.vy);
     const imSchuss = b.x > SCHUSS.innen;
-    const aufFlipper = b.y > 760;
-    if (v < 18 && !imSchuss && !aufFlipper) b.ruhig += dt; else b.ruhig = 0;
+    // Auf einem hochgehaltenen Flipper darf eine Kugel ruhig liegen (Absicht des Spielers), sonst nirgends
+    const gehalten = b.y > 740 && s.T.flipper.some(f => f.gedrueckt && Math.hypot(b.x - f.x, b.y - f.y) < 110);
+    if (v < 18 && !imSchuss && !gehalten) b.ruhig += dt; else b.ruhig = 0;
     if (b.ruhig > 2.5) {
       b.ruhig = 0;
       s.letzteRettung = [Math.round(b.x), Math.round(b.y)];

@@ -141,7 +141,7 @@ function malUnten(T, th, kp, versatz) {
   for (const sgn of [1, -1]) {
     const X = x => sgn === 1 ? x : spiegel(x);
     c.beginPath();
-    c.moveTo(X(20), 1000); c.lineTo(X(20), 905); c.lineTo(X(58), 905); c.lineTo(X(58), 775); c.lineTo(X(146), 826); c.lineTo(X(146), 1000);
+    c.moveTo(X(20), 1000); c.lineTo(X(20), 905); c.lineTo(X(58), 905); c.lineTo(X(58), 775); c.lineTo(X(150), 822); c.lineTo(X(150), 1000);
     c.closePath();
     const m = c.createLinearGradient(X(20), 820, X(146), 960);
     m.addColorStop(0, th.blech[0]); m.addColorStop(1, th.blech[1]);

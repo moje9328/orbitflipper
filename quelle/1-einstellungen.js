@@ -158,41 +158,123 @@ const ton = {
   klick() { this.piep(880, 0.05, 0.04, 'square'); }
 };
 
-// Leise Synth-Begleitung im Hintergrund
+// =====================================================================
+//  MUSIK: Ein kleiner Komponist. Jede Welt hat Tonleiter, Tempo und Klangfarben.
+//  Daraus entstehen immer neue Stücke: Akkordfolge, Begleitung und eine eigene
+//  Melodie (Intro, Melodie A, Melodie B, Variation). Etwa alle 30 bis 40 Sekunden
+//  beginnt ein neues Stück, und jedes Level hat seine eigenen.
+// =====================================================================
+
+const FOLGEN = [[0, 5, 3, 4], [0, 3, 4, 4], [5, 3, 0, 4], [0, 4, 5, 3], [0, 2, 5, 4], [5, 4, 3, 4], [0, 5, 1, 4], [3, 4, 0, 0], [0, 6, 5, 4], [0, 3, 0, 4]];
+const RHYTHMEN = [
+  [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+  [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+  [1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+  [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  [1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+  [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0]
+];
+const ARPS = [[0, 2, 4, 7], [7, 4, 2, 0], [0, 4, 2, 4, 7, 4, 2, 4], [0, 7, 2, 4], [0, 2, 4, 2]];
+
+function textZahl(text) { let h = 2166136261; for (const z of text) h = Math.imul(h ^ z.charCodeAt(0), 16777619); return h >>> 0; }
+
+// Ein Stück erfinden. Gleiche Saat ergibt immer dasselbe Stück.
+function erfindeStueck(saat) {
+  const z = zufall(saat);
+  const w = n => Math.floor(z() * n);
+  const folge = FOLGEN[w(FOLGEN.length)];
+  const arp = ARPS[w(ARPS.length)];
+  const tempo = 0.9 + z() * 0.22;
+  // Eine Phrase: 4 Takte zu 16 Schritten, im Takt über dem jeweiligen Akkord
+  const phrase = (rhythmen) => {
+    const noten = new Array(64).fill(null);
+    let ton = folge[0] + 7;
+    for (let takt = 0; takt < 4; takt++) {
+      const r = rhythmen[takt % rhythmen.length];
+      const akk = folge[takt];
+      for (let i = 0; i < 16; i++) {
+        if (!r[i]) continue;
+        if (i === 0 || (i === 8 && z() < 0.5)) ton = akk + [0, 2, 4, 7][w(4)];   // auf Akkordtönen beginnen
+        else ton += [-2, -1, -1, 1, 1, 2, 0][w(7)];
+        ton = Math.max(akk - 2, Math.min(akk + 11, ton));
+        noten[takt * 16 + i] = ton;
+      }
+    }
+    noten[63] = null; noten[60] = folge[3] === 4 ? 4 : 0;   // Ende auf einem ruhigen Ton
+    return noten;
+  };
+  const rA = [RHYTHMEN[w(6)], RHYTHMEN[w(6)]];
+  const rB = [RHYTHMEN[w(6)], RHYTHMEN[w(6)]];
+  const A = phrase(rA), B = phrase(rB);
+  const A2 = A.slice(0, 48).concat(phrase(rA).slice(48));   // Variation: anderer Schluss
+  return { folge, arp, tempo, teile: [null, A, B, A2], bassSprung: z() < 0.5 };
+}
+
 const musik = {
-  schritt: 0, naechste: 0, uhr: null,
-  stueck: null,   // Bass, Melodie und Tempo der aktuellen Welt
+  schritt: 0, naechste: 0, uhr: null, stueck: null, stueckNr: 0, stueckStart: 0, quelle: '',
   starte() {
     this.stoppe();
     if (!ton.ctx) return;
     this.naechste = ton.ctx.currentTime + 0.1;
+    this.schritt = 0;
+    this.stueck = null;
     this.uhr = setInterval(() => this.takt(), 60);
   },
   stoppe() { if (this.uhr) clearInterval(this.uhr); this.uhr = null; },
+  neuesStueck() {
+    // Saat aus Tisch und Stücknummer: jedes Level hat seine eigene Reihe von Stücken
+    if (this.quelle !== s.tisch) { this.quelle = s.tisch; this.stueckNr = Math.floor(Math.random() * 4); }
+    else this.stueckNr++;
+    this.stueck = erfindeStueck(textZahl(s.tisch + ':' + this.stueckNr));
+    this.stueckStart = this.schritt;
+  },
   takt() {
     if (!ton.ctx || ton.ctx.state !== 'running' || !s || s.phase !== 'lauf' || !$('fenster').hidden) {
       if (ton.ctx) this.naechste = ton.ctx.currentTime + 0.05;
       return;
     }
+    const m = s.thema.musik;
+    if (!this.stueck || this.quelle !== s.tisch || this.schritt - this.stueckStart >= 256) this.neuesStueck();
     const jetzt = ton.ctx.currentTime;
-    this.stueck = s.thema.musik;
-    const dauer = this.stueck.takt * (s.multiball ? 0.8 : 1);
+    const dauer = m.takt / this.stueck.tempo * (s.multiball ? 0.8 : 1);
     if (this.naechste < jetzt) this.naechste = jetzt + 0.02;
     while (this.naechste < jetzt + 0.2) {
-      if (daten.musik) this.note(this.schritt, this.naechste - jetzt, dauer);
+      if (daten.musik) this.note(this.schritt - this.stueckStart, this.naechste - jetzt, dauer, m);
       this.schritt++;
       this.naechste += dauer;
+      if (this.schritt - this.stueckStart >= 256) this.neuesStueck();
     }
   },
-  note(nr, start, dauer) {
-    const m = this.stueck;
+  note(k, start, dauer, m) {
+    const st = this.stueck;
     const hz = n => 440 * Math.pow(2, (n - 69) / 12);
-    const b = m.bass[Math.floor(nr / 16) % m.bass.length];
+    // Tonleiterstufe -> Midi-Note
+    const stufe = d => { const L = m.skala.length; const o = Math.floor(d / L); return m.grund + m.skala[((d % L) + L) % L] + 12 * o; };
+    const mild = n => { while (n > 86) n -= 12; return n; };   // nie schrill
+    const teil = Math.floor(k / 64), i = k % 64;
+    const akk = st.folge[Math.floor(i / 16)];
     ton.roh = true;   // Musik nicht von der Effekt-Klangfarbe verändern lassen
-    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, m.bassWelle, start);
-    if (nr % 2 === 0) ton.piep(hz(m.arp[(nr / 2) % 8] + (b - m.bass[0])), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut, m.arpWelle, start);
-    if (m.trommel && nr % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
-    if (m.trommel && nr % 16 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+    // Bass
+    if (i % 4 === 0) ton.piep(hz(stufe(akk) - 12 + (st.bassSprung && i % 8 === 4 ? 12 : 0)), dauer * 3, 0.03, m.bassWelle, start);
+    // Begleitung (Arpeggio), im Intro etwas leiser
+    if (i % 2 === 0) {
+      const a = st.arp[(i / 2) % st.arp.length];
+      ton.piep(hz(mild(stufe(akk + a) + 12)), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut * (teil === 0 ? 0.7 : 1), m.arpWelle, start);
+    }
+    // Melodie
+    const mel = st.teile[teil];
+    if (mel && mel[i] != null) {
+      let lang = 1; while (lang < 4 && i + lang < 64 && mel[i + lang] == null) lang++;
+      const n = hz(mild(stufe(mel[i]) + 12));
+      ton.piep(n, dauer * lang * (m.kurz ? 0.6 : 0.95), m.leadLaut, m.leadWelle, start);
+      if (m.hall) ton.piep(n, dauer * lang, m.leadLaut * 0.35, m.leadWelle, start + dauer * 1.5);
+    }
+    // Schlagzeug (im Multiball immer)
+    if (m.trommel || s.multiball) {
+      if (i % 8 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+      if (i % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
+      if (m.hihat && i % 2 === 1) ton.knall(0.02, 0.015, 9000, start);
+    }
     ton.roh = false;
   }
 };
