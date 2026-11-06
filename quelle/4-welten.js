@@ -36,8 +36,7 @@ const THEMEN = {
     teilchen: 'quadrat',
     male(c) { malKlassikKunst(c); },
     ambient() {},
-    klang: { welle: 'square', hoch: 1 },
-    musik: { grund: 50, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', leadWelle: 'square', arpLaut: 0.007, leadLaut: 0.011 }
+    klang: { welle: 'square', hoch: 1 }
   },
 
   // ------------------------------------------------------------------ WELTRAUM
@@ -55,8 +54,7 @@ const THEMEN = {
     teilchen: 'stern',
     male(c) { malWeltraum(c); },
     ambient(c, zeit) { funkelSterne(c, zeit); },
-    klang: { welle: 'triangle', hoch: 1.15 },
-    musik: { grund: 48, skala: [0, 2, 4, 6, 7, 9, 11], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', leadWelle: 'triangle', arpLaut: 0.011, leadLaut: 0.016, hall: true }
+    klang: { welle: 'triangle', hoch: 1.15 }
   },
 
   // ------------------------------------------------------------------ CYBERPUNK
@@ -74,8 +72,7 @@ const THEMEN = {
     teilchen: 'quadrat',
     male(c) { malCyber(c); },
     ambient(c, zeit) { cyberRegen(c, zeit); },
-    klang: { welle: 'square', hoch: 1.3 },
-    musik: { grund: 45, skala: [0, 2, 3, 5, 7, 8, 10], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', leadWelle: 'sawtooth', arpLaut: 0.008, leadLaut: 0.008, trommel: true, hihat: true }
+    klang: { welle: 'square', hoch: 1.3 }
   },
 
   // ------------------------------------------------------------------ DSCHUNGEL
@@ -93,8 +90,7 @@ const THEMEN = {
     teilchen: 'blatt',
     male(c) { malDschungel(c); },
     ambient(c, zeit) { dschungelLeben(c, zeit); },
-    klang: { welle: 'sine', hoch: 0.9, holz: true },
-    musik: { grund: 52, skala: [0, 3, 5, 7, 10], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', leadWelle: 'sine', arpLaut: 0.018, leadLaut: 0.022, trommel: true, kurz: true }
+    klang: { welle: 'sine', hoch: 0.9, holz: true }
   },
 
   // ------------------------------------------------------------------ UNTERWASSER
@@ -112,8 +108,7 @@ const THEMEN = {
     teilchen: 'blase',
     male(c) { malWasser(c); },
     ambient(c, zeit) { wasserLeben(c, zeit); },
-    klang: { welle: 'sine', hoch: 1.05, blub: true },
-    musik: { grund: 53, skala: [0, 2, 4, 7, 9], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', leadWelle: 'triangle', arpLaut: 0.016, leadLaut: 0.018, hall: true }
+    klang: { welle: 'sine', hoch: 1.05, blub: true }
   },
 
   // ------------------------------------------------------------------ VULKAN
@@ -131,17 +126,19 @@ const THEMEN = {
     teilchen: 'glut',
     male(c) { malVulkan(c); },
     ambient(c, zeit) { vulkanGlut(c, zeit); },
-    klang: { welle: 'sawtooth', hoch: 0.75, grollen: true },
-    musik: { grund: 40, skala: [0, 1, 3, 5, 7, 8, 10], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', leadWelle: 'sawtooth', arpLaut: 0.011, leadLaut: 0.009, trommel: true }
+    klang: { welle: 'sawtooth', hoch: 0.75, grollen: true }
   }
 };
 
+// Deko, Animationen und Eigenschaften den Themen zuordnen (werden weiter unten definiert)
+function themaExtras(id) { const th = THEMEN[id]; th.deko = (c, T) => DEKO[id](c, T); const alt = th.ambient; th.ambient = (c, z) => { alt(c, z); BELEBT_EXTRA[id](c, z); }; th.physik = WELT_PHYSIK[id]; }
+
 const WELTEN = [
-  { id: 'weltraum', name: 'Weltraum', text: 'Planeten, Raumstationen und Energiebahnen.' },
-  { id: 'cyber', name: 'Cyberpunk', text: 'Nachts in der Neonstadt, Hologramme im Regen.' },
-  { id: 'dschungel', name: 'Dschungeltempel', text: 'Überwachsene Ruinen, Wasserfall und alte Steinmechanik.' },
-  { id: 'wasser', name: 'Unterwasser', text: 'Versunkene Stadt mit Korallen, Quallen und Luftblasen.' },
-  { id: 'vulkan', name: 'Vulkan', text: 'Glühende Rampen, Lava und fliegende Funken.' }
+  { id: 'weltraum', name: 'Weltraum', text: 'Station Orbita zwischen Ringplaneten und Energiebahnen.' },
+  { id: 'cyber', name: 'Cyberpunk', text: 'Nachts in Neon City: Hologramme, Regen und fliegende Autos.' },
+  { id: 'dschungel', name: 'Dschungeltempel', text: 'Der Tempel der Ahnen: Ruinen, Wasserfall und alte Steinmechanik.' },
+  { id: 'wasser', name: 'Unterwasser', text: 'Das versunkene Atlantis mit Korallen, Quallen und Fischschwärmen.' },
+  { id: 'vulkan', name: 'Vulkan', text: 'Im Glutkern: glühende Rampen, Lavaströme und fliegende Funken.' }
 ];
 
 // --------------------------- Level ---------------------------
@@ -217,7 +214,7 @@ const LEVEL = [
     tisch: { bumper: 'vier', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['flanke'], rampenTempo: 60 },
     aufgaben: [{ art: 'multiball', ziel: 1 }, { art: 'jackpot', ziel: 3 }] },
   { id: 'w5-4', welt: 'vulkan', name: 'Herz des Vulkans', neigung: 1.16, schutz: 0.7,
-    tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 70 },
+    tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 70 },
     aufgaben: [{ art: 'folge', folge: ['rampe-links', 'orbit-rechts', 'rampe-rechts', 'wurmloch'], zeit: 180 }, { art: 'punkte', ziel: 300000 }, { art: 'jackpot', ziel: 3 }] }
 ];
 
@@ -305,16 +302,6 @@ function malWeltraum(c) {
   v = c.createRadialGradient(470, 860, 4, 476, 866, 30);
   v.addColorStop(0, '#ff9a6a'); v.addColorStop(1, '#4a1408');
   c.fillStyle = v; c.beginPath(); c.arc(476, 866, 26, 0, Math.PI * 2); c.fill();
-  c.restore();
-  // Raumstation als Umriss in der Mitte
-  c.save();
-  c.globalAlpha = 0.16;
-  c.strokeStyle = '#9fc8ff'; c.lineWidth = 1.5;
-  c.beginPath(); c.arc(MITTE, 560, 58, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.arc(MITTE, 560, 18, 0, Math.PI * 2); c.stroke();
-  for (let i = 0; i < 6; i++) { const w = i * Math.PI / 3; c.beginPath(); c.moveTo(MITTE + Math.cos(w) * 18, 560 + Math.sin(w) * 18); c.lineTo(MITTE + Math.cos(w) * 58, 560 + Math.sin(w) * 58); c.stroke(); }
-  // Solarflügel nur als feine Umrisse
-  c.strokeRect(MITTE - 120, 554, 50, 12); c.strokeRect(MITTE + 70, 554, 50, 12);
   c.restore();
   // Energiebahnen
   c.globalCompositeOperation = 'lighter';
@@ -459,10 +446,11 @@ function malVulkan(c) {
   // Lavarisse
   c.lineCap = 'round'; c.lineJoin = 'round';
   vulkanRisse.length = 0;
+  // Risse nur an den Rändern, damit das Spielfeld in der Mitte ruhig bleibt
   for (let i = 0; i < 9; i++) {
-    let x = 40 + z() * 440, y = 120 + z() * 760;
+    let x = i % 2 ? 30 + z() * 60 : 414 + z() * 60, y = 140 + z() * 700;
     const p = [[x, y]];
-    for (let k = 0; k < 6; k++) { x += (z() - 0.5) * 70; y += (z() - 0.3) * 50; p.push([x, y]); }
+    for (let k = 0; k < 6; k++) { x = begrenzt(x + (z() - 0.5) * 50, 24, 516); if (x > 100 && x < 404) x = x < MITTE ? 100 : 404; y += (z() - 0.3) * 50; p.push([x, y]); }
     vulkanRisse.push(p);
     pfad(c, p); c.strokeStyle = 'rgba(255,90,20,0.25)'; c.lineWidth = 8; c.stroke();
     pfad(c, p); c.strokeStyle = 'rgba(255,170,60,0.75)'; c.lineWidth = 2; c.stroke();
@@ -569,3 +557,219 @@ function vulkanGlut(c, zeit) {
   }
   c.globalCompositeOperation = 'source-over';
 }
+
+// =====================================================================
+//  WELT-EIGENSCHAFTEN: Jede Welt spielt sich ein bisschen anders
+// =====================================================================
+const WELT_PHYSIK = {
+  klassik: { schwere: 1, zaeh: 0, bumperKick: 1, schleuderKick: 1 },
+  weltraum: { schwere: 0.9, zaeh: 0, bumperKick: 1, schleuderKick: 1, text: 'Weniger Schwerkraft: Die Kugel fliegt länger.' },
+  cyber: { schwere: 1, zaeh: 0, bumperKick: 1.18, schleuderKick: 1, text: 'Überladene Neon-Bumper schießen härter.' },
+  dschungel: { schwere: 1, zaeh: 0.05, bumperKick: 0.92, schleuderKick: 1.2, text: 'Schwere Steinbumper, kräftige Holzschleudern.' },
+  wasser: { schwere: 0.86, zaeh: 0.2, bumperKick: 1, schleuderKick: 1, text: 'Im Wasser schwebt die Kugel langsamer.' },
+  vulkan: { schwere: 1.06, zaeh: 0, bumperKick: 1.12, schleuderKick: 1.08, text: 'Steiler Hang und glühend heiße Bumper.' }
+};
+
+// =====================================================================
+//  GROSSE MOTIVE, SCHILDER UND VERZIERUNGEN (einmal vorgemalt)
+// =====================================================================
+
+// Namensschild auf dem linken Abdeckblech, Symbol auf dem rechten
+function schild(c, text, farbe, grund, symbol) {
+  c.save();
+  c.fillStyle = grund;
+  rund(c, 64, 868, 80, 40, 6); c.fill();
+  c.strokeStyle = farbe; c.lineWidth = 1.5; c.stroke();
+  c.fillStyle = farbe; c.font = '7px ' + SCHRIFT; c.textAlign = 'center';
+  const zeilen = text.split('\n');
+  zeilen.forEach((z, i) => c.fillText(z, 104, 885 + i * 11 - (zeilen.length - 1) * 4, 72));
+  c.translate(spiegel(104), 888);
+  c.fillStyle = grund;
+  rund(c, -40, -20, 80, 40, 6); c.fill();
+  c.strokeStyle = farbe; c.stroke();
+  symbol(c);
+  c.restore();
+}
+// Muster in den Schleudern
+function schleuderMuster(c, T, f) {
+  for (const sl of T.schleudern) {
+    const mx = (sl.A[0] + sl.B[0] + sl.C[0]) / 3, my = (sl.A[1] + sl.B[1] + sl.C[1]) / 3;
+    c.save();
+    c.beginPath(); c.moveTo(...sl.A); c.lineTo(...sl.B); c.lineTo(...sl.C); c.closePath(); c.clip();
+    f(c, mx, my, sl.seite === 'links' ? 1 : -1);
+    c.restore();
+  }
+}
+
+const DEKO = {
+  klassik() {},
+  weltraum(c, T) {
+    // Raumstation unten in der Mitte: Ring, Speichen, Module
+    c.save(); c.translate(MITTE, 905);
+    c.globalAlpha = 0.55;
+    c.strokeStyle = '#9fc8ff'; c.lineWidth = 3;
+    c.beginPath(); c.ellipse(0, 0, 62, 20, 0, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#1d2a48'; c.fillRect(-10, -34, 20, 52);
+    c.strokeStyle = '#c4d4f0'; c.lineWidth = 1.5; c.strokeRect(-10, -34, 20, 52);
+    c.fillStyle = '#7fd4ff';
+    for (let i = 0; i < 4; i++) c.fillRect(-4, -28 + i * 11, 8, 4);
+    c.fillStyle = '#2a4a8a'; c.fillRect(-58, -6, 34, 12); c.fillRect(24, -6, 34, 12);
+    c.strokeStyle = '#c4d4f0'; c.strokeRect(-58, -6, 34, 12); c.strokeRect(24, -6, 34, 12);
+    c.restore();
+    schild(c, 'STATION\nORBITA', '#7fd4ff', '#0f1830', g => {
+      g.fillStyle = '#ffb36b'; g.beginPath(); g.arc(0, 0, 10, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#ffe0a0'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, 18, 5, -0.35, 0, Math.PI * 2); g.stroke();
+    });
+    schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = 'rgba(127,212,255,0.5)'; g.lineWidth = 1; for (let k = -40; k < 60; k += 9) { g.beginPath(); g.moveTo(x - 40, y + k); g.lineTo(x + 40, y + k); g.stroke(); } g.fillStyle = '#ffc35a'; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); });
+  },
+  cyber(c, T) {
+    // großes Neonschild unten: ORBIT CITY
+    c.save();
+    c.translate(MITTE, 915);
+    c.globalAlpha = 0.85;
+    c.strokeStyle = '#ff3db4'; c.lineWidth = 2.5;
+    rund(c, -62, -22, 124, 40, 8); c.stroke();
+    c.globalAlpha = 0.25; c.lineWidth = 8; c.stroke();
+    c.globalAlpha = 0.9;
+    c.font = '10px ' + SCHRIFT; c.textAlign = 'center'; c.fillStyle = '#2ef9ff';
+    c.fillText('ORBIT', 0, -4); c.fillStyle = '#fff13a'; c.fillText('CITY', 0, 10);
+    c.restore();
+    schild(c, 'NEON\nCITY', '#ff3db4', '#1a0626', g => {
+      g.strokeStyle = '#2ef9ff'; g.lineWidth = 2;
+      for (const [x, h] of [[-14, 18], [-4, 26], [6, 14], [14, 22]]) g.strokeRect(x - 4, 12 - h, 8, h);
+    });
+    schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = '#2ef9ff'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 6 * s, y - 22); g.lineTo(x + 8 * s, y + 10); g.lineTo(x - 8 * s, y + 18); g.stroke(); });
+  },
+  dschungel(c, T) {
+    // Stufentempel unten in der Mitte
+    c.save(); c.translate(MITTE, 960);
+    const stufen = [[120, 18], [96, 18], [72, 18], [48, 18]];
+    let y = 0;
+    stufen.forEach(([b, h], i) => {
+      y -= h;
+      c.fillStyle = ['#4a3d26', '#54452c', '#5e4e32', '#685838'][i];
+      c.fillRect(-b / 2, y, b, h);
+      c.strokeStyle = 'rgba(255,210,120,0.5)'; c.lineWidth = 1; c.strokeRect(-b / 2, y, b, h);
+    });
+    c.fillStyle = '#1a140a'; c.fillRect(-9, y - 2, 18, 14);
+    c.fillStyle = '#ffd25a'; c.beginPath(); c.arc(0, y - 10, 5, 0, Math.PI * 2); c.fill();
+    c.restore();
+    schild(c, 'TEMPEL\nDER AHNEN', '#ffd25a', '#2a2216', g => {
+      g.fillStyle = '#ffd25a'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#2a1e10'; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 2); g.fill();
+    });
+    schleuderMuster(c, T, (g, x, y) => { g.strokeStyle = 'rgba(255,210,90,0.7)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - 8, y - 14); g.lineTo(x, y - 22); g.lineTo(x + 8, y - 14); g.moveTo(x - 8, y); g.lineTo(x, y - 8); g.lineTo(x + 8, y); g.stroke(); });
+  },
+  wasser(c, T) {
+    // Kuppel von Atlantis unten in der Mitte
+    c.save(); c.translate(MITTE, 960);
+    c.fillStyle = 'rgba(170,250,255,0.18)';
+    c.beginPath(); c.arc(0, -10, 70, Math.PI, 0); c.fill();
+    c.strokeStyle = 'rgba(220,255,255,0.7)'; c.lineWidth = 2;
+    c.beginPath(); c.arc(0, -10, 70, Math.PI, 0); c.stroke();
+    for (const x of [-48, -24, 0, 24, 48]) { c.fillStyle = 'rgba(230,250,255,0.55)'; c.fillRect(x - 4, -60 + Math.abs(x) * 0.5, 8, 50 - Math.abs(x) * 0.5); }
+    c.fillStyle = '#ffd2a0'; c.beginPath(); c.moveTo(0, -96); c.lineTo(5, -80); c.lineTo(-5, -80); c.closePath(); c.fill();
+    c.restore();
+    schild(c, 'ATLANTIS', '#5ff6e8', '#0a3040', g => {
+      g.fillStyle = '#ffe0ec';
+      g.beginPath(); g.moveTo(0, 12); for (let k = 0; k <= 6; k++) { const w = Math.PI + k / 6 * Math.PI; g.lineTo(Math.cos(w) * 16, Math.sin(w) * 14 + 6); } g.closePath(); g.fill();
+      g.strokeStyle = '#d88aaa'; g.lineWidth = 1; for (let k = 1; k < 6; k++) { const w = Math.PI + k / 6 * Math.PI; g.beginPath(); g.moveTo(0, 12); g.lineTo(Math.cos(w) * 16, Math.sin(w) * 14 + 6); g.stroke(); }
+    });
+    schleuderMuster(c, T, (g, x, y, s) => { g.strokeStyle = 'rgba(255,210,160,0.6)'; g.lineWidth = 1.5; for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + 20 * s, y + 30, 14 + k * 8, Math.PI, Math.PI * 1.5); g.stroke(); } });
+  },
+  vulkan(c, T) {
+    // Vulkankegel unten mit Lavastrom
+    c.save(); c.translate(MITTE, 962);
+    c.fillStyle = '#2a1a14';
+    c.beginPath(); c.moveTo(-110, 0); c.lineTo(-26, -86); c.lineTo(26, -86); c.lineTo(110, 0); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(255,120,40,0.5)'; c.lineWidth = 1.5; c.stroke();
+    c.globalCompositeOperation = 'lighter';
+    c.fillStyle = 'rgba(255,90,20,0.55)';
+    c.beginPath(); c.ellipse(0, -86, 26, 6, 0, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,150,40,0.75)'; c.lineWidth = 4;
+    c.beginPath(); c.moveTo(-6, -84); c.quadraticCurveTo(-24, -50, -14, -20); c.quadraticCurveTo(-6, -6, -30, 0); c.stroke();
+    c.restore();
+    schild(c, 'GLUT-\nKERN', '#ff9a2a', '#1e100a', g => {
+      g.fillStyle = '#ff6a1a';
+      g.beginPath(); g.moveTo(0, -16); g.quadraticCurveTo(12, 0, 6, 12); g.lineTo(-6, 12); g.quadraticCurveTo(-12, 0, 0, -16); g.fill();
+      g.fillStyle = '#ffe066'; g.beginPath(); g.moveTo(0, -4); g.quadraticCurveTo(6, 4, 3, 12); g.lineTo(-3, 12); g.quadraticCurveTo(-6, 4, 0, -4); g.fill();
+    });
+    schleuderMuster(c, T, (g, x, y) => { g.globalCompositeOperation = 'lighter'; g.strokeStyle = 'rgba(255,120,30,0.8)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 14, y - 20); g.lineTo(x - 2, y - 4); g.lineTo(x - 8, y + 6); g.lineTo(x + 6, y + 20); g.stroke(); });
+  }
+};
+
+// =====================================================================
+//  VORBEIZIEHENDE ANIMATIONEN (blass, hinter der Kugel)
+// =====================================================================
+function zieht(zeit, periode, versatz = 0) { return ((zeit + versatz) % periode) / periode; }
+
+const BELEBT_EXTRA = {
+  klassik() {},
+  weltraum(c, zeit) {
+    // ein Mond zieht langsam oben vorbei, ein Satellit blinkt
+    const a = zieht(zeit, 46);
+    const x = -60 + a * 660, y = 150 + Math.sin(a * Math.PI) * -40;
+    const v = c.createRadialGradient(x - 8, y - 8, 2, x, y, 30);
+    v.addColorStop(0, 'rgba(230,236,255,0.55)'); v.addColorStop(1, 'rgba(90,100,140,0.25)');
+    c.fillStyle = v; c.beginPath(); c.arc(x, y, 26, 0, Math.PI * 2); c.fill();
+    const b = zieht(zeit, 23, 7), sx = 540 - b * 600, sy = 380 + b * 60;
+    c.fillStyle = 'rgba(200,220,255,0.6)'; c.fillRect(sx - 6, sy - 1, 12, 2); c.fillRect(sx - 1, sy - 3, 2, 6);
+    if (Math.sin(zeit * 8) > 0.6) { c.fillStyle = '#ff5a5a'; c.fillRect(sx + 6, sy - 1, 2, 2); }
+  },
+  cyber(c, zeit) {
+    // fliegende Autos: Lichterpaare ziehen quer über die Stadt
+    for (const [y, p, v, f] of [[250, 9, 0, '#fff13a'], [330, 13, 4, '#2ef9ff'], [205, 17, 9, '#ff3db4']]) {
+      const a = zieht(zeit, p, v), x = v % 2 ? 560 - a * 600 : -20 + a * 600;
+      c.fillStyle = f; c.globalAlpha = 0.7;
+      c.fillRect(x, y, 5, 2); c.fillRect(x + 8, y, 5, 2);
+      c.globalAlpha = 0.15; c.fillRect(x - (v % 2 ? -14 : 30), y, 30, 2);
+      c.globalAlpha = 1;
+    }
+    // Laufschrift unter dem Neonschild
+    c.save();
+    c.beginPath(); c.rect(190, 932, 124, 12); c.clip();
+    c.font = '7px ' + SCHRIFT; c.fillStyle = 'rgba(255,61,180,0.75)';
+    const text = 'BUMPER  ·  RAMPEN  ·  JACKPOT  ·  ';
+    const x = 314 - (zeit * 30) % 260;
+    c.fillText(text, x, 941); c.fillText(text, x + 260, 941);
+    c.restore();
+  },
+  dschungel(c, zeit) {
+    // Blätter fallen langsam und drehen sich
+    for (let i = 0; i < 4; i++) {
+      const a = zieht(zeit, 14 + i * 3, i * 5);
+      const x = 80 + i * 110 + Math.sin(a * 12 + i) * 20, y = 90 + a * 820;
+      c.save(); c.translate(x, y); c.rotate(Math.sin(a * 9 + i) * 1.2);
+      c.fillStyle = 'rgba(110,190,70,0.45)';
+      c.beginPath(); c.ellipse(0, 0, 7, 3, 0, 0, Math.PI * 2); c.fill();
+      c.restore();
+    }
+  },
+  wasser(c, zeit) {
+    // Fischschwarm zieht vorbei
+    const a = zieht(zeit, 24);
+    const rechts = Math.floor((zeit) / 24) % 2 === 0;
+    const bx = rechts ? -80 + a * 700 : 620 - a * 700, by = 640 + Math.sin(a * 6) * 30;
+    c.fillStyle = 'rgba(255,224,140,0.45)';
+    for (let k = 0; k < 7; k++) {
+      const x = bx + (k % 3) * 14 * (rechts ? -1 : 1) - k * 4, y = by + (k % 4) * 9 - 12 + Math.sin(zeit * 4 + k) * 2;
+      const r = rechts ? 1 : -1;
+      c.beginPath(); c.ellipse(x, y, 6, 3, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.moveTo(x - 5 * r, y); c.lineTo(x - 10 * r, y - 3); c.lineTo(x - 10 * r, y + 3); c.closePath(); c.fill();
+    }
+  },
+  vulkan(c, zeit) {
+    // Lava fließt den Kegel hinunter, ab und zu leuchtet der Krater auf
+    c.globalCompositeOperation = 'lighter';
+    c.setLineDash([6, 10]);
+    c.lineDashOffset = -zeit * 30;
+    c.strokeStyle = 'rgba(255,200,80,0.6)'; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(MITTE - 6, 878); c.quadraticCurveTo(MITTE - 24, 912, MITTE - 14, 942); c.quadraticCurveTo(MITTE - 6, 956, MITTE - 30, 962); c.stroke();
+    c.setLineDash([]);
+    const glut = Math.max(0, Math.sin(zeit * 0.9)) ** 6;
+    if (glut > 0.02) leuchte(c, MITTE, 876, 70, '#ff5a1a', glut * 0.8);
+    c.globalCompositeOperation = 'source-over';
+  }
+};
+
+for (const id of Object.keys(THEMEN)) themaExtras(id);

@@ -121,8 +121,8 @@ function baueTisch(plan = KLASSIK_PLAN) {
 
   // ---------- Bumper ----------
   BUMPER_FORMEN[plan.bumper].forEach(([x, y, r], i) => {
-    const bu = { x, y, r, blitz: 0, treffer: 0, nr: i };
     const t = neu(pfosten(x, y, r, { mat: 'bumper', kick: 820, kickAb: 0, kickPause: 0.05 }));
+    const bu = { x, y, r, blitz: 0, treffer: 0, nr: i, t };
     t.beiKick = (b, w) => { bu.blitz = 1; regeln.bumper(bu, b); };
     T.bumper.push(bu);
   });

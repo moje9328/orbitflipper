@@ -176,6 +176,9 @@ function malUnten(T, th, kp, versatz) {
     c.stroke();
   }
 
+  // Motive, Schilder und Verzierungen der Welt
+  th.deko(c, T);
+
   // Blech hinter den Fallzielen
   if (T.dach) { pfad(c, T.dach); c.strokeStyle = th.schiene.hell; c.lineWidth = 3; c.lineJoin = 'round'; c.stroke(); }
 

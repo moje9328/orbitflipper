@@ -16,8 +16,13 @@ function neuerBall(x, y) {
 function neuesSpiel(modus = { art: 'klassik' }) {
   const stufe = STUFEN[daten.stufe];
   const level = modus.art === 'level' ? LEVEL[modus.nr] : null;
-  PH.schwerkraft = stufe.schwerkraft * (level ? level.neigung : 1);
+  const physik = THEMEN[level ? level.welt : 'klassik'].physik;
+  PH.schwerkraft = stufe.schwerkraft * (level ? level.neigung : 1) * physik.schwere;
   const T = baueTisch(level ? level.tisch : KLASSIK_PLAN);
+  // Eigenschaften der Welt: Wasser bremst, Neon-Bumper schießen härter, ...
+  T.welt.zaeh = physik.zaeh;
+  for (const bu of T.bumper) bu.t.kick *= physik.bumperKick;
+  for (const sl of T.schleudern) sl.t.kick *= physik.schleuderKick;
   s = {
     T, welt: T.welt, stufe: daten.stufe, phase: 'lauf',
     modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: THEMEN[level ? level.welt : 'klassik'],
@@ -105,6 +110,7 @@ function auftragGeschafft() {
   punkte(preis);
   bonusDazu(10000);
   ton.auftrag();
+  musik.ducken(0.45, 1.2);
   s.wackeln = 0.4;
   const alterRang = s.rang;
   s.rang = Math.min(RAENGE.length - 1, Math.floor(s.auftraegeGeschafft / 2));
@@ -161,6 +167,7 @@ function schrittGeschafft() {
   s.punkte += 20000 * (s.schritt + 1);
   s.schritt++;
   ton.auftrag();
+  musik.ducken(0.45, 1.2);
   s.wackeln = 0.4;
   for (let i = 0; i < 40; i++) funken(MITTE, 420, i % 2 ? s.thema.f.gold : s.thema.f.haupt, 1, 500);
   if (s.schritt >= lv.aufgaben.length) {
@@ -172,7 +179,7 @@ function schrittGeschafft() {
     if (rest > 0) s.punkte += 50000 * rest;
     s.schrittZeit = 0;
     melde('LEVEL GESCHAFFT', '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne), 3, s.thema.f.gold);
-    ton.extra();
+    musik.sieg();
     s.wartet = 3;
     s.warteAktion = () => spielEnde(true);
     return;
@@ -213,6 +220,7 @@ function kombiSchuss(art, x, y) {
   if (s.kombo >= 2) {
     const p = punkte(5000 * s.kombo, x, y - 22, '#ffe46b');
     ton.kombo(s.kombo);
+    musik.aktion(1.5);
     melde('KOMBO X' + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
     s.statistik.maxKombo = Math.max(s.statistik.maxKombo, s.kombo);
     ereignis('kombo', 0, s.kombo);
@@ -228,6 +236,7 @@ const regeln = {
     punkte(s.multiball ? 300 : 100, bu.x, bu.y - 30, s.thema.f.bumper);
     bonusDazu(50);
     ton.bumper();
+    musik.aktion(0.3);
     funken(b.x, b.y, s.thema.f.bumper, 10, 300);
     welle(bu.x, bu.y, s.thema.bumper.glow, 50);
     ereignis('bumper');
@@ -235,6 +244,7 @@ const regeln = {
   schleuder(sl, b) {
     punkte(10, b.x, b.y - 18, s.thema.f.haupt);
     ton.schleuder();
+    musik.aktion(0.15);
     funken(b.x, b.y, s.thema.f.haupt, 8, 240);
   },
   pfosten(p, b) {
@@ -256,6 +266,7 @@ const regeln = {
     punkte(500, z.x, z.y - 20, '#ffe46b');
     bonusDazu(250);
     ton.fallziel();
+    musik.aktion(0.5);
     funken(z.x, z.y, '#ffe46b', 14, 280);
     if (s.T.fallziele.every(f => f.unten)) {
       punkte(5000);
@@ -268,6 +279,7 @@ const regeln = {
     z.blitz = 1;
     punkte(z.an ? 500 : 1000, z.x, z.y - 18, '#ff7bf2');
     ton.stehziel();
+    musik.aktion(0.4);
     funken(z.x, z.y, '#ff7bf2', 8, 200);
     if (!z.an) {
       z.an = true;
@@ -283,6 +295,7 @@ const regeln = {
   rollbahn(r, b) {
     r.blitz = 1;
     ton.roll();
+    musik.aktion(0.3);
     if (s.skill >= 0 && s.T.roll[s.skill] === r && s.welt.zeit - s.skillZeit < 5) {
       s.skill = -1;
       const p = punkte(20000, r.x, r.y + 30, '#ffe46b');
@@ -320,6 +333,7 @@ const regeln = {
     const p = punkte(4000, seite === 'links' ? 60 : 450, 380, '#7ef9ff');
     bonusDazu(1000);
     ton.orbit();
+    musik.aktion(1.2);
     melde('ORBIT', '+' + zahl(p), 1.2);
     kombiSchuss('orbit', seite === 'links' ? 80 : 430, 380);
     ereignis('orbit');
@@ -329,6 +343,7 @@ const regeln = {
     ra.blitz = 1;
     s.statistik.rampen++;
     ton.rampe();
+    musik.aktion(1.2);
     const [ex, ey] = ra.bahn.ort(ra.bahn.L);
     if (s.multiball) {
       const p = punkte(s.jackpot, ex, ey - 40, '#ffe46b');
@@ -336,6 +351,7 @@ const regeln = {
       ereignis('jackpot');
       s.jackpot += 25000;
       ton.jackpot();
+      musik.ducken(0.4, 1.2);
       s.wackeln = 0.5;
       melde('JACKPOT', '+' + zahl(p), 2, '#ffe46b');
       for (let i = 0; i < 30; i++) funken(ex, ey - 40, i % 2 ? '#ffe46b' : '#ff7bf2', 1, 520);
@@ -376,6 +392,7 @@ function fangeImLoch(l, b) {
     b.in.clear();
     l.blitz = 1;
     ton.loch();
+    musik.aktion(0.8);
     welle(l.x, l.y, '#7dff9a', 46);
     funken(l.x, l.y, '#7dff9a', 14, 200);
     s.statistik.loecher++;
@@ -456,6 +473,7 @@ function starteMultiball(l, b) {
   s.jackpot = 50000;
   s.statistik.multibaelle++;
   ton.multiball();
+  musik.ducken(0.5, 1.0);
   s.wackeln = 0.6;
   melde('MULTIBALL', 'Rampen bringen Jackpots!', 3, '#ff7bf2');
   ereignis('multiball');
@@ -523,6 +541,7 @@ function ballRaus(b) {
   if (rest > 0) return;
   // letzte Kugel weg: Bonus zählen
   ton.verloren();
+  if (s.ballNr < BAELLE || s.extraBaelle > 0) musik.kugelWeg();
   s.kombo = 0;
   const bonus = s.bonus * s.multi;
   s.bonusAnzeige = { bonus: s.bonus, multi: s.multi, zeit: 0 };
@@ -553,6 +572,7 @@ function ballRaus(b) {
 function logikSchritt(dt) {
   const w = s.welt;
   s.zeit += dt;
+  musik.aktualisiere(dt);
   const sdt = dt * w.zeitlupe;
 
   for (let i = spaeter.length - 1; i >= 0; i--) {

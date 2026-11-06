@@ -31,8 +31,8 @@ function spielEnde(sieg = false) {
     daten.sterne[s.level.id] = Math.max(vorher, s.sterne);
   }
   merkeRekord();
-  musik.stoppe();
-  setTimeout(zeigeEnde, 600);
+  if (!sieg) musik.ende();
+  setTimeout(zeigeEnde, sieg ? 600 : 1400);
 }
 
 function merkeRekord() {
@@ -89,6 +89,7 @@ function pausiere() {
   $('pausePunkte').textContent = zahl(s.punkte);
   loesAlles();
   zeigeFenster('fPause');
+  ton.pause();   // Musik und Geräusche anhalten
 }
 function weiter() {
   ton.an();
@@ -103,13 +104,14 @@ function zumMenue() {
 
 // --------------------------- Fenster ---------------------------
 
-const FENSTER_IDS = ['fStart', 'fWelten', 'fLevel', 'fListe', 'fHilfe', 'fPause', 'fEnde', 'fTeilen'];
+const FENSTER_IDS = ['fStart', 'fWelten', 'fLevel', 'fListe', 'fHilfe', 'fTon', 'fPause', 'fEnde', 'fTeilen'];
 const ERSTER_KNOPF = { fStart: 'losKnopf', fPause: 'weiterKnopf', fEnde: 'nochmalKnopf' };
 
 function zeigeFenster(id) {
   for (const f of FENSTER_IDS) $(f).hidden = f !== id;
   $('fenster').hidden = false;
   $('fenster').scrollTop = 0;
+  document.querySelector('.tafel').classList.toggle('breit', id === 'fWelten' || id === 'fLevel');
   body.classList.remove('imSpiel');
   if (id === 'fStart') baueStart();
   if (id === 'fListe') baueListe();
@@ -175,13 +177,14 @@ function baueWelten() {
     knopf.type = 'button';
     knopf.className = 'weltKarte' + (frei ? '' : ' zu');
     knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
-    knopf.append(bildElement(ersterIndex, 96));
+    knopf.append(bildElement(ersterIndex, 112));
     const info = document.createElement('span');
     info.className = 'weltInfo';
-    const name = document.createElement('strong'); name.textContent = w.name;
+    const name = document.createElement('strong'); name.textContent = w.name.toUpperCase();
     const text = document.createElement('span'); text.textContent = frei ? w.text : '🔒 Schaff zuerst das letzte Level der Welt davor.';
+    const merkmal = document.createElement('span'); merkmal.className = 'weltMerkmal'; merkmal.textContent = THEMEN[w.id].physik.text;
     const sterne = document.createElement('span'); sterne.className = 'sterneZeile'; sterne.textContent = '★ ' + sterneVon(w.id) + ' / ' + weltLevel(w.id).length * 3;
-    info.append(name, text, sterne);
+    info.append(name, text, merkmal, sterne);
     knopf.append(info);
     knopf.disabled = !frei;
     knopf.addEventListener('click', () => { gewaehlteWelt = w.id; ton.an(); ton.klick(); zeigeFenster('fLevel'); });
@@ -191,8 +194,13 @@ function baueWelten() {
 
 function baueLevel() {
   const w = WELTEN.find(x => x.id === gewaehlteWelt);
+  const wNr = WELTEN.indexOf(w);
+  $('levelOber').textContent = 'WELT ' + (wNr + 1) + ' VON ' + WELTEN.length;
   $('levelTitel').textContent = w.name.toUpperCase();
-  $('levelTitel').style.color = THEMEN[w.id].f.haupt;
+  $('levelText').textContent = w.text + ' ' + THEMEN[w.id].physik.text + ' Musik: „' + LIEDER[w.id].name + '“.';
+  const kopf = $('weltKopf');
+  kopf.textContent = '';
+  kopf.append(bildElement(weltLevel(w.id)[0][1], 520));
   const liste = $('levelListe');
   liste.textContent = '';
   for (const [l, i] of weltLevel(w.id)) {
@@ -200,7 +208,8 @@ function baueLevel() {
     const knopf = document.createElement('button');
     knopf.type = 'button';
     knopf.className = 'levelKarte' + (frei ? '' : ' zu');
-    knopf.append(bildElement(i, 72));
+    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
+    knopf.append(bildElement(i, 84));
     const info = document.createElement('span');
     info.className = 'weltInfo';
     const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
@@ -344,13 +353,33 @@ function schalteTon() {
   speichere();
   zeigeTon();
   ton.an();
+  ton.lautstaerke();
   ton.klick();
 }
 function zeigeTon() {
   $('tonKnopf').classList.toggle('stumm', !daten.ton);
   $('tonKnopf').setAttribute('aria-label', daten.ton ? 'Ton ausschalten' : 'Ton einschalten');
 }
-function zeigeMusikKnopf() { $('pauseMusik').textContent = daten.musik ? 'Musik ausschalten' : 'Musik einschalten'; }
+// Lautstärke-Regler für Musik und Effekte (es gibt sie in der Pause und unter "Ton und Musik")
+function zeigeRegler() {
+  for (const r of document.querySelectorAll('input[data-laut]')) {
+    r.value = daten[r.dataset.laut];
+    const anzeige = r.parentElement.querySelector('output');
+    if (anzeige) anzeige.textContent = r.value + ' %';
+  }
+}
+for (const r of document.querySelectorAll('input[data-laut]')) {
+  r.addEventListener('input', () => {
+    daten[r.dataset.laut] = Number(r.value);
+    zeigeRegler();
+    ton.an();
+    ton.lautstaerke();
+  });
+  r.addEventListener('change', () => {
+    speichere();
+    if (r.dataset.laut === 'lautEffekte') ton.klick();
+  });
+}
 
 for (const k of document.querySelectorAll('[data-oeffne]')) {
   k.addEventListener('click', () => {
@@ -366,7 +395,7 @@ $('listeTisch').addEventListener('change', e => { daten.listeTisch = e.target.va
 $('tonKnopf').addEventListener('click', schalteTon);
 $('pauseKnopf').addEventListener('click', () => { ton.an(); pausiere(); });
 $('weiterKnopf').addEventListener('click', weiter);
-$('pauseMusik').addEventListener('click', () => { daten.musik = !daten.musik; speichere(); zeigeMusikKnopf(); });
+
 $('pauseNeu').addEventListener('click', () => { merkeRekord(); starte(); });
 $('pauseAuswahl').addEventListener('click', () => { merkeRekord(); musik.stoppe(); zeigeFenster(s.level ? 'fLevel' : 'fWelten'); });
 $('pauseMenue').addEventListener('click', zumMenue);
@@ -466,7 +495,7 @@ window.addEventListener('keyup', e => {
   aktualisiereFlipper();
 });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) pausiere(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { pausiere(); ton.pause(); } });
 window.addEventListener('blur', () => { loesAlles(); pausiere(); });
 window.addEventListener('resize', passeGroesseAn);
 window.addEventListener('orientationchange', passeGroesseAn);
@@ -495,7 +524,7 @@ leseHerausforderung();
 neuesSpiel();
 s.phase = 'menue';
 zeigeTon();
-zeigeMusikKnopf();
+zeigeRegler();
 passeGroesseAn();
 zeigeFenster('fStart');
 if (document.fonts && document.fonts.load) document.fonts.load("12px 'Press Start 2P'").then(() => { if (s) baueBilder(); }).catch(() => {});

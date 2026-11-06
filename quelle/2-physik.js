@@ -99,6 +99,7 @@ class Welt {
     this.zelle = 40;
     this.zeit = 0;
     this.zeitlupe = 1;
+    this.zaeh = 0;         // Wasser bremst die Kugel zusätzlich
   }
 
   // Raster für die schnelle Suche: Jede Zelle kennt die Hindernisse in ihrer Nähe
@@ -151,7 +152,8 @@ class Welt {
     let v = Math.hypot(b.vx, b.vy);
     if (v > PH.maxTempo) { b.vx *= PH.maxTempo / v; b.vy *= PH.maxTempo / v; }
     // ganz leichte Rollreibung
-    b.vx *= 1 - 0.04 * h; b.vy *= 1 - 0.04 * h;
+    const reib = 1 - (0.04 + this.zaeh) * h;
+    b.vx *= reib; b.vy *= reib;
     const altX = b.x, altY = b.y;
     b.x += b.vx * h;
     b.y += b.vy * h;
