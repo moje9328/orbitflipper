@@ -45,18 +45,28 @@ const KAPSEL_PREISE = [
 
 // --------------------------- Speichern ---------------------------
 
+// Bestwerte gibt es je Tisch (Klassik oder Level) und je Stufe: bestwerte[tisch][stufe]
 function ladeDaten() {
-  const leer = { name: '', stufe: 'normal', ton: true, musik: true, freunde: [], rekorde: {}, spiele: 0 };
+  const leer = { name: '', stufe: 'normal', ton: true, musik: true, freunde: [], rekorde: {}, bestwerte: {}, sterne: {}, spiele: 0, listeTisch: 'klassik' };
   let roh = null;
   try { roh = JSON.parse(localStorage.getItem(SPEICHER)); } catch (error) {}
   const d = Object.assign(leer, roh && typeof roh === 'object' ? roh : {});
   if (!Object.prototype.hasOwnProperty.call(STUFEN, d.stufe)) d.stufe = 'normal';
   if (!Array.isArray(d.freunde)) d.freunde = [];
   if (!d.rekorde || typeof d.rekorde !== 'object') d.rekorde = {};
-  for (const stufe of STUFEN_NAMEN) if (!Number.isFinite(d.rekorde[stufe])) d.rekorde[stufe] = 0;
+  if (!d.bestwerte || typeof d.bestwerte !== 'object') d.bestwerte = {};
+  if (!d.sterne || typeof d.sterne !== 'object') d.sterne = {};
+  // Alte Rekorde (vor den Welten) gehören zum Klassik-Tisch
+  if (!d.bestwerte.klassik) d.bestwerte.klassik = {};
+  for (const stufe of STUFEN_NAMEN) {
+    if (Number.isFinite(d.rekorde[stufe])) d.bestwerte.klassik[stufe] = Math.max(d.bestwerte.klassik[stufe] || 0, d.rekorde[stufe]);
+  }
+  delete d.rekorde;
+  for (const f of d.freunde) if (!f.tisch) f.tisch = 'klassik';
   return d;
 }
 const daten = ladeDaten();
+function bestwert(tisch, stufe = daten.stufe) { return (daten.bestwerte[tisch] && daten.bestwerte[tisch][stufe]) || 0; }
 function speichere() {
   try { localStorage.setItem(SPEICHER, JSON.stringify(daten)); } catch (error) {}
 }
@@ -66,6 +76,7 @@ function speichere() {
 
 const ton = {
   ctx: null, haupt: null, rauschen: null,
+  thema: { welle: 'square', hoch: 1 },     // Klangfarbe der aktuellen Welt
   an() {
     if (!this.ctx) {
       const AudioClass = window.AudioContext || window.webkitAudioContext;
@@ -87,9 +98,12 @@ const ton = {
     if (!this.bereit()) return;
     const t = this.ctx.currentTime + start;
     const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+    // Die Welt färbt die Effekt-Töne: andere Wellenform, andere Tonlage
+    if (art === 'square' && !this.roh) art = this.thema.welle;
+    const h = this.roh ? 1 : this.thema.hoch;
     osc.type = art;
-    osc.frequency.setValueAtTime(frequenz, t);
-    if (ziel) osc.frequency.exponentialRampToValueAtTime(ziel, t + dauer);
+    osc.frequency.setValueAtTime(frequenz * h, t);
+    if (ziel) osc.frequency.exponentialRampToValueAtTime(ziel * h, t + dauer);
     g.gain.setValueAtTime(laut, t);
     g.gain.exponentialRampToValueAtTime(0.0008, t + dauer);
     osc.connect(g).connect(this.haupt);
@@ -107,8 +121,18 @@ const ton = {
     q.start(t); q.stop(t + dauer + 0.02);
   },
   flipper() { this.knall(0.06, 0.12, 900); this.piep(110, 0.05, 0.04, 'square'); },
-  bumper() { this.piep(520 + Math.random() * 60, 0.12, 0.06, 'square', 0, 260); this.knall(0.05, 0.08, 3000); },
-  schleuder() { this.piep(300, 0.08, 0.06, 'sawtooth', 0, 140); this.knall(0.05, 0.1, 2400); },
+  bumper() {
+    const k = this.thema;
+    if (k.holz) { this.piep(700 + Math.random() * 80, 0.09, 0.08, 'sine'); this.piep(1400, 0.04, 0.03, 'sine'); this.knall(0.03, 0.1, 4500); return; }
+    if (k.blub) { this.piep(300, 0.14, 0.07, 'sine', 0, 900); this.piep(500, 0.08, 0.03, 'sine', 0.05, 1200); return; }
+    if (k.grollen) { this.knall(0.25, 0.14, 300); this.piep(90, 0.2, 0.07, 'sawtooth', 0, 50); return; }
+    this.piep(520 + Math.random() * 60, 0.12, 0.06, 'square', 0, 260); this.knall(0.05, 0.08, 3000);
+  },
+  schleuder() {
+    if (this.thema.holz) { this.knall(0.05, 0.14, 3500); this.piep(260, 0.06, 0.05, 'sine'); return; }
+    if (this.thema.blub) { this.piep(220, 0.12, 0.06, 'sine', 0, 600); return; }
+    this.piep(300, 0.08, 0.06, 'sawtooth', 0, 140); this.knall(0.05, 0.1, this.thema.grollen ? 800 : 2400);
+  },
   wand(w) { if (w > 300) this.knall(0.035, Math.min(0.08, w / 12000), 1200); },
   fallziel() { this.piep(200, 0.1, 0.06, 'square', 0, 90); this.knall(0.08, 0.1, 700); },
   stehziel() { this.piep(990, 0.07, 0.05, 'square'); },
@@ -137,8 +161,7 @@ const ton = {
 // Leise Synth-Begleitung im Hintergrund
 const musik = {
   schritt: 0, naechste: 0, uhr: null,
-  bass: [38, 38, 41, 43, 36, 36, 43, 41],
-  arp: [62, 65, 69, 72, 69, 65, 62, 57],
+  stueck: null,   // Bass, Melodie und Tempo der aktuellen Welt
   starte() {
     this.stoppe();
     if (!ton.ctx) return;
@@ -152,7 +175,8 @@ const musik = {
       return;
     }
     const jetzt = ton.ctx.currentTime;
-    const dauer = s.multiball ? 0.105 : 0.13;
+    this.stueck = s.thema.musik;
+    const dauer = this.stueck.takt * (s.multiball ? 0.8 : 1);
     if (this.naechste < jetzt) this.naechste = jetzt + 0.02;
     while (this.naechste < jetzt + 0.2) {
       if (daten.musik) this.note(this.schritt, this.naechste - jetzt, dauer);
@@ -161,9 +185,14 @@ const musik = {
     }
   },
   note(nr, start, dauer) {
+    const m = this.stueck;
     const hz = n => 440 * Math.pow(2, (n - 69) / 12);
-    const b = this.bass[Math.floor(nr / 16) % this.bass.length];
-    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, 'triangle', start);
-    if (nr % 2 === 0) ton.piep(hz(this.arp[(nr / 2) % 8] + (b - 38)), dauer * 0.9, 0.008, 'square', start);
+    const b = m.bass[Math.floor(nr / 16) % m.bass.length];
+    ton.roh = true;   // Musik nicht von der Effekt-Klangfarbe verändern lassen
+    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, m.bassWelle, start);
+    if (nr % 2 === 0) ton.piep(hz(m.arp[(nr / 2) % 8] + (b - m.bass[0])), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut, m.arpWelle, start);
+    if (m.trommel && nr % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
+    if (m.trommel && nr % 16 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+    ton.roh = false;
   }
 };

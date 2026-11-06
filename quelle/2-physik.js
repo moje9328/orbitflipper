@@ -65,8 +65,12 @@ class Flipper {
     this.gedrueckt = false;
     this.hochTempo = 30;
     this.runterTempo = 17;
-    this.e = MAT.flipper.e; this.reib = MAT.flipper.reib; this.kick = 0; this.sperre = 0;
+    this.reib = MAT.flipper.reib; this.kick = 0; this.sperre = 0;
   }
+  // Schwingt der Flipper, "nimmt" er die Kugel mit (kaum Abprall): Sie rollt auf ihm nach außen
+  // und fliegt erst los, wenn sie die Spitze erreicht oder der Flipper oben anhält.
+  // So bestimmt die Stelle auf dem Flipper die Richtung: nah am Drehpunkt steil, an der Spitze quer.
+  get e() { return this.wTempo !== 0 ? 0.05 : MAT.flipper.e; }
   spitze() { return [this.x + this.s * this.L * Math.cos(this.w), this.y + this.L * Math.sin(this.w)]; }
   bewegt() { return this.wTempo !== 0; }
   schritt(h) {

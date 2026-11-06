@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orbitflipper – Pixelhafen</title>
-<meta name="description" content="Ein Flipper aus der Zukunft: echte Kugel-Physik, zwei Rampen, Wurmloch-Tunnel, Multiball, Aufträge und Neonlicht. Kostenlos, ohne Anmeldung, ohne Werbung.">
+<meta name="description" content="Ein Flipper aus der Zukunft: 5 Welten mit 20 Leveln, echte Kugel-Physik, Rampen, Wurmloch, Multiball und ein Klassik-Tisch. Kostenlos, ohne Anmeldung, ohne Werbung.">
 <!-- App-Einstellungen, damit sich das Spiel auf dem Handy wie eine App verhält -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#04040d">
@@ -166,6 +166,29 @@
     #quer { display: grid; place-items: center; position: fixed; inset: 0; z-index: 9; padding: 24px; background: var(--bg); color: var(--text); text-align: center; font: 12px/1.8 var(--retro); }
   }
   @media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+
+  /* Welt- und Levelauswahl */
+  .tafel.breit { width: min(520px, 100%); }
+  .auswahl { display: grid; gap: 10px; margin: 16px 0 0; }
+  .weltKarte, .levelKarte {
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px;
+    color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--welt, var(--accent)); border-radius: 12px;
+    font: inherit;
+  }
+  .weltKarte:hover:not(:disabled), .levelKarte:hover:not(:disabled) { filter: brightness(1.15); }
+  .weltKarte img, .levelKarte img { flex: none; height: auto; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); background: #000; }
+  .weltKarte img { width: 96px; }
+  .levelKarte img { width: 72px; }
+  .weltKarte.zu, .levelKarte.zu { cursor: default; opacity: 0.55; }
+  .weltKarte.zu img, .levelKarte.zu img { filter: grayscale(1) brightness(0.6); }
+  .weltInfo { display: grid; gap: 4px; min-width: 0; font-size: 14px; line-height: 1.35; color: var(--muted); }
+  .weltInfo strong { color: var(--text); font: 11px/1.4 var(--retro); }
+  .sterneZeile { color: #ffd84a; font-weight: 600; letter-spacing: 0.04em; }
+  .gesamt { margin: 10px 0 0; color: #ffd84a; font: 10px/1.6 var(--retro); }
+  #eSterne { margin: 14px 0 0; color: #ffd84a; font-size: 34px; letter-spacing: 0.1em; text-shadow: 0 0 14px rgba(255, 216, 74, 0.6); }
+  #eTisch { margin: 6px 0 0; color: var(--muted); font: 9px/1.6 var(--retro); }
+  select { width: 100%; min-height: 48px; margin-top: 14px; padding: 8px 12px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; font: 600 15px/1.3 var(--body); }
 </style>
 </head>
 <body>
@@ -194,13 +217,14 @@
     <section id="fStart">
       <p class="marke"><svg aria-hidden="true"><use href="#logo"/></svg>PIXELHAFEN</p>
       <h1>ORBIT&shy;FLIPPER</h1>
-      <p class="unterzeile">Ein Flipper aus der Zukunft. Rampen, Wurmloch, Reaktor und Multiball – wie viele Aufträge schaffst du mit drei Kugeln?</p>
+      <p class="unterzeile">Ein Flipper aus der Zukunft. Fünf Welten mit 20 Leveln, Rampen, Wurmloch und Multiball – oder der klassische Tisch für Highscore-Jagd.</p>
       <div id="duell" hidden><strong id="duellTitel"></strong><span id="duellText"></span></div>
       <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
       <p class="klein js-stufentext"></p>
-      <p class="rekord">REKORD <b class="js-rekord">0</b></p>
+      <p class="rekord">REKORD KLASSIK <b class="js-rekord">0</b></p>
       <div class="knoepfe">
-        <button class="btn main" id="losKnopf" type="button">Spielen</button>
+        <button class="btn main" id="losKnopf" type="button">Welten &amp; Level</button>
+        <button class="btn" id="klassikKnopf" type="button">Klassik spielen</button>
         <div class="paar">
           <button class="btn" type="button" data-oeffne="fListe">Rangliste</button>
           <button class="btn" type="button" data-oeffne="fHilfe">So geht's</button>
@@ -209,8 +233,24 @@
       </div>
     </section>
 
+    <section id="fWelten" hidden>
+      <h2>WELTEN</h2>
+      <p class="gesamt">STERNE <span id="sterneGesamt"></span></p>
+      <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
+      <div class="auswahl" id="weltListe"></div>
+      <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
+    </section>
+
+    <section id="fLevel" hidden>
+      <h2 id="levelTitel">LEVEL</h2>
+      <p class="klein">Jedes Level hat einen eigenen Tisch und eigene Aufgaben. Schaffst du es, ohne eine Kugel zu verlieren, gibt es 3 Sterne.</p>
+      <div class="auswahl" id="levelListe"></div>
+      <div class="knoepfe"><button class="btn" type="button" data-oeffne="fWelten">Zu den Welten</button></div>
+    </section>
+
     <section id="fListe" hidden>
       <h2>RANGLISTE</h2>
+      <select id="listeTisch" aria-label="Tisch"></select>
       <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
       <ol id="liste"></ol>
       <p class="klein">Schick deinen Link an Freunde. Schicken sie dir ihren zurück, stehen sie hier in deiner Liste. Alles bleibt auf deinem Gerät.</p>
@@ -237,7 +277,15 @@
         <li><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
         <li><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
         <li><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
-        <li><b>Aufträge</b> stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+        <li><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+      </ul>
+      <p class="zwischen">WELTEN UND LEVEL</p>
+      <ul class="regeln">
+        <li>5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
+        <li>Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
+        <li><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
+        <li><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
+        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Ein geschafftes Level schaltet das nächste frei.</li>
       </ul>
       <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
     </section>
@@ -249,24 +297,31 @@
         <button class="btn main" id="weiterKnopf" type="button">Weiterspielen</button>
         <button class="btn" id="pauseMusik" type="button">Musik</button>
         <button class="btn" id="pauseNeu" type="button">Neu starten</button>
+        <button class="btn" id="pauseAuswahl" type="button">Levelauswahl</button>
         <button class="btn" id="pauseMenue" type="button">Spiel beenden</button>
       </div>
     </section>
 
     <section id="fEnde" hidden>
-      <h2>GAME OVER</h2>
+      <h2 id="eTitel">GAME OVER</h2>
+      <p id="eTisch"></p>
+      <p id="eSterne" hidden></p>
+      <p class="klein" id="eSterneText" hidden></p>
+      <p class="hervor" id="eFrei" hidden></p>
       <p class="hervor" id="neuerRekord" hidden>NEUER REKORD!</p>
       <dl class="zahlen">
         <div><dt>Punkte</dt><dd id="ePunkte"></dd></div>
-        <div><dt>Rang</dt><dd id="eRang"></dd></div>
-        <div><dt>Aufträge</dt><dd id="eAuftraege"></dd></div>
+        <div id="eRangZeile"><dt>Rang</dt><dd id="eRang"></dd></div>
+        <div><dt id="eAuftraegeName">Aufträge</dt><dd id="eAuftraege"></dd></div>
         <div><dt>Rampen</dt><dd id="eRampen"></dd></div>
         <div><dt>Beste Kombo</dt><dd id="eKombo"></dd></div>
         <div><dt>Dein Rekord</dt><dd id="eRekord"></dd></div>
       </dl>
       <p class="klein" id="eDuell" hidden></p>
       <div class="knoepfe">
+        <button class="btn main" id="weiterLevel" type="button" hidden>Nächstes Level</button>
         <button class="btn main" id="nochmalKnopf" type="button">Nochmal</button>
+        <button class="btn" id="zurAuswahl" type="button" hidden>Levelauswahl</button>
         <button class="btn" id="endeTeilen" type="button">Freunde herausfordern</button>
         <button class="btn" type="button" data-oeffne="fStart">Zum Menü</button>
       </div>
@@ -338,18 +393,28 @@ const KAPSEL_PREISE = [
 
 // --------------------------- Speichern ---------------------------
 
+// Bestwerte gibt es je Tisch (Klassik oder Level) und je Stufe: bestwerte[tisch][stufe]
 function ladeDaten() {
-  const leer = { name: '', stufe: 'normal', ton: true, musik: true, freunde: [], rekorde: {}, spiele: 0 };
+  const leer = { name: '', stufe: 'normal', ton: true, musik: true, freunde: [], rekorde: {}, bestwerte: {}, sterne: {}, spiele: 0, listeTisch: 'klassik' };
   let roh = null;
   try { roh = JSON.parse(localStorage.getItem(SPEICHER)); } catch (error) {}
   const d = Object.assign(leer, roh && typeof roh === 'object' ? roh : {});
   if (!Object.prototype.hasOwnProperty.call(STUFEN, d.stufe)) d.stufe = 'normal';
   if (!Array.isArray(d.freunde)) d.freunde = [];
   if (!d.rekorde || typeof d.rekorde !== 'object') d.rekorde = {};
-  for (const stufe of STUFEN_NAMEN) if (!Number.isFinite(d.rekorde[stufe])) d.rekorde[stufe] = 0;
+  if (!d.bestwerte || typeof d.bestwerte !== 'object') d.bestwerte = {};
+  if (!d.sterne || typeof d.sterne !== 'object') d.sterne = {};
+  // Alte Rekorde (vor den Welten) gehören zum Klassik-Tisch
+  if (!d.bestwerte.klassik) d.bestwerte.klassik = {};
+  for (const stufe of STUFEN_NAMEN) {
+    if (Number.isFinite(d.rekorde[stufe])) d.bestwerte.klassik[stufe] = Math.max(d.bestwerte.klassik[stufe] || 0, d.rekorde[stufe]);
+  }
+  delete d.rekorde;
+  for (const f of d.freunde) if (!f.tisch) f.tisch = 'klassik';
   return d;
 }
 const daten = ladeDaten();
+function bestwert(tisch, stufe = daten.stufe) { return (daten.bestwerte[tisch] && daten.bestwerte[tisch][stufe]) || 0; }
 function speichere() {
   try { localStorage.setItem(SPEICHER, JSON.stringify(daten)); } catch (error) {}
 }
@@ -359,6 +424,7 @@ function speichere() {
 
 const ton = {
   ctx: null, haupt: null, rauschen: null,
+  thema: { welle: 'square', hoch: 1 },     // Klangfarbe der aktuellen Welt
   an() {
     if (!this.ctx) {
       const AudioClass = window.AudioContext || window.webkitAudioContext;
@@ -380,9 +446,12 @@ const ton = {
     if (!this.bereit()) return;
     const t = this.ctx.currentTime + start;
     const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+    // Die Welt färbt die Effekt-Töne: andere Wellenform, andere Tonlage
+    if (art === 'square' && !this.roh) art = this.thema.welle;
+    const h = this.roh ? 1 : this.thema.hoch;
     osc.type = art;
-    osc.frequency.setValueAtTime(frequenz, t);
-    if (ziel) osc.frequency.exponentialRampToValueAtTime(ziel, t + dauer);
+    osc.frequency.setValueAtTime(frequenz * h, t);
+    if (ziel) osc.frequency.exponentialRampToValueAtTime(ziel * h, t + dauer);
     g.gain.setValueAtTime(laut, t);
     g.gain.exponentialRampToValueAtTime(0.0008, t + dauer);
     osc.connect(g).connect(this.haupt);
@@ -400,8 +469,18 @@ const ton = {
     q.start(t); q.stop(t + dauer + 0.02);
   },
   flipper() { this.knall(0.06, 0.12, 900); this.piep(110, 0.05, 0.04, 'square'); },
-  bumper() { this.piep(520 + Math.random() * 60, 0.12, 0.06, 'square', 0, 260); this.knall(0.05, 0.08, 3000); },
-  schleuder() { this.piep(300, 0.08, 0.06, 'sawtooth', 0, 140); this.knall(0.05, 0.1, 2400); },
+  bumper() {
+    const k = this.thema;
+    if (k.holz) { this.piep(700 + Math.random() * 80, 0.09, 0.08, 'sine'); this.piep(1400, 0.04, 0.03, 'sine'); this.knall(0.03, 0.1, 4500); return; }
+    if (k.blub) { this.piep(300, 0.14, 0.07, 'sine', 0, 900); this.piep(500, 0.08, 0.03, 'sine', 0.05, 1200); return; }
+    if (k.grollen) { this.knall(0.25, 0.14, 300); this.piep(90, 0.2, 0.07, 'sawtooth', 0, 50); return; }
+    this.piep(520 + Math.random() * 60, 0.12, 0.06, 'square', 0, 260); this.knall(0.05, 0.08, 3000);
+  },
+  schleuder() {
+    if (this.thema.holz) { this.knall(0.05, 0.14, 3500); this.piep(260, 0.06, 0.05, 'sine'); return; }
+    if (this.thema.blub) { this.piep(220, 0.12, 0.06, 'sine', 0, 600); return; }
+    this.piep(300, 0.08, 0.06, 'sawtooth', 0, 140); this.knall(0.05, 0.1, this.thema.grollen ? 800 : 2400);
+  },
   wand(w) { if (w > 300) this.knall(0.035, Math.min(0.08, w / 12000), 1200); },
   fallziel() { this.piep(200, 0.1, 0.06, 'square', 0, 90); this.knall(0.08, 0.1, 700); },
   stehziel() { this.piep(990, 0.07, 0.05, 'square'); },
@@ -430,8 +509,7 @@ const ton = {
 // Leise Synth-Begleitung im Hintergrund
 const musik = {
   schritt: 0, naechste: 0, uhr: null,
-  bass: [38, 38, 41, 43, 36, 36, 43, 41],
-  arp: [62, 65, 69, 72, 69, 65, 62, 57],
+  stueck: null,   // Bass, Melodie und Tempo der aktuellen Welt
   starte() {
     this.stoppe();
     if (!ton.ctx) return;
@@ -445,7 +523,8 @@ const musik = {
       return;
     }
     const jetzt = ton.ctx.currentTime;
-    const dauer = s.multiball ? 0.105 : 0.13;
+    this.stueck = s.thema.musik;
+    const dauer = this.stueck.takt * (s.multiball ? 0.8 : 1);
     if (this.naechste < jetzt) this.naechste = jetzt + 0.02;
     while (this.naechste < jetzt + 0.2) {
       if (daten.musik) this.note(this.schritt, this.naechste - jetzt, dauer);
@@ -454,10 +533,15 @@ const musik = {
     }
   },
   note(nr, start, dauer) {
+    const m = this.stueck;
     const hz = n => 440 * Math.pow(2, (n - 69) / 12);
-    const b = this.bass[Math.floor(nr / 16) % this.bass.length];
-    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, 'triangle', start);
-    if (nr % 2 === 0) ton.piep(hz(this.arp[(nr / 2) % 8] + (b - 38)), dauer * 0.9, 0.008, 'square', start);
+    const b = m.bass[Math.floor(nr / 16) % m.bass.length];
+    ton.roh = true;   // Musik nicht von der Effekt-Klangfarbe verändern lassen
+    if (nr % 4 === 0) ton.piep(hz(b), dauer * 3, 0.03, m.bassWelle, start);
+    if (nr % 2 === 0) ton.piep(hz(m.arp[(nr / 2) % 8] + (b - m.bass[0])), dauer * (m.kurz ? 0.5 : 0.9), m.arpLaut, m.arpWelle, start);
+    if (m.trommel && nr % 8 === 4) ton.knall(0.06, 0.05, 2500, start);
+    if (m.trommel && nr % 16 === 0) ton.piep(70, 0.15, 0.06, 'sine', start, 40);
+    ton.roh = false;
   }
 };
 
@@ -528,8 +612,12 @@ class Flipper {
     this.gedrueckt = false;
     this.hochTempo = 30;
     this.runterTempo = 17;
-    this.e = MAT.flipper.e; this.reib = MAT.flipper.reib; this.kick = 0; this.sperre = 0;
+    this.reib = MAT.flipper.reib; this.kick = 0; this.sperre = 0;
   }
+  // Schwingt der Flipper, "nimmt" er die Kugel mit (kaum Abprall): Sie rollt auf ihm nach außen
+  // und fliegt erst los, wenn sie die Spitze erreicht oder der Flipper oben anhält.
+  // So bestimmt die Stelle auf dem Flipper die Richtung: nah am Drehpunkt steil, an der Spitze quer.
+  get e() { return this.wTempo !== 0 ? 0.05 : MAT.flipper.e; }
   spitze() { return [this.x + this.s * this.L * Math.cos(this.w), this.y + this.L * Math.sin(this.w)]; }
   bewegt() { return this.wTempo !== 0; }
   schritt(h) {
@@ -832,13 +920,47 @@ const spiegel = x => 2 * MITTE - x;
 // Abschussbahn rechts
 const SCHUSS = { innen: 484, aussen: 520, x: 502, kolbenY: 900 };
 
-function baueTisch() {
+// ---------- Baukasten für die Tische der Level ----------
+// Bumper-Anordnungen: [x, y, Radius]. Abstände sind so gewählt, dass zwischen
+// zwei Bumpern immer eine Kugel durchpasst (keine Falle, in der sie festsitzt).
+const BUMPER_FORMEN = {
+  dreieck: [[200, 262, 25], [304, 262, 25], [252, 338, 25]],
+  reihe: [[178, 285, 24], [252, 255, 24], [326, 285, 24]],
+  vier: [[182, 272, 22], [322, 272, 22], [252, 236, 22], [252, 336, 22]],
+  zwei: [[205, 280, 27], [299, 280, 27]],
+  tief: [[188, 300, 24], [316, 300, 24], [252, 236, 24]]
+};
+// Kleine Schlagpfosten als zusätzliche Hindernisse
+const PFOSTEN_FORMEN = {
+  flanke: [[176, 566], [328, 566]],
+  seiten: [[132, 356], [372, 356]],
+  mitte: [[252, 610]],
+  oben: [[150, 205], [354, 205]]
+};
+// Wege der Rampen. Rechts ist (außer bei "innen") das Spiegelbild von links.
+const RAMPEN_WEGE = {
+  innen: [[114, 505], [114, 360], [116, 250], [140, 152], [252, 104], [364, 152], [418, 250], [426, 360], [426, 560], [424, 628]],
+  kehre: [[114, 505], [114, 300], [116, 222], [97, 190], [78, 222], [79, 300], [80, 560], [80, 628]],
+  loch: [[114, 505], [114, 340], [124, 240], [160, 214], [180, 262], [171, 350], [166, 412]],
+  oben: [[114, 505], [114, 330], [128, 222], [175, 142], [228, 114], [252, 118]]
+};
+const RAMPEN_WEG_RECHTS_INNEN = [[spiegel(114), 505], [spiegel(114), 380], [372, 268], [330, 222], [252, 208], [174, 222], [118, 268], [82, 360], [80, 560], [80, 628]];
+// Anteil bergauf und bergab je Weg
+const RAMPEN_PROFIL = { innen: [0.42, 0.4], kehre: [0.45, 0.42], loch: [0.5, 0.35], oben: [0.8, 0.12] };
+
+// Der bisherige ORBITFLIPPER-Tisch
+const KLASSIK_PLAN = {
+  bumper: 'dreieck', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true,
+  steh: ['links', 'mitte', 'rechts'], pfosten: [], kickback: false, rampenTempo: 0
+};
+
+function baueTisch(plan = KLASSIK_PLAN) {
   const welt = new Welt();
   const T = {
-    welt,
+    welt, plan,
     waende: [],      // zum Zeichnen: Linienzüge
-    bumper: [], schleudern: [], fallziele: [], stehziele: [], roll: [], loecher: [], rampen: [],
-    spinner: null, tore: [], kolben: null, lichter: {}
+    bumper: [], schleudern: [], fallziele: [], stehziele: [], roll: [], loecher: [], rampen: [], pfosten: [], kickback: [],
+    spinner: null, tore: [], kolben: null, lichter: {}, dach: null
   };
   const neu = t => { welt.teile.push(t); return t; };
   const zug = (punkte, opt = {}) => {
@@ -860,7 +982,7 @@ function baueTisch() {
   T.kolben.zug = 0;
 
   // ---------- Orbits links und rechts ----------
-  const fuehrL = [[66, 545], [66, 330], ...bogen(270, 330, 204, 180, 212, 8).slice(1)];
+  const fuehrL = [[66, 498], [66, 330], ...bogen(270, 330, 204, 180, 212, 8).slice(1)];
   zug(fuehrL, { r: 3.5 });
   const lEnde = fuehrL[fuehrL.length - 1];
   const lAussen = [270 + 250 * Math.cos(212 * Math.PI / 180), 330 + 250 * Math.sin(212 * Math.PI / 180)];
@@ -869,7 +991,7 @@ function baueTisch() {
 
   // rechte Führung: gleicher Bogen um (270,330) mit passendem Radius
   const rR = spiegel(66) - 270;
-  const fuehrR = [[spiegel(66), 545], [spiegel(66), 330], ...bogen(270, 330, rR, 360, 330, 8).slice(1)];
+  const fuehrR = [[spiegel(66), 498], [spiegel(66), 330], ...bogen(270, 330, rR, 360, 330, 8).slice(1)];
   zug(fuehrR, { r: 3.5 });
 
   // Abweiser unten an den Orbits: Ein Ball, der herunterkommt, rollt zur Innenbahn
@@ -905,15 +1027,25 @@ function baueTisch() {
   });
 
   // ---------- Bumper ----------
-  for (const [x, y] of [[200, 262], [304, 262], [252, 338]]) {
-    const bu = { x, y, r: 25, blitz: 0, treffer: 0 };
-    const t = neu(pfosten(x, y, 25, { mat: 'bumper', kick: 820, kickAb: 0, kickPause: 0.05 }));
+  BUMPER_FORMEN[plan.bumper].forEach(([x, y, r], i) => {
+    const bu = { x, y, r, blitz: 0, treffer: 0, nr: i };
+    const t = neu(pfosten(x, y, r, { mat: 'bumper', kick: 820, kickAb: 0, kickPause: 0.05 }));
     t.beiKick = (b, w) => { bu.blitz = 1; regeln.bumper(bu, b); };
     T.bumper.push(bu);
+  });
+
+  // Schlagpfosten
+  for (const name of plan.pfosten || []) {
+    for (const [x, y] of PFOSTEN_FORMEN[name]) {
+      const p = { x, y, r: 10, blitz: 0 };
+      const t = neu(pfosten(x, y, 10, { mat: 'gummi', kick: 520, kickAb: 60, kickPause: 0.1 }));
+      t.beiKick = (b, w) => { p.blitz = 1; regeln.pfosten(p, b); };
+      T.pfosten.push(p);
+    }
   }
 
   // ---------- Fallziele vor dem Wurmloch ----------
-  [218, 252, 286].forEach((x, i) => {
+  if (plan.fallziele) [218, 252, 286].forEach((x, i) => {
     const t = neu(wand(x - 14, 505, x + 14, 505, { r: 4, mat: 'plastik' }));
     const z = { x, y: 505, t, unten: false, blitz: 0, nr: i };
     t.beiTreffer = (b, w) => { if (w > 120) regeln.fallziel(z, b); };
@@ -921,20 +1053,24 @@ function baueTisch() {
   });
   // Dach hinter den Fallzielen: Eine Kugel von oben rollt seitlich ab statt liegenzubleiben.
   // Von unten (durch ein abgeräumtes Ziel) lässt es die Kugel durch.
-  for (const t of linienzug([[200, 501], [252, 487], [304, 501]], { r: 2, mat: 'metall', einweg: [0, -1] })) neu(t);
-  T.dach = [[200, 501], [252, 487], [304, 501]];
+  if (plan.fallziele) {
+    for (const t of linienzug([[200, 501], [252, 487], [304, 501]], { r: 2, mat: 'metall', einweg: [0, -1] })) neu(t);
+    T.dach = [[200, 501], [252, 487], [304, 501]];
+  }
 
   // ---------- Stehziele S C H I L D ----------
-  const steh = [
-    { x: 70, y: 455, ax: 70, ay: 438, bx: 70, by: 472, n: [1, 0] },
-    { x: 252, y: 384, ax: 238, ay: 384, bx: 266, by: 384, n: [0, 1] },
-    { x: spiegel(70), y: 455, ax: spiegel(70), ay: 438, bx: spiegel(70), by: 472, n: [-1, 0] }
-  ];
-  steh.forEach((s, i) => {
+  const STEH = {
+    links: { x: 70, y: 455, ax: 70, ay: 438, bx: 70, by: 472, n: [1, 0] },
+    mitte: { x: 252, y: 384, ax: 238, ay: 384, bx: 266, by: 384, n: [0, 1] },
+    rechts: { x: spiegel(70), y: 455, ax: spiegel(70), ay: 438, bx: spiegel(70), by: 472, n: [-1, 0] }
+  };
+  (plan.steh || []).map(n => STEH[n]).forEach((s, i) => {
     const t = neu(wand(s.ax, s.ay, s.bx, s.by, { r: 4, mat: 'plastik' }));
     const z = Object.assign({ t, an: false, blitz: 0, nr: i }, s);
     t.beiTreffer = (b, w) => { if (w > 90) regeln.stehziel(z, b); };
     T.stehziele.push(z);
+    // Liegt das Ziel waagerecht, bekommt es ein spitzes Dach: Eine Kugel von oben rollt ab statt liegenzubleiben
+    if (s.ay === s.by) for (const d of linienzug([[s.ax - 4, s.ay - 1], [s.x, s.ay - 9], [s.bx + 4, s.ay - 1]], { r: 2, einweg: [0, -1] })) neu(d);
   });
 
   // ---------- Löcher ----------
@@ -956,16 +1092,18 @@ function baueTisch() {
   T.spinner = { x: 43, y: 440, w: 0, tempo: 0, halbe: 0 };
   welt.linien.push({ ax: 20, ay: 440, bx: 66, by: 440, aktiv: true, melde: (b, k) => regeln.spinner(b, k) });
 
-  // Orbit-Schranken: zählen einen ganzen Umlauf
-  welt.linien.push({ ax: 20, ay: 520, bx: 66, by: 520, aktiv: true, melde: (b, k) => { if (b.vy < 0) b.orbitStart = { seite: 'links', zeit: welt.zeit }; } });
-  welt.linien.push({ ax: spiegel(66), ay: 520, bx: SCHUSS.innen, by: 520, aktiv: true, melde: (b, k) => {
-    if (b.vy < 0) b.orbitStart = { seite: 'rechts', zeit: welt.zeit };
-    else if (b.orbitStart && b.orbitStart.seite === 'links' && welt.zeit - b.orbitStart.zeit < 4) { b.orbitStart = null; regeln.orbit('links', b); }
-  } });
-  // Rechter Orbit: Der Ball läuft oben herum und prallt auf das linke Tor
-  torL.beiTreffer = b => {
-    if (b.orbitStart && b.orbitStart.seite === 'rechts' && welt.zeit - b.orbitStart.zeit < 4) { b.orbitStart = null; regeln.orbit('rechts', b); }
+  // Orbit-Schranken: Unten merkt sich die Kugel, in welche Bahn sie hineinfährt.
+  // Ein Orbit zählt, sobald sie es oben über die Kuppe der Bahn schafft.
+  welt.linien.push({ ax: 20, ay: 480, bx: 66, by: 480, aktiv: true, melde: (b, k) => { if (b.vy < 0) b.orbitStart = { seite: 'links', zeit: welt.zeit }; } });
+  welt.linien.push({ ax: spiegel(66), ay: 480, bx: SCHUSS.innen, by: 480, aktiv: true, melde: (b, k) => { if (b.vy < 0) b.orbitStart = { seite: 'rechts', zeit: welt.zeit }; } });
+  const ueberKuppe = seite => b => {
+    if (b.orbitStart && b.orbitStart.seite === seite && welt.zeit - b.orbitStart.zeit < 3) { b.orbitStart = null; regeln.orbit(seite, b); }
   };
+  // links: durch das Einbahn-Tor oben aus der Bahn hinaus
+  welt.linien.push({ ax: lEnde[0], ay: lEnde[1], bx: lAussen[0], by: lAussen[1], aktiv: true, melde: ueberKuppe('links') });
+  // rechts: über das obere Ende der rechten Führung
+  const rEnde = fuehrR[fuehrR.length - 1];
+  welt.linien.push({ ax: rEnde[0], ay: rEnde[1], bx: 270 + 250 * Math.cos(-30 * Math.PI / 180), by: 330 + 250 * Math.sin(-30 * Math.PI / 180), aktiv: true, melde: ueberKuppe('rechts') });
 
   // Abschussbahn verlassen
   welt.linien.push({ ax: SCHUSS.innen, ay: 334, bx: 521, by: 298, aktiv: true, melde: (b, k) => { if (b.vy < 0) regeln.abgeschossen(b); } });
@@ -975,29 +1113,47 @@ function baueTisch() {
     const X = x => s === 1 ? x : spiegel(x);
     welt.punkte.push({ x: X(80), y: 700, r: 12, rein: b => regeln.innenbahn(s === 1 ? 'links' : 'rechts', b) });
     welt.punkte.push({ x: X(39), y: 700, r: 12, rein: b => regeln.aussenbahn(s === 1 ? 'links' : 'rechts', b) });
+    if (plan.kickback) {
+      const kb = { seite: s === 1 ? 'links' : 'rechts', x: X(39), y: 820, an: true, blitz: 0 };
+      welt.punkte.push({ x: kb.x, y: 812, r: 14, rein: b => regeln.kickback(kb, b) });
+      T.kickback.push(kb);
+    }
   }
 
   // ---------- Rampen ----------
-  // Linke Rampe (cyan): Eingang links, über den Tisch nach rechts unten in die rechte Innenbahn
-  // Rechte Rampe (violett): Eingang rechts, über den Tisch nach links in die linke Innenbahn
-  const rampeL = new Bahn([[114, 505], [114, 360], [116, 250], [140, 152], [252, 104], [364, 152], [418, 250], [426, 360], [426, 560], [424, 628]], { auf: 0.42, ab: 0.4, bremse: 1250, schub: 600 });
-  const rampeR = new Bahn([[spiegel(114), 505], [spiegel(114), 380], [372, 268], [330, 222], [252, 208], [174, 222], [118, 268], [82, 360], [80, 560], [80, 628]], { auf: 0.36, ab: 0.44, bremse: 1500, schub: 600 });
-  const mundBreite = 27;
-  for (const [name, bahn, farbe] of [['links', rampeL, 'cyan'], ['rechts', rampeR, 'violett']]) {
+  // "innen": über den Tisch in die gegenüberliegende Innenbahn
+  // "kehre": Haarnadelkurve zurück in die eigene Innenbahn
+  // "loch": endet direkt in der Kapsel (links) oder im Reaktor (rechts)
+  // "oben": wirft die Kugel oben in die Rollbahnen
+  const mundBreite = 36;
+  ['links', 'rechts'].forEach((name, nr) => {
+    const art = plan.rampen[name];
+    if (!art) return;
+    let punkte = RAMPEN_WEGE[art];
+    if (name === 'rechts') punkte = art === 'innen' ? RAMPEN_WEG_RECHTS_INNEN : punkte.map(([x, y]) => [spiegel(x), y]);
+    const [auf, ab] = name === 'rechts' && art === 'innen' ? [0.36, 0.44] : RAMPEN_PROFIL[art];
+    const probe = new Bahn(punkte, { auf, ab });
+    // Bremsung so, dass etwa ein Schuss mit "noetig" Einheiten/s gerade hinaufreicht
+    const noetig = 1180 + (plan.rampenTempo || 0);
+    const bremse = KLASSIK_PLAN === plan
+      ? (name === 'links' ? 1250 : 1500)
+      : noetig * noetig / (2 * probe.L * auf);
+    const bahn = new Bahn(punkte, { auf, ab, bremse, schub: 600 });
     const [mx, my] = bahn.ort(0);
-    const ra = { name, bahn, farbe, mx, my, blitz: 0 };
-    // Lippen links und rechts am Eingang
-    // Innere Lippe zeigt nach unten, die äußere geht schräg hoch zur Orbit-Führung (keine Ecke, in der eine Kugel liegen bleibt)
+    const loch = art === 'loch' ? (name === 'links' ? T.kapsel : T.reaktor) : null;
+    const ra = { name, nr, art, bahn, mx, my, blitz: 0, loch };
+    // Innere Lippe: geht unten nach außen auseinander (Trichter) und lenkt knappe Schüsse in den Eingang
     const innen = name === 'links' ? 1 : -1;
-    zug([[mx + innen * mundBreite, my], [mx + innen * (mundBreite + 9), my + 26]], { r: 3.5, zeichne: 'lippe' });
+    zug([[mx + innen * mundBreite, my], [mx + innen * (mundBreite + 20), my + 32]], { r: 3.5, zeichne: 'lippe' });
     welt.linien.push({ ax: mx - mundBreite + 3, ay: my, bx: mx + mundBreite - 3, by: my, aktiv: true, melde: (b, k) => {
       if (b.vy < -60 && b.ort === 'tisch') faehrtRampe(b, ra);
     } });
-    // Schräge zwischen Orbit-Führung und Rampenlippe, damit dort keine Kugel liegenbleibt
-    const aussen = name === 'links' ? [66, 470, mx - mundBreite, my] : [spiegel(66), 470, mx + mundBreite, my];
+    // Äußere Ecke direkt mit dem unteren Ende der Orbit-Führung verbunden: keine Lücke, in der eine
+    // Kugel liegenbleibt, und der Orbit-Eingang darunter bleibt für flache Schüsse frei
+    const aussen = name === 'links' ? [66, 494, mx - mundBreite, my] : [spiegel(66), 494, mx + mundBreite, my];
     zug([[aussen[0], aussen[1]], [aussen[2], aussen[3]]], { r: 3.5, zeichne: 'lippe' });
     T.rampen.push(ra);
-  }
+  });
 
   welt.baueRaster(TB, TH + 60);
   return T;
@@ -1036,6 +1192,7 @@ function rampenSchritt(b, dt) {
     b.ort = 'tisch'; b.hoehe = 0;
     b.x = ex; b.y = ey; b.vx = tx * v; b.vy = ty * v;
     regeln.rampe(ra, b);
+    if (ra.loch) fangeImLoch(ra.loch, b);
   } else if (b.s <= 0 && b.sv < 0) {
     // zu wenig Schwung: zurück auf den Tisch, nach unten
     const [ex, ey, tx, ty] = bahn.ort(0);
@@ -1044,6 +1201,578 @@ function rampenSchritt(b, dt) {
     b.vx = tx * b.sv * 0.7; b.vy = ty * b.sv * 0.7;
     ton.rampeRunter();
   }
+}
+
+// =====================================================================
+//  WELTEN UND LEVEL
+//  Jede Welt hat ihr eigenes Aussehen (Hintergrund, Schienen, Bumper, Rampen,
+//  Flipper, Kugel, Funken) und ihren eigenen Klang. Jedes Level hat einen
+//  eigenen Tischaufbau und eigene Aufgaben.
+// =====================================================================
+
+// Immer gleiche "Zufallszahlen", damit ein Hintergrund bei jedem Start gleich aussieht
+function zufall(saat) {
+  let a = saat >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// --------------------------- Gemeinsame Farbnamen ---------------------------
+// f.haupt: Punkte und Hauptlicht, f.zweit: zweites Licht, gold/gruen/pink: Ziele
+
+const THEMEN = {
+  // ------------------------------------------------------------------ KLASSIK
+  klassik: {
+    name: 'Klassik', rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
+    f: { haupt: '#38f3ff', zweit: '#a066ff', gold: '#ffd84a', gruen: '#4dff9a', pink: '#ff4fd8', text: '#eef2ff', bumper: '#b48cff' },
+    schiene: { glow: 'rgba(56,243,255,0.18)', dunkel: '#2b3150', hell: '#a9b6d8', kante: '#eaf2ff' },
+    gummi: ['rgba(255,79,216,0.25)', '#f2e8ff'],
+    schleuder: ['#2c3456', '#141830', '#d9e2ff', '#3d4666'],
+    blech: ['#20263e', '#0d1020', 'rgba(160,180,230,0.35)'],
+    rampen: [{ rgb: '56,243,255', voll: '#38f3ff' }, { rgb: '176,102,255', voll: '#b066ff' }], rampenStil: 'neon',
+    bumper: { stil: 'klassik', glow: '#7a4dff', ring: '#38f3ff', kappe: ['#e3d3ff', '#9a63ff', '#3b1a8a'] },
+    flipper: { stops: ['#f4f8ff', '#a9b5cf', '#4a5470', '#1d2236'], kante: '#38f3ff', glow: '56,243,255' },
+    ball: { stops: ['#ffffff', '#dfe7f5', '#7d889f', '#2a3042', '#151a26'], unten: '56,243,255', seite: '176,102,255', licht: '#4a7dff', spur: '80,200,255' },
+    teilchen: 'quadrat',
+    male(c) { malKlassikKunst(c); },
+    ambient() {},
+    klang: { welle: 'square', hoch: 1 },
+    musik: { bass: [38, 38, 41, 43, 36, 36, 43, 41], arp: [62, 65, 69, 72, 69, 65, 62, 57], takt: 0.13, bassWelle: 'triangle', arpWelle: 'square', arpLaut: 0.008 }
+  },
+
+  // ------------------------------------------------------------------ WELTRAUM
+  weltraum: {
+    name: 'Weltraum', rand: '#3d7bff', grund: ['#02030c', '#040818', '#02020a'],
+    f: { haupt: '#7fd4ff', zweit: '#ffc35a', gold: '#ffe27a', gruen: '#6dffc4', pink: '#ff7ad9', text: '#eef4ff', bumper: '#9fd0ff' },
+    schiene: { glow: 'rgba(110,190,255,0.22)', dunkel: '#1d2740', hell: '#c4d4f0', kante: '#ffffff' },
+    gummi: ['rgba(255,195,90,0.3)', '#fff2d6'],
+    schleuder: ['#1e2a48', '#0b1124', '#e6eeff', '#33415f'],
+    blech: ['#18213a', '#080c18', 'rgba(170,200,255,0.35)'],
+    rampen: [{ rgb: '127,212,255', voll: '#7fd4ff' }, { rgb: '255,195,90', voll: '#ffc35a' }], rampenStil: 'neon',
+    bumper: { stil: 'planet', glow: '#4f8dff', ring: '#ffe0a0', farben: [['#ffb36b', '#c2552a', '#3a1206'], ['#8fd8ff', '#2a6cc2', '#0a1a3a'], ['#d9b3ff', '#7a3fc2', '#1e0a3a'], ['#9dffcf', '#2aa274', '#06301e']] },
+    flipper: { stops: ['#ffffff', '#c6d3ec', '#55688f', '#1a2238'], kante: '#7fd4ff', glow: '127,212,255' },
+    ball: { stops: ['#ffffff', '#e8f0ff', '#8a97b4', '#2a3350', '#121a2c'], unten: '127,212,255', seite: '255,195,90', licht: '#5d8cff', spur: '140,210,255' },
+    teilchen: 'stern',
+    male(c) { malWeltraum(c); },
+    ambient(c, zeit) { funkelSterne(c, zeit); },
+    klang: { welle: 'triangle', hoch: 1.15 },
+    musik: { bass: [36, 36, 43, 41, 39, 39, 41, 43], arp: [72, 79, 84, 79, 75, 79, 82, 79], takt: 0.16, bassWelle: 'sine', arpWelle: 'triangle', arpLaut: 0.012 }
+  },
+
+  // ------------------------------------------------------------------ CYBERPUNK
+  cyber: {
+    name: 'Cyberpunk', rand: '#ff2ea6', grund: ['#120420', '#0b0318', '#05020c'],
+    f: { haupt: '#ff3db4', zweit: '#2ef9ff', gold: '#fff13a', gruen: '#3dff8e', pink: '#ff3db4', text: '#fff0fb', bumper: '#ff6fd0' },
+    schiene: { glow: 'rgba(255,61,180,0.35)', dunkel: '#1a0b24', hell: '#ff8ad6', kante: '#ffe3f5' },
+    gummi: ['rgba(46,249,255,0.35)', '#d9feff'],
+    schleuder: ['#1d0b2c', '#0b0414', '#2ef9ff', '#3a1650'],
+    blech: ['#1c0a2a', '#08030f', 'rgba(255,61,180,0.45)'],
+    rampen: [{ rgb: '46,249,255', voll: '#2ef9ff' }, { rgb: '255,241,58', voll: '#fff13a' }], rampenStil: 'neon',
+    bumper: { stil: 'holo', glow: '#ff3db4', ring: '#2ef9ff', kappe: ['#ffd1f0', '#ff3db4', '#4a0a3a'] },
+    flipper: { stops: ['#5a5d70', '#24262f', '#101118', '#05050a'], kante: '#ff3db4', glow: '255,61,180' },
+    ball: { stops: ['#ffffff', '#f0e6ff', '#8f86a8', '#2c2440', '#120c1c'], unten: '255,61,180', seite: '46,249,255', licht: '#ff3db4', spur: '255,90,200' },
+    teilchen: 'quadrat',
+    male(c) { malCyber(c); },
+    ambient(c, zeit) { cyberRegen(c, zeit); },
+    klang: { welle: 'square', hoch: 1.3 },
+    musik: { bass: [33, 33, 36, 31, 33, 33, 38, 36], arp: [69, 72, 76, 81, 76, 72, 69, 64], takt: 0.11, bassWelle: 'sawtooth', arpWelle: 'square', arpLaut: 0.009, trommel: true }
+  },
+
+  // ------------------------------------------------------------------ DSCHUNGEL
+  dschungel: {
+    name: 'Dschungeltempel', rand: '#c9a23a', grund: ['#17241a', '#132014', '#0a120b'],
+    f: { haupt: '#ffd25a', zweit: '#5fe0ff', gold: '#ffd25a', gruen: '#7dff6a', pink: '#ff8a5c', text: '#fff6dc', bumper: '#ffd25a' },
+    schiene: { glow: 'rgba(255,210,90,0.18)', dunkel: '#3a2814', hell: '#9b7340', kante: '#ffd98a' },
+    gummi: ['rgba(125,255,106,0.25)', '#e8ffd6'],
+    schleuder: ['#5a4a32', '#2c2418', '#ffd98a', '#4a3b24'],
+    blech: ['#4a3d2a', '#1c160e', 'rgba(255,210,120,0.45)'],
+    rampen: [{ rgb: '95,224,255', voll: '#5fe0ff' }, { rgb: '255,210,90', voll: '#ffd25a' }], rampenStil: 'stein',
+    bumper: { stil: 'stein', glow: '#ffc14a', ring: '#ffd25a', kappe: ['#c9b48e', '#7d6a4c', '#3a2e1e'] },
+    flipper: { stops: ['#e2b778', '#a8743c', '#6a4520', '#2e1c0a'], kante: '#ffd25a', glow: '255,210,90' },
+    ball: { stops: ['#ffffff', '#fff3d6', '#b8a27a', '#4a3a24', '#1c140a'], unten: '125,255,106', seite: '255,210,90', licht: '#ffd25a', spur: '255,220,120' },
+    teilchen: 'blatt',
+    male(c) { malDschungel(c); },
+    ambient(c, zeit) { dschungelLeben(c, zeit); },
+    klang: { welle: 'sine', hoch: 0.9, holz: true },
+    musik: { bass: [40, 40, 43, 45, 40, 40, 47, 45], arp: [64, 67, 69, 71, 74, 71, 69, 67], takt: 0.14, bassWelle: 'triangle', arpWelle: 'sine', arpLaut: 0.02, trommel: true, kurz: true }
+  },
+
+  // ------------------------------------------------------------------ UNTERWASSER
+  wasser: {
+    name: 'Unterwasser', rand: '#2ad6c8', grund: ['#06324a', '#04223a', '#03131f'],
+    f: { haupt: '#5ff6e8', zweit: '#ff8fc8', gold: '#ffe08a', gruen: '#7dffc6', pink: '#ff8fc8', text: '#e9fffd', bumper: '#9ffff3' },
+    schiene: { glow: 'rgba(95,246,232,0.2)', dunkel: '#3a2a1a', hell: '#c98a4a', kante: '#ffd2a0' },
+    gummi: ['rgba(255,143,200,0.3)', '#ffe6f2'],
+    schleuder: ['#1a4a5a', '#0a2430', '#ffd2a0', '#2a5a6a'],
+    blech: ['#c9a87a', '#7a5f3a', 'rgba(255,230,190,0.5)'],
+    rampen: [{ rgb: '170,250,255', voll: '#aafaff' }, { rgb: '255,170,220', voll: '#ffaadc' }], rampenStil: 'glas',
+    bumper: { stil: 'qualle', glow: '#5ff6e8', ring: '#ffffff', kappe: ['#e6ffff', '#7ff0ff', '#1a6a8a'] },
+    flipper: { stops: ['#ffffff', '#ffe0ec', '#e2a6c0', '#8a5a72'], kante: '#ff8fc8', glow: '255,143,200' },
+    ball: { stops: ['#ffffff', '#fff6fb', '#d8dbe8', '#8a8fb0', '#4a4f70'], unten: '95,246,232', seite: '255,143,200', licht: '#7ff0ff', spur: '180,255,250' },
+    teilchen: 'blase',
+    male(c) { malWasser(c); },
+    ambient(c, zeit) { wasserLeben(c, zeit); },
+    klang: { welle: 'sine', hoch: 1.05, blub: true },
+    musik: { bass: [41, 41, 38, 36, 41, 41, 43, 45], arp: [65, 69, 72, 77, 76, 72, 69, 67], takt: 0.18, bassWelle: 'sine', arpWelle: 'sine', arpLaut: 0.018 }
+  },
+
+  // ------------------------------------------------------------------ VULKAN
+  vulkan: {
+    name: 'Vulkan', rand: '#ff5a1a', grund: ['#1c0e0a', '#140906', '#0a0403'],
+    f: { haupt: '#ff9a2a', zweit: '#ffd84a', gold: '#ffe066', gruen: '#b6ff4a', pink: '#ff4a3a', text: '#fff1e6', bumper: '#ff8a2a' },
+    schiene: { glow: 'rgba(255,110,30,0.3)', dunkel: '#1a1412', hell: '#5a4a44', kante: '#ff9a5a' },
+    gummi: ['rgba(255,90,26,0.35)', '#ffd9b8'],
+    schleuder: ['#2a1a16', '#120a08', '#ff9a2a', '#3a221a'],
+    blech: ['#2a1c18', '#0e0806', 'rgba(255,120,40,0.45)'],
+    rampen: [{ rgb: '255,140,40', voll: '#ff8c28' }, { rgb: '255,216,74', voll: '#ffd84a' }], rampenStil: 'lava',
+    bumper: { stil: 'magma', glow: '#ff6a1a', ring: '#ff9a2a', kappe: ['#ffe8a0', '#ff6a1a', '#3a0c04'] },
+    flipper: { stops: ['#6a5a56', '#3a2e2a', '#1e1614', '#0a0605'], kante: '#ff8a2a', glow: '255,120,40' },
+    ball: { stops: ['#ffffff', '#f2ece8', '#9a8f8a', '#3a302c', '#161010'], unten: '255,120,40', seite: '255,216,74', licht: '#ff7a2a', spur: '255,150,60' },
+    teilchen: 'glut',
+    male(c) { malVulkan(c); },
+    ambient(c, zeit) { vulkanGlut(c, zeit); },
+    klang: { welle: 'sawtooth', hoch: 0.75, grollen: true },
+    musik: { bass: [28, 28, 31, 27, 28, 28, 34, 31], arp: [52, 55, 58, 63, 58, 55, 52, 51], takt: 0.15, bassWelle: 'sawtooth', arpWelle: 'triangle', arpLaut: 0.012, trommel: true }
+  }
+};
+
+const WELTEN = [
+  { id: 'weltraum', name: 'Weltraum', text: 'Planeten, Raumstationen und Energiebahnen.' },
+  { id: 'cyber', name: 'Cyberpunk', text: 'Nachts in der Neonstadt, Hologramme im Regen.' },
+  { id: 'dschungel', name: 'Dschungeltempel', text: 'Überwachsene Ruinen, Wasserfall und alte Steinmechanik.' },
+  { id: 'wasser', name: 'Unterwasser', text: 'Versunkene Stadt mit Korallen, Quallen und Luftblasen.' },
+  { id: 'vulkan', name: 'Vulkan', text: 'Glühende Rampen, Lava und fliegende Funken.' }
+];
+
+// --------------------------- Level ---------------------------
+// tisch: Bauplan (siehe BUMPER_FORMEN, RAMPEN_WEGE, PFOSTEN_FORMEN in 3-tisch.js)
+// aufgaben: nacheinander zu schaffen. zeit = Zeitlimit nur für diese Aufgabe.
+// neigung: macht den Tisch steiler (schneller), schutz: Anteil der Schutzzeit
+
+const LEVEL = [
+  // ---------------- Weltraum: zum Kennenlernen
+  { id: 'w1-1', welt: 'weltraum', name: 'Startrampe', neigung: 0.95, schutz: 1.4,
+    tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, rampenTempo: -80 },
+    aufgaben: [{ art: 'rampe', ziel: 2 }, { art: 'bumper', ziel: 15 }, { art: 'fallbank', ziel: 1 }] },
+  { id: 'w1-2', welt: 'weltraum', name: 'Asteroidengürtel', neigung: 0.97, schutz: 1.3,
+    tisch: { bumper: 'vier', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], kickback: true, rampenTempo: -60 },
+    aufgaben: [{ art: 'orbit', ziel: 2 }, { art: 'folge', folge: ['rampe-links', 'rampe-rechts'] }, { art: 'wurmloch', ziel: 1 }] },
+  { id: 'w1-3', welt: 'weltraum', name: 'Raumstation', neigung: 1.0, schutz: 1.2,
+    tisch: { bumper: 'reihe', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: false, rampenTempo: -40 },
+    aufgaben: [{ art: 'kapsel', ziel: 2 }, { art: 'multiball', ziel: 1 }] },
+  { id: 'w1-4', welt: 'weltraum', name: 'Schwarzes Loch', neigung: 1.02, schutz: 1.1,
+    tisch: { bumper: 'dreieck', rampen: { links: 'oben', rechts: 'innen' }, fallziele: false, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: -20 },
+    aufgaben: [{ art: 'wurmloch', ziel: 3, zeit: 120 }, { art: 'punkte', ziel: 150000 }] },
+
+  // ---------------- Cyberpunk
+  { id: 'w2-1', welt: 'cyber', name: 'Neonmarkt', neigung: 1.02, schutz: 1.1,
+    tisch: { bumper: 'reihe', rampen: { links: 'innen', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true },
+    aufgaben: [{ art: 'rampe', ziel: 4 }, { art: 'kombo', ziel: 2 }] },
+  { id: 'w2-2', welt: 'cyber', name: 'Datenautobahn', neigung: 1.04, schutz: 1.0,
+    tisch: { bumper: 'zwei', rampen: { links: 'kehre', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'] },
+    aufgaben: [{ art: 'spin', ziel: 30 }, { art: 'orbit', ziel: 3, zeit: 150 }] },
+  { id: 'w2-3', welt: 'cyber', name: 'Hologramm-Turm', neigung: 1.05, schutz: 1.0,
+    tisch: { bumper: 'vier', rampen: { links: 'oben', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'] },
+    aufgaben: [{ art: 'folge', folge: ['orbit-links', 'rampe-links', 'reaktor'] }, { art: 'multiball', ziel: 1 }] },
+  { id: 'w2-4', welt: 'cyber', name: 'Mitternachts-Hack', neigung: 1.07, schutz: 0.9,
+    tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: 20 },
+    aufgaben: [{ art: 'punkte', ziel: 200000, zeit: 120 }, { art: 'jackpot', ziel: 2 }] },
+
+  // ---------------- Dschungeltempel
+  { id: 'w3-1', welt: 'dschungel', name: 'Rankenpfad', neigung: 1.05, schutz: 1.0,
+    tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: null }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, pfosten: ['oben'] },
+    aufgaben: [{ art: 'rampe', ziel: 3 }, { art: 'fallbank', ziel: 2 }] },
+  { id: 'w3-2', welt: 'dschungel', name: 'Wasserfall', neigung: 1.07, schutz: 0.95,
+    tisch: { bumper: 'reihe', rampen: { links: 'oben', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'] },
+    aufgaben: [{ art: 'orbit', ziel: 2 }, { art: 'rampe', ziel: 3 }, { art: 'schild', ziel: 1 }] },
+  { id: 'w3-3', welt: 'dschungel', name: 'Tempelkammer', neigung: 1.08, schutz: 0.9,
+    tisch: { bumper: 'vier', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], rampenTempo: 20 },
+    aufgaben: [{ art: 'folge', folge: ['kapsel', 'reaktor', 'wurmloch'], zeit: 180 }, { art: 'multiball', ziel: 1 }] },
+  { id: 'w3-4', welt: 'dschungel', name: 'Götzenauge', neigung: 1.1, schutz: 0.85,
+    tisch: { bumper: 'zwei', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 40 },
+    aufgaben: [{ art: 'kombo', ziel: 3 }, { art: 'jackpot', ziel: 2 }] },
+
+  // ---------------- Unterwasser
+  { id: 'w4-1', welt: 'wasser', name: 'Korallenriff', neigung: 1.08, schutz: 0.95,
+    tisch: { bumper: 'reihe', rampen: { links: 'kehre', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, rampenTempo: 20 },
+    aufgaben: [{ art: 'bumper', ziel: 30 }, { art: 'rampe', ziel: 4, zeit: 150 }] },
+  { id: 'w4-2', welt: 'wasser', name: 'Quallengarten', neigung: 1.1, schutz: 0.9,
+    tisch: { bumper: 'vier', rampen: { links: 'oben', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: 30 },
+    aufgaben: [{ art: 'spin', ziel: 40 }, { art: 'multiball', ziel: 1 }] },
+  { id: 'w4-3', welt: 'wasser', name: 'Versunkene Stadt', neigung: 1.11, schutz: 0.85,
+    tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: false, steh: ['links', 'mitte', 'rechts'], rampenTempo: 40 },
+    aufgaben: [{ art: 'wurmloch', ziel: 2 }, { art: 'folge', folge: ['rampe-rechts', 'rampe-links', 'rampe-rechts'], zeit: 120 }] },
+  { id: 'w4-4', welt: 'wasser', name: 'Tiefseegraben', neigung: 1.13, schutz: 0.8,
+    tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke'], rampenTempo: 50 },
+    aufgaben: [{ art: 'punkte', ziel: 250000, zeit: 150 }, { art: 'jackpot', ziel: 2 }] },
+
+  // ---------------- Vulkan: am schwersten
+  { id: 'w5-1', welt: 'vulkan', name: 'Aschefeld', neigung: 1.11, schutz: 0.85,
+    tisch: { bumper: 'reihe', rampen: { links: 'innen', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['oben'], rampenTempo: 40 },
+    aufgaben: [{ art: 'rampe', ziel: 5 }, { art: 'bumper', ziel: 30 }] },
+  { id: 'w5-2', welt: 'vulkan', name: 'Lavastrom', neigung: 1.13, schutz: 0.8,
+    tisch: { bumper: 'zwei', rampen: { links: 'kehre', rechts: 'oben' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten', 'flanke'], rampenTempo: 50 },
+    aufgaben: [{ art: 'orbit', ziel: 2, zeit: 180 }, { art: 'kombo', ziel: 3 }] },
+  { id: 'w5-3', welt: 'vulkan', name: 'Magmakammer', neigung: 1.14, schutz: 0.75,
+    tisch: { bumper: 'vier', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['flanke'], rampenTempo: 60 },
+    aufgaben: [{ art: 'multiball', ziel: 1 }, { art: 'jackpot', ziel: 3 }] },
+  { id: 'w5-4', welt: 'vulkan', name: 'Herz des Vulkans', neigung: 1.16, schutz: 0.7,
+    tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 70 },
+    aufgaben: [{ art: 'folge', folge: ['rampe-links', 'orbit-rechts', 'rampe-rechts', 'wurmloch'], zeit: 180 }, { art: 'punkte', ziel: 300000 }, { art: 'jackpot', ziel: 3 }] }
+];
+
+const SCHUSS_NAMEN = {
+  'rampe-links': 'Rampe links', 'rampe-rechts': 'Rampe rechts', 'orbit-links': 'Orbit links', 'orbit-rechts': 'Orbit rechts',
+  wurmloch: 'Wurmloch', kapsel: 'Kapsel', reaktor: 'Reaktor'
+};
+const AUFGABEN_TEXT = {
+  rampe: 'Fahr {z} Rampen', bumper: 'Triff {z}-mal die Bumper', spin: 'Dreh den Spinner {z}-mal', fallbank: 'Räum die Fallziele {z}-mal ab',
+  orbit: 'Schaff {z} Orbits', wurmloch: 'Versenk die Kugel {z}-mal im Wurmloch', kapsel: 'Triff {z}-mal die Kapsel', reaktor: 'Triff {z}-mal den Reaktor',
+  schild: 'Triff alle Schild-Ziele', multiball: 'Starte den Multiball', jackpot: 'Hol {z} Jackpots im Multiball', kombo: 'Schaff eine {z}er-Kombo',
+  punkte: 'Sammle {z} Punkte'
+};
+function aufgabeText(a) {
+  if (a.art === 'folge') return a.folge.map(n => SCHUSS_NAMEN[n]).join(' → ');
+  let t = AUFGABEN_TEXT[a.art].replace('{z}', a.art === 'punkte' ? zahl(a.ziel) : a.ziel);
+  if (a.ziel === 1) t = t.replace('1-mal ', '').replace('1 Jackpots', '1 Jackpot').replace('1 Rampen', '1 Rampe').replace('1 Orbits', '1 Orbit');
+  return t;
+}
+function aufgabeZiel(a) { return a.art === 'folge' ? a.folge.length : a.ziel; }
+function levelNr(id) { return LEVEL.findIndex(l => l.id === id); }
+function levelFrei(i) { return i === 0 || (daten.sterne[LEVEL[i - 1].id] || 0) > 0; }
+function tischName(id) {
+  if (id === 'klassik') return 'Klassik';
+  const l = LEVEL[levelNr(id)];
+  return l ? THEMEN[l.welt].name + ' ' + l.id.slice(-1) + ': ' + l.name : id;
+}
+
+// =====================================================================
+//  HINTERGRÜNDE DER WELTEN (einmal vorgemalt, liegen unter allem)
+// =====================================================================
+
+function malKlassikKunst(c) {
+  c.strokeStyle = 'rgba(80, 120, 255, 0.07)';
+  c.lineWidth = 1;
+  const r = 18, hx = r * Math.sqrt(3);
+  for (let y = 60, z = 0; y < TH + 40; y += r * 1.5, z++) {
+    for (let x = (z % 2) * hx / 2 - hx; x < TB + hx; x += hx) {
+      c.beginPath();
+      for (let i = 0; i < 6; i++) { const w = Math.PI / 3 * i + Math.PI / 6; c[i ? 'lineTo' : 'moveTo'](x + r * Math.cos(w), y + r * Math.sin(w)); }
+      c.closePath(); c.stroke();
+    }
+  }
+  c.globalCompositeOperation = 'lighter';
+  for (const [rr, a, f] of [[150, 0.08, '#6a4dff'], [205, 0.06, '#38f3ff'], [95, 0.07, '#ff4fd8']]) {
+    c.strokeStyle = f; c.globalAlpha = a; c.lineWidth = 2;
+    c.beginPath(); c.ellipse(MITTE, 420, rr, rr * 0.62, -0.25, 0, Math.PI * 2); c.stroke();
+  }
+  c.globalAlpha = 1;
+  leuchte(c, MITTE, 420, 260, '#3b1d9a', 0.35);
+  leuchte(c, MITTE, 800, 220, '#0c3a7a', 0.35);
+  c.strokeStyle = 'rgba(56, 243, 255, 0.10)';
+  c.lineWidth = 1.5;
+  for (const p of [[[120, 560], [180, 600], [180, 660]], [[384, 560], [324, 600], [324, 660]], [[252, 540], [252, 600]], [[200, 600], [304, 600]]]) { pfad(c, p); c.stroke(); }
+  c.globalCompositeOperation = 'source-over';
+  c.fillStyle = 'rgba(56, 243, 255, 0.10)';
+  c.font = '12px ' + SCHRIFT; c.textAlign = 'center';
+  c.fillText('ORBIT', MITTE, 640);
+}
+
+function malWeltraum(c) {
+  const z = zufall(11);
+  // Nebel
+  c.globalCompositeOperation = 'lighter';
+  leuchte(c, 150, 300, 260, '#2a1a7a', 0.5);
+  leuchte(c, 400, 620, 240, '#0a4a6a', 0.45);
+  leuchte(c, 260, 860, 200, '#4a1a5a', 0.35);
+  c.globalCompositeOperation = 'source-over';
+  // Sterne
+  for (let i = 0; i < 260; i++) {
+    const x = z() * TB, y = 60 + z() * TH, g = z();
+    c.fillStyle = `rgba(255,255,255,${0.15 + g * 0.55})`;
+    c.fillRect(x, y, g > 0.92 ? 2 : 1.2, g > 0.92 ? 2 : 1.2);
+  }
+  // großer Ringplanet unten links
+  c.save();
+  c.globalAlpha = 0.55;
+  let v = c.createRadialGradient(70, 700, 10, 110, 740, 120);
+  v.addColorStop(0, '#3a5a9a'); v.addColorStop(0.7, '#14244a'); v.addColorStop(1, '#060a18');
+  c.fillStyle = v; c.beginPath(); c.arc(110, 740, 110, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = 'rgba(255,210,150,0.45)'; c.lineWidth = 6;
+  c.beginPath(); c.ellipse(110, 740, 175, 34, -0.35, 0, Math.PI * 2); c.stroke();
+  // kleiner, blasser Planet ganz am Rand (darf nicht wie ein Bumper aussehen)
+  c.globalAlpha = 0.22;
+  v = c.createRadialGradient(470, 860, 4, 476, 866, 30);
+  v.addColorStop(0, '#ff9a6a'); v.addColorStop(1, '#4a1408');
+  c.fillStyle = v; c.beginPath(); c.arc(476, 866, 26, 0, Math.PI * 2); c.fill();
+  c.restore();
+  // Raumstation als Umriss in der Mitte
+  c.save();
+  c.globalAlpha = 0.16;
+  c.strokeStyle = '#9fc8ff'; c.lineWidth = 1.5;
+  c.beginPath(); c.arc(MITTE, 560, 58, 0, Math.PI * 2); c.stroke();
+  c.beginPath(); c.arc(MITTE, 560, 18, 0, Math.PI * 2); c.stroke();
+  for (let i = 0; i < 6; i++) { const w = i * Math.PI / 3; c.beginPath(); c.moveTo(MITTE + Math.cos(w) * 18, 560 + Math.sin(w) * 18); c.lineTo(MITTE + Math.cos(w) * 58, 560 + Math.sin(w) * 58); c.stroke(); }
+  // Solarflügel nur als feine Umrisse
+  c.strokeRect(MITTE - 120, 554, 50, 12); c.strokeRect(MITTE + 70, 554, 50, 12);
+  c.restore();
+  // Energiebahnen
+  c.globalCompositeOperation = 'lighter';
+  c.strokeStyle = 'rgba(127,212,255,0.12)'; c.lineWidth = 3;
+  for (const p of [[[60, 860], [160, 650], [252, 560]], [[444, 860], [344, 650], [252, 560]]]) { pfad(c, p); c.stroke(); }
+  c.globalCompositeOperation = 'source-over';
+}
+
+function malCyber(c) {
+  const z = zufall(22);
+  // Hochhäuser als Silhouetten mit Fenstern, nach oben hin dunkler
+  for (let reihe = 0; reihe < 2; reihe++) {
+    let x = 10;
+    while (x < TB) {
+      const b = 26 + z() * 46, h = 120 + z() * 220 - reihe * 60;
+      const unten = reihe === 0 ? 470 : 380;
+      c.fillStyle = reihe === 0 ? '#14081f' : '#0d0517';
+      c.fillRect(x, unten - h, b, h);
+      for (let fy = unten - h + 8; fy < unten - 6; fy += 10) for (let fx = x + 4; fx < x + b - 4; fx += 8) {
+        if (z() < 0.3) { c.fillStyle = ['rgba(255,61,180,0.35)', 'rgba(46,249,255,0.3)', 'rgba(255,241,58,0.25)'][Math.floor(z() * 3)]; c.fillRect(fx, fy, 4, 5); }
+      }
+      x += b + 4 + z() * 10;
+    }
+  }
+  // Synthwave-Boden
+  c.strokeStyle = 'rgba(255,61,180,0.18)'; c.lineWidth = 1.2;
+  for (let i = 0; i < 12; i++) { const y = 480 + Math.pow(i / 11, 1.6) * 480; c.beginPath(); c.moveTo(0, y); c.lineTo(TB, y); c.stroke(); }
+  for (let i = -8; i <= 8; i++) { c.beginPath(); c.moveTo(MITTE + i * 18, 480); c.lineTo(MITTE + i * 110, TH + 20); c.stroke(); }
+  // Holo-Werbetafeln
+  c.save();
+  c.font = '14px ' + SCHRIFT; c.textAlign = 'center';
+  for (const [x, y, w, txt, f] of [[110, 300, -0.12, 'NEON', '#2ef9ff'], [395, 330, 0.1, '24/7', '#fff13a'], [252, 720, 0, 'ORBIT CITY', '#ff3db4']]) {
+    c.save(); c.translate(x, y); c.rotate(w);
+    c.globalAlpha = 0.22; c.fillStyle = f;
+    c.fillText(txt, 0, 0);
+    c.globalAlpha = 0.12; c.strokeStyle = f; c.lineWidth = 1;
+    c.strokeRect(-c.measureText(txt).width / 2 - 8, -20, c.measureText(txt).width + 16, 28);
+    c.restore();
+  }
+  c.restore();
+  c.globalCompositeOperation = 'lighter';
+  leuchte(c, MITTE, 470, 280, '#5a0a4a', 0.5);
+  c.globalCompositeOperation = 'source-over';
+}
+
+function malDschungel(c) {
+  const z = zufall(33);
+  // Steinplatten
+  for (let y = 60; y < TH + 20; y += 34) {
+    let x = -z() * 40;
+    while (x < TB) {
+      const b = 40 + z() * 40;
+      const h = 30 + z() * 8;
+      const g = 28 + Math.floor(z() * 18);
+      c.fillStyle = `rgb(${g + 6},${g + 14},${g})`;
+      rund(c, x + 1.5, y + 1.5, b - 3, h - 3, 4); c.fill();
+      if (z() < 0.35) { c.fillStyle = 'rgba(80,140,50,0.35)'; c.beginPath(); c.ellipse(x + z() * b, y + z() * h, 10 + z() * 14, 6 + z() * 6, 0, 0, Math.PI * 2); c.fill(); }
+      x += b;
+    }
+  }
+  // Wasserfall oben links und Becken
+  const wv = c.createLinearGradient(0, 100, 0, 400);
+  wv.addColorStop(0, 'rgba(120,220,255,0.45)'); wv.addColorStop(1, 'rgba(60,160,220,0.15)');
+  c.fillStyle = wv; c.fillRect(126, 100, 40, 300);
+  c.fillStyle = 'rgba(70,170,220,0.35)'; c.beginPath(); c.ellipse(146, 410, 50, 18, 0, 0, Math.PI * 2); c.fill();
+  // Glyphen-Ring in der Mitte (antike Mechanik)
+  c.save(); c.translate(MITTE, 560);
+  c.strokeStyle = 'rgba(255,210,90,0.28)'; c.lineWidth = 3;
+  c.beginPath(); c.arc(0, 0, 70, 0, Math.PI * 2); c.stroke();
+  c.beginPath(); c.arc(0, 0, 48, 0, Math.PI * 2); c.stroke();
+  for (let i = 0; i < 16; i++) { c.rotate(Math.PI / 8); c.fillStyle = 'rgba(255,210,90,0.3)'; c.fillRect(52, -4, 14, 8); }
+  c.fillStyle = 'rgba(255,210,90,0.22)'; c.beginPath(); c.moveTo(0, -24); c.lineTo(20, 12); c.lineTo(-20, 12); c.closePath(); c.fill();
+  c.restore();
+  // Ranken an den Rändern
+  c.strokeStyle = 'rgba(60,120,40,0.75)'; c.lineWidth = 4; c.lineCap = 'round';
+  for (const [x0, y0, x1, y1, x2, y2] of [[20, 340, 70, 420, 30, 520], [520, 360, 460, 450, 500, 560], [40, 140, 120, 160, 160, 110], [500, 150, 420, 170, 380, 110]]) {
+    c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(x1, y1, x2, y2); c.stroke();
+    for (let t = 0.1; t < 1; t += 0.18) {
+      const x = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * x1 + t * t * x2, y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * y1 + t * t * y2;
+      c.fillStyle = 'rgba(90,170,60,0.75)'; c.beginPath(); c.ellipse(x + 6, y, 8, 4, t * 5, 0, Math.PI * 2); c.fill();
+    }
+  }
+}
+
+function malWasser(c) {
+  const z = zufall(44);
+  // Lichtstrahlen von oben
+  c.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 6; i++) {
+    const x = 40 + i * 90 + z() * 30;
+    const v = c.createLinearGradient(0, 80, 0, 700);
+    v.addColorStop(0, 'rgba(160,255,250,0.10)'); v.addColorStop(1, 'rgba(160,255,250,0)');
+    c.fillStyle = v;
+    c.beginPath(); c.moveTo(x, 80); c.lineTo(x + 40, 80); c.lineTo(x + 140, 700); c.lineTo(x + 60, 700); c.closePath(); c.fill();
+  }
+  c.globalCompositeOperation = 'source-over';
+  // Sand unten
+  const sv = c.createLinearGradient(0, 760, 0, TH);
+  sv.addColorStop(0, 'rgba(201,168,122,0)'); sv.addColorStop(1, 'rgba(201,168,122,0.35)');
+  c.fillStyle = sv; c.fillRect(0, 760, TB, 220);
+  // Säulen der versunkenen Stadt
+  c.fillStyle = 'rgba(120,190,200,0.16)';
+  for (const [x, y, h] of [[120, 220, 140], [384, 220, 140], [200, 540, 90], [304, 540, 90]]) {
+    c.fillRect(x - 10, y, 20, h); c.fillRect(x - 16, y - 8, 32, 8); c.fillRect(x - 16, y + h, 32, 8);
+  }
+  c.strokeStyle = 'rgba(120,190,200,0.16)'; c.lineWidth = 5;
+  c.beginPath(); c.arc(MITTE, 230, 132, Math.PI, 0); c.stroke();
+  // Korallen an den Rändern
+  const koralle = (x, y, f, gr) => {
+    c.strokeStyle = f; c.lineCap = 'round';
+    const ast = (x, y, w, l, tiefe) => {
+      if (tiefe === 0) return;
+      const x2 = x + Math.cos(w) * l, y2 = y + Math.sin(w) * l;
+      c.lineWidth = tiefe * 1.6; c.beginPath(); c.moveTo(x, y); c.lineTo(x2, y2); c.stroke();
+      ast(x2, y2, w - 0.45 - z() * 0.2, l * 0.72, tiefe - 1);
+      ast(x2, y2, w + 0.45 + z() * 0.2, l * 0.72, tiefe - 1);
+    };
+    ast(x, y, -Math.PI / 2 + (z() - 0.5) * 0.4, gr, 4);
+  };
+  koralle(40, 640, 'rgba(255,120,150,0.55)', 30);
+  koralle(470, 650, 'rgba(255,170,90,0.55)', 30);
+  koralle(110, 950, 'rgba(255,143,200,0.5)', 26);
+  koralle(400, 955, 'rgba(255,120,150,0.5)', 26);
+  // Seegras
+  c.strokeStyle = 'rgba(70,170,110,0.4)'; c.lineWidth = 3;
+  for (let i = 0; i < 10; i++) {
+    const x = 30 + z() * 460, y = 880 + z() * 70;
+    c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + 14, y - 40, x - 4, y - 70); c.stroke();
+  }
+}
+
+function malVulkan(c) {
+  const z = zufall(55);
+  // Gesteinsbrocken
+  for (let i = 0; i < 70; i++) {
+    const x = z() * TB, y = 60 + z() * TH, r = 12 + z() * 30, g = 22 + Math.floor(z() * 16);
+    c.fillStyle = `rgb(${g + 8},${g},${g - 4})`;
+    c.beginPath();
+    for (let k = 0; k < 7; k++) { const w = k / 7 * Math.PI * 2; const rr = r * (0.7 + z() * 0.3); c[k ? 'lineTo' : 'moveTo'](x + Math.cos(w) * rr, y + Math.sin(w) * rr); }
+    c.closePath(); c.fill();
+  }
+  // Lavarisse
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  vulkanRisse.length = 0;
+  for (let i = 0; i < 9; i++) {
+    let x = 40 + z() * 440, y = 120 + z() * 760;
+    const p = [[x, y]];
+    for (let k = 0; k < 6; k++) { x += (z() - 0.5) * 70; y += (z() - 0.3) * 50; p.push([x, y]); }
+    vulkanRisse.push(p);
+    pfad(c, p); c.strokeStyle = 'rgba(255,90,20,0.25)'; c.lineWidth = 8; c.stroke();
+    pfad(c, p); c.strokeStyle = 'rgba(255,170,60,0.75)'; c.lineWidth = 2; c.stroke();
+  }
+  // Lavaseen unten
+  c.globalCompositeOperation = 'lighter';
+  leuchte(c, 80, 930, 120, '#ff4a0a', 0.55);
+  leuchte(c, 430, 930, 120, '#ff4a0a', 0.55);
+  leuchte(c, MITTE, 420, 240, '#5a1404', 0.6);
+  c.globalCompositeOperation = 'source-over';
+}
+const vulkanRisse = [];
+
+// =====================================================================
+//  BELEBUNG (jedes Bild, sparsam und blass, damit das Spielfeld klar bleibt)
+// =====================================================================
+
+const STERNE_FUNKEL = Array.from({ length: 26 }, (_, i) => { const z = zufall(100 + i); return [z() * TB, 80 + z() * 820, z() * 6]; });
+function funkelSterne(c, zeit) {
+  c.globalCompositeOperation = 'lighter';
+  for (const [x, y, p] of STERNE_FUNKEL) {
+    const a = Math.max(0, Math.sin(zeit * 1.7 + p * 3)) * 0.8;
+    if (a < 0.05) continue;
+    c.fillStyle = `rgba(200,230,255,${a})`;
+    c.fillRect(x - 3, y - 0.5, 6, 1); c.fillRect(x - 0.5, y - 3, 1, 6);
+  }
+  // Sternschnuppe alle paar Sekunden
+  const t = zeit % 7;
+  if (t < 0.8) {
+    const x = 60 + t * 500, y = 120 + t * 160;
+    const v = c.createLinearGradient(x - 70, y - 22, x, y);
+    v.addColorStop(0, 'rgba(255,255,255,0)'); v.addColorStop(1, 'rgba(255,255,255,0.7)');
+    c.strokeStyle = v; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(x - 70, y - 22); c.lineTo(x, y); c.stroke();
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+
+function cyberRegen(c, zeit) {
+  c.strokeStyle = 'rgba(180,220,255,0.10)'; c.lineWidth = 1;
+  c.beginPath();
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 53.7) % TB, y = 80 + ((zeit * 520 + i * 97) % 860);
+    c.moveTo(x, y); c.lineTo(x - 3, y + 16);
+  }
+  c.stroke();
+  // Laufende Abtastlinie
+  const y = 80 + (zeit * 90) % 880;
+  c.fillStyle = 'rgba(46,249,255,0.05)';
+  c.fillRect(20, y, 500, 3);
+}
+
+const GLUEHWUERMCHEN = Array.from({ length: 10 }, (_, i) => { const z = zufall(200 + i); return [80 + z() * 380, 140 + z() * 600, z() * 6]; });
+function dschungelLeben(c, zeit) {
+  // fließendes Wasser im Wasserfall
+  c.strokeStyle = 'rgba(220,250,255,0.35)'; c.lineWidth = 1.5;
+  c.beginPath();
+  for (let i = 0; i < 7; i++) {
+    const x = 130 + i * 5.5, y = 100 + ((zeit * 160 + i * 41) % 290);
+    c.moveTo(x, y); c.lineTo(x, y + 16);
+  }
+  c.stroke();
+  c.globalCompositeOperation = 'lighter';
+  for (const [x, y, p] of GLUEHWUERMCHEN) {
+    const a = 0.25 + 0.35 * Math.sin(zeit * 2 + p);
+    leuchte(c, x + Math.sin(zeit * 0.7 + p) * 14, y + Math.cos(zeit * 0.5 + p) * 10, 10, '#d8ff6a', a);
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+
+const BLASEN = Array.from({ length: 14 }, (_, i) => { const z = zufall(300 + i); return [30 + z() * 470, z() * 900, 2 + z() * 4, 30 + z() * 40]; });
+function wasserLeben(c, zeit) {
+  // Quallen im Hintergrund
+  for (let i = 0; i < 2; i++) {
+    const x = 150 + i * 220 + Math.sin(zeit * 0.3 + i * 2) * 40;
+    const y = 640 - ((zeit * 12 + i * 300) % 520);
+    c.fillStyle = i ? 'rgba(255,143,200,0.12)' : 'rgba(160,240,255,0.12)';
+    c.beginPath(); c.arc(x, y, 22, Math.PI, 0); c.closePath(); c.fill();
+    c.strokeStyle = c.fillStyle; c.lineWidth = 2;
+    for (let k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(x + k * 8, y); c.quadraticCurveTo(x + k * 8 + Math.sin(zeit * 2 + k) * 6, y + 20, x + k * 7, y + 40); c.stroke(); }
+  }
+  // Luftblasen steigen auf
+  c.strokeStyle = 'rgba(220,255,255,0.35)'; c.lineWidth = 1;
+  for (const [x, y0, r, v] of BLASEN) {
+    const y = TH - ((y0 + zeit * v) % 880);
+    c.beginPath(); c.arc(x + Math.sin(zeit * 1.5 + y0) * 4, y, r, 0, Math.PI * 2); c.stroke();
+  }
+}
+
+function vulkanGlut(c, zeit) {
+  c.globalCompositeOperation = 'lighter';
+  vulkanRisse.forEach((p, i) => {
+    const a = 0.12 + 0.12 * Math.sin(zeit * 1.6 + i * 1.3);
+    pfad(c, p);
+    c.strokeStyle = `rgba(255,120,30,${a})`;
+    c.lineWidth = 7; c.stroke();
+  });
+  // aufsteigende Glut
+  for (let i = 0; i < 18; i++) {
+    const x = (i * 71.3) % 480 + 30 + Math.sin(zeit + i) * 8;
+    const y = TH - ((zeit * (40 + (i % 5) * 12) + i * 61) % 860);
+    c.fillStyle = `rgba(255,${120 + (i % 3) * 40},40,0.55)`;
+    c.fillRect(x, y, 2, 2);
+  }
+  c.globalCompositeOperation = 'source-over';
 }
 
 // =====================================================================
@@ -1060,12 +1789,16 @@ function neuerBall(x, y) {
     beiStoss(w, t) { if (t.art === 'seg' && !t.kick && w > 300) ton.wand(w); } };
 }
 
-function neuesSpiel() {
+// modus: { art: 'klassik' } oder { art: 'level', nr }
+function neuesSpiel(modus = { art: 'klassik' }) {
   const stufe = STUFEN[daten.stufe];
-  PH.schwerkraft = stufe.schwerkraft;
-  const T = baueTisch();
+  const level = modus.art === 'level' ? LEVEL[modus.nr] : null;
+  PH.schwerkraft = stufe.schwerkraft * (level ? level.neigung : 1);
+  const T = baueTisch(level ? level.tisch : KLASSIK_PLAN);
   s = {
     T, welt: T.welt, stufe: daten.stufe, phase: 'lauf',
+    modus: modus.art, level, tisch: level ? level.id : 'klassik', thema: THEMEN[level ? level.welt : 'klassik'],
+    schritt: 0, schrittStand: 0, schrittZeit: 0, schrittPunkte: 0, levelGeschafft: false, sterne: 0,
     punkte: 0, ballNr: 1, extraBaelle: 0,
     multi: 1, bonus: 0, kombo: 0, letzterSchuss: -99, letzteArt: '',
     auftrag: 0, runde: 0, stand: 0, rang: 0, auftraegeGeschafft: 0,
@@ -1079,15 +1812,21 @@ function neuesSpiel() {
     zeit: 0, neuerRekord: false, fallbankZeit: 0
   };
   baueAuftrag();
+  starteSchritt();
   ballInBahn(false);
-  melde('ORBITFLIPPER', 'Halten zum Spannen, loslassen zum Abschießen', 3);
+  if (level) {
+    melde(level.name.toUpperCase(), THEMEN[level.welt].name + ' · Level ' + level.id.slice(-1), 2.4, s.thema.f.haupt);
+    melde('AUFGABE 1/' + level.aufgaben.length, aufgabeText(level.aufgaben[0]) + zeitHinweis(level.aufgaben[0]), 3, s.thema.f.gold);
+  } else melde('ORBITFLIPPER', 'Halten zum Spannen, loslassen zum Abschießen', 3);
 }
+function zeitHinweis(a) { return a.zeit ? ' (in ' + a.zeit + ' s)' : ''; }
 
 // --------------------------- Hilfen ---------------------------
 
 function punkte(n, x, y, farbe) {
   const wert = Math.round(n * (s.effekt.doppelt > 0 ? 2 : 1));
   s.punkte += wert;
+  if (s.modus === 'level') { s.schrittPunkte += wert; if (aufgabeJetzt() && aufgabeJetzt().art === 'punkte') levelEreignis('punkte'); }
   if (x != null) s.schrift.push({ x, y, text: zahl(wert), farbe: farbe || '#7ef9ff', zeit: 0, dauer: 1.0 });
   return wert;
 }
@@ -1103,7 +1842,7 @@ function naechsteMeldung() {
 function funken(x, y, farbe, anzahl = 12, tempo = 260) {
   for (let i = 0; i < anzahl; i++) {
     const w = Math.random() * Math.PI * 2, v = tempo * (0.3 + Math.random() * 0.9);
-    s.teilchen.push({ x, y, vx: Math.cos(w) * v, vy: Math.sin(w) * v, leben: 0.35 + Math.random() * 0.45, zeit: 0, farbe, groesse: 1.5 + Math.random() * 2.5 });
+    s.teilchen.push({ x, y, vx: Math.cos(w) * v, vy: Math.sin(w) * v, leben: 0.35 + Math.random() * 0.45, zeit: 0, farbe, groesse: 1.5 + Math.random() * 2.5, form: s.thema.teilchen, dreh: Math.random() * 6 });
   }
   if (s.teilchen.length > 500) s.teilchen.splice(0, s.teilchen.length - 500);
 }
@@ -1121,6 +1860,12 @@ function auftragZiel() {
 }
 function auftragText() { return auftragJetzt().text.replace('{z}', auftragZiel()); }
 function baueAuftrag() { s.stand = 0; }
+
+// Ein Ereignis auf dem Tisch: zählt für Klassik-Aufträge oder die Level-Aufgabe
+function ereignis(art, menge = 1, wert) {
+  if (s.modus === 'level') levelEreignis(art, menge, wert);
+  else fortschritt(art, menge, wert);
+}
 
 function fortschritt(art, menge = 1, wert) {
   const a = auftragJetzt();
@@ -1154,6 +1899,80 @@ function auftragGeschafft() {
   for (let i = 0; i < 40; i++) funken(MITTE, 420, i % 2 ? '#ffe46b' : '#7ef9ff', 1, 500);
 }
 
+// --------------------------- Level-Aufgaben ---------------------------
+
+function aufgabeJetzt() { return s.level ? s.level.aufgaben[s.schritt] : null; }
+function starteSchritt() {
+  s.schrittStand = 0;
+  s.schrittPunkte = 0;
+  const a = aufgabeJetzt();
+  s.schrittZeit = a && a.zeit ? a.zeit : 0;
+}
+// Was gerade zählt: für die leuchtenden Pfeile auf dem Tisch
+function zielArt() {
+  if (s.modus !== 'level') return auftragJetzt().art;
+  const a = aufgabeJetzt();
+  if (!a) return '';
+  return a.art === 'folge' ? a.folge[s.schrittStand] : a.art;
+}
+
+function levelEreignis(art, menge = 1, wert) {
+  const a = aufgabeJetzt();
+  if (!a || s.levelGeschafft) return;
+  if (a.art === 'folge') {
+    if (art !== a.folge[s.schrittStand]) return;
+    s.schrittStand++;
+    ton.kombo(s.schrittStand + 1);
+    if (s.schrittStand < a.folge.length) melde('RICHTIG!', 'Jetzt: ' + SCHUSS_NAMEN[a.folge[s.schrittStand]], 1.5, s.thema.f.gold);
+  } else if (a.art === art) {
+    if (art === 'kombo') s.schrittStand = Math.max(s.schrittStand, wert);
+    else if (art === 'punkte') s.schrittStand = s.schrittPunkte;
+    else s.schrittStand += menge;
+  } else return;
+  if (s.schrittStand >= aufgabeZiel(a)) schrittGeschafft();
+}
+
+function schrittGeschafft() {
+  const lv = s.level;
+  // direkt gutschreiben (nicht über punkte(), sonst zählt es schon für die nächste Aufgabe)
+  s.punkte += 20000 * (s.schritt + 1);
+  s.schritt++;
+  ton.auftrag();
+  s.wackeln = 0.4;
+  for (let i = 0; i < 40; i++) funken(MITTE, 420, i % 2 ? s.thema.f.gold : s.thema.f.haupt, 1, 500);
+  if (s.schritt >= lv.aufgaben.length) {
+    // Level geschafft: Sterne nach verlorenen Kugeln
+    s.levelGeschafft = true;
+    const verloren = s.ballNr - 1;
+    s.sterne = verloren === 0 ? 3 : verloren === 1 ? 2 : 1;
+    const rest = BAELLE - s.ballNr;
+    if (rest > 0) s.punkte += 50000 * rest;
+    s.schrittZeit = 0;
+    melde('LEVEL GESCHAFFT', '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne), 3, s.thema.f.gold);
+    ton.extra();
+    s.wartet = 3;
+    s.warteAktion = () => spielEnde(true);
+    return;
+  }
+  starteSchritt();
+  const a = aufgabeJetzt();
+  melde('AUFGABE ' + (s.schritt + 1) + '/' + lv.aufgaben.length, aufgabeText(a) + zeitHinweis(a), 3, s.thema.f.gold);
+}
+
+// Zeitlimit läuft nur, solange eine Kugel im Spiel ist. Läuft es ab, beginnt die Aufgabe von vorn.
+function schrittUhr(dt) {
+  const a = aufgabeJetzt();
+  if (!a || !a.zeit || s.levelGeschafft || s.wartet > 0) return;
+  const imSpiel = s.welt.baelle.some(b => b.ort !== 'tisch' || b.x < SCHUSS.innen || b.y < 600);
+  if (!imSpiel) return;
+  s.schrittZeit -= dt;
+  if (s.schrittZeit <= 0) {
+    melde('ZEIT UM', 'Die Aufgabe beginnt von vorn', 2, s.thema.f.pink);
+    ton.verloren();
+    starteSchritt();
+  }
+}
+
 // --------------------------- Spezialfähigkeiten ---------------------------
 
 function spezial(art, sekunden) {
@@ -1173,7 +1992,7 @@ function kombiSchuss(art, x, y) {
     ton.kombo(s.kombo);
     melde('KOMBO X' + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
     s.statistik.maxKombo = Math.max(s.statistik.maxKombo, s.kombo);
-    fortschritt('kombo', 0, s.kombo);
+    ereignis('kombo', 0, s.kombo);
   }
 }
 
@@ -1183,17 +2002,30 @@ const regeln = {
   bumper(bu, b) {
     bu.treffer++;
     s.statistik.bumper++;
-    punkte(s.multiball ? 300 : 100, bu.x, bu.y - 30, '#b48cff');
+    punkte(s.multiball ? 300 : 100, bu.x, bu.y - 30, s.thema.f.bumper);
     bonusDazu(50);
     ton.bumper();
-    funken(b.x, b.y, '#b48cff', 10, 300);
-    welle(bu.x, bu.y, '#9b6bff', 50);
-    fortschritt('bumper');
+    funken(b.x, b.y, s.thema.f.bumper, 10, 300);
+    welle(bu.x, bu.y, s.thema.bumper.glow, 50);
+    ereignis('bumper');
   },
   schleuder(sl, b) {
-    punkte(10, b.x, b.y - 18, '#7ef9ff');
+    punkte(10, b.x, b.y - 18, s.thema.f.haupt);
     ton.schleuder();
-    funken(b.x, b.y, '#7ef9ff', 8, 240);
+    funken(b.x, b.y, s.thema.f.haupt, 8, 240);
+  },
+  pfosten(p, b) {
+    punkte(50, p.x, p.y - 18, s.thema.f.zweit);
+    ton.schleuder();
+    funken(b.x, b.y, s.thema.f.zweit, 6, 200);
+  },
+  kickback(kb, b) {
+    if (!kb.an || b.vy < 0) return;
+    kb.an = false; kb.blitz = 1;
+    b.vy = -1550; b.vx = kb.seite === 'links' ? 40 : -40;
+    ton.abschuss(0.9);
+    melde('KICKBACK', 'Schild-Ziele laden ihn wieder auf', 1.6, s.thema.f.gruen);
+    funken(b.x, b.y, s.thema.f.gruen, 16, 300);
   },
   fallziel(z, b) {
     if (z.unten) return;
@@ -1206,7 +2038,7 @@ const regeln = {
       punkte(5000);
       melde('WURMLOCH OFFEN', 'Schieß in die Mitte!', 2, '#7dff9a');
       s.fallbankZeit = 25;
-      fortschritt('fallbank');
+      ereignis('fallbank');
     }
   },
   stehziel(z, b) {
@@ -1220,7 +2052,8 @@ const regeln = {
         s.T.stehziele.forEach(x => { x.an = false; x.blitz = 1; });
         spezial('schild', 20);
         punkte(10000);
-        fortschritt('schild');
+        for (const kb of s.T.kickback) kb.an = true;
+        ereignis('schild');
       }
     }
   },
@@ -1256,7 +2089,7 @@ const regeln = {
     bonusDazu(10);
     ton.spin();
     s.spinFuerZeitlupe++;
-    fortschritt('spin');
+    ereignis('spin');
     if (s.spinFuerZeitlupe >= 40) { s.spinFuerZeitlupe = 0; spezial('zeitlupe', 8); }
   },
   orbit(seite, b) {
@@ -1266,7 +2099,8 @@ const regeln = {
     ton.orbit();
     melde('ORBIT', '+' + zahl(p), 1.2);
     kombiSchuss('orbit', seite === 'links' ? 80 : 430, 380);
-    fortschritt('orbit');
+    ereignis('orbit');
+    ereignis('orbit-' + seite);
   },
   rampe(ra, b) {
     ra.blitz = 1;
@@ -1276,28 +2110,30 @@ const regeln = {
     if (s.multiball) {
       const p = punkte(s.jackpot, ex, ey - 40, '#ffe46b');
       s.jackpots++; s.statistik.jackpots++;
+      ereignis('jackpot');
       s.jackpot += 25000;
       ton.jackpot();
       s.wackeln = 0.5;
       melde('JACKPOT', '+' + zahl(p), 2, '#ffe46b');
       for (let i = 0; i < 30; i++) funken(ex, ey - 40, i % 2 ? '#ffe46b' : '#ff7bf2', 1, 520);
     } else {
-      punkte(5000, ex, ey - 40, ra.farbe === 'cyan' ? '#7ef9ff' : '#d08cff');
+      punkte(5000, ex, ey - 40, s.thema.rampen[ra.nr].voll);
       if (!s.lockBereit && s.gesperrt < 2) {
         s.lockBereit = true;
-        melde('LOCK BEREIT', 'Schieß in den Reaktor rechts', 2, '#ff7bf2');
+        if (!ra.loch) melde('LOCK BEREIT', 'Schieß in den Reaktor rechts', 2, '#ff7bf2');
       }
     }
     bonusDazu(2000);
     kombiSchuss('rampe', ex, ey - 40);
-    fortschritt('rampe');
+    ereignis('rampe');
+    ereignis('rampe-' + ra.name);
   },
   innenbahn(seite, b) { punkte(250, b.x, b.y - 20); },
   aussenbahn(seite, b) { punkte(500, b.x, b.y - 20, '#ff6b8b'); },
   abgeschossen(b) {
     if (b.imSpiel) return;
     b.imSpiel = true;
-    if (!s.multiball && s.schutz <= 0) s.schutz = STUFEN[s.stufe].schutz;
+    if (!s.multiball && s.schutz <= 0) s.schutz = Math.round(STUFEN[s.stufe].schutz * (s.level ? s.level.schutz : 1));
   },
 
   // Ein Ball rollt über ein Loch
@@ -1305,6 +2141,13 @@ const regeln = {
     if (b.ort !== 'tisch' || s.welt.zeit < b.lochSperre) return;
     const v = Math.hypot(b.vx, b.vy);
     if (v > 1500) return;
+    fangeImLoch(l, b);
+  }
+};
+
+// Kugel fällt in ein Loch (vom Tisch oder direkt vom Ende einer Rampe)
+function fangeImLoch(l, b) {
+  {
     b.ort = 'loch';
     b.x = l.x; b.y = l.y; b.vx = 0; b.vy = 0;
     b.in.clear();
@@ -1317,16 +2160,18 @@ const regeln = {
       punkte(10000, l.x, l.y - 26, '#7dff9a');
       bonusDazu(3000);
       kombiSchuss('wurmloch', l.x, l.y - 30);
-      fortschritt('wurmloch');
+      ereignis('wurmloch');
       melde('WURMLOCH', 'Ab durch den Tunnel!', 1.4, '#7dff9a');
       l.schlange.push({ b, zeit: 0.5, was: 'tunnel' });
     } else if (l.name === 'kapsel') {
+      ereignis('kapsel');
       l.schlange.push({ b, zeit: 1.1, was: 'kapsel' });
     } else if (l.name === 'reaktor') {
+      ereignis('reaktor');
       l.schlange.push({ b, zeit: 1.0, was: 'reaktor' });
     }
   }
-};
+}
 
 // Was ein Loch mit einem gefangenen Ball macht, wenn seine Wartezeit vorbei ist
 function lochFertig(l, eintrag) {
@@ -1390,7 +2235,7 @@ function starteMultiball(l, b) {
   ton.multiball();
   s.wackeln = 0.6;
   melde('MULTIBALL', 'Rampen bringen Jackpots!', 3, '#ff7bf2');
-  fortschritt('multiball');
+  ereignis('multiball');
   auswerfen(l, b);
   s.schutz = 12;
   ballInBahn(true, 0.8);
@@ -1433,6 +2278,7 @@ function feuere(zug) {
 
 function ballRaus(b) {
   b.ort = 'weg';
+  if (s.levelGeschafft) return;
   const rest = aktiveBaelle().length;
   // Schutz: Kugel kommt zurück
   if ((s.schutz > 0 || s.effekt.schild > 0) && !s.multiball) {
@@ -1471,7 +2317,7 @@ function ballRaus(b) {
       ballInBahn(false);
     } else if (s.ballNr < BAELLE) {
       s.ballNr++;
-      melde('KUGEL ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : auftragText(), 2);
+      melde('KUGEL ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : s.modus === 'level' ? aufgabeText(aufgabeJetzt()) : auftragText(), 2);
       ballInBahn(false);
     } else {
       spielEnde();
@@ -1499,6 +2345,7 @@ function logikSchritt(dt) {
   for (const k of Object.keys(s.effekt)) if (s.effekt[k] > 0) s.effekt[k] = Math.max(0, s.effekt[k] - dt);
   w.zeitlupe += ((s.effekt.zeitlupe > 0 ? 0.55 : 1) - w.zeitlupe) * Math.min(1, dt * 4);
   if (s.schutz > 0) s.schutz = Math.max(0, s.schutz - dt);
+  if (s.modus === 'level') schrittUhr(dt);
   if (s.fallbankZeit > 0) {
     s.fallbankZeit -= dt;
     if (s.fallbankZeit <= 0) stelleFallzieleAuf();
@@ -1589,10 +2436,10 @@ function logikSchritt(dt) {
   w.baelle = w.baelle.filter(b => b.ort !== 'weg');
 
   // Lichter abklingen
-  for (const x of [...s.T.bumper, ...s.T.schleudern, ...s.T.fallziele, ...s.T.stehziele, ...s.T.roll, ...s.T.rampen]) if (x.blitz > 0) x.blitz = Math.max(0, x.blitz - dt * 3);
+  for (const x of [...s.T.bumper, ...s.T.pfosten, ...s.T.kickback, ...s.T.schleudern, ...s.T.fallziele, ...s.T.stehziele, ...s.T.roll, ...s.T.rampen]) if (x.blitz > 0) x.blitz = Math.max(0, x.blitz - dt * 3);
 
   // Effekte
-  for (const t of s.teilchen) { t.zeit += dt; t.x += t.vx * dt; t.y += t.vy * dt; t.vx *= 1 - 2.5 * dt; t.vy = t.vy * (1 - 2.5 * dt) + 200 * dt; }
+  for (const t of s.teilchen) { t.zeit += dt; t.x += t.vx * dt; t.y += t.vy * dt; t.vx *= 1 - 2.5 * dt; t.vy = t.vy * (1 - 2.5 * dt) + (t.form === 'blase' || t.form === 'glut' ? -260 : 200) * dt; t.dreh += dt * 4; }
   s.teilchen = s.teilchen.filter(t => t.zeit < t.leben);
   for (const t of s.schrift) { t.zeit += dt; t.y -= 40 * dt; }
   s.schrift = s.schrift.filter(t => t.zeit < t.dauer);
@@ -1677,19 +2524,21 @@ function leuchte(c, x, y, r, farbe, staerke = 1) {
   c.globalAlpha = 1;
 }
 
-function neueLeinwand() {
+// kp: Bildpunkte pro Tisch-Einheit, versatz: Platz für die Anzeige über dem Tisch
+function neueLeinwand(kp, versatz) {
   const c = document.createElement('canvas');
-  c.width = Math.max(1, Math.round(VB * ansicht.k * ansicht.dpr));
-  c.height = Math.max(1, Math.round(VH * ansicht.k * ansicht.dpr));
+  c.width = Math.max(1, Math.round(VB * kp));
+  c.height = Math.max(1, Math.round((TH + versatz) * kp));
   const g = c.getContext('2d');
-  g.setTransform(ansicht.k * ansicht.dpr, 0, 0, ansicht.k * ansicht.dpr, 0, 0);
+  g.setTransform(kp, 0, 0, kp, 0, 0);
   return [c, g];
 }
 
 function baueBilder() {
-  [unten] = malUnten();
-  [oben] = malRampen();
-  ballBild = malBall();
+  const kp = ansicht.k * ansicht.dpr;
+  unten = malUnten(s.T, s.thema, kp, HUDH);
+  oben = malRampen(s.T, s.thema, kp, HUDH);
+  ballBild = malBall(s.thema, kp);
 }
 
 function pfad(c, p) {
@@ -1700,12 +2549,12 @@ function pfad(c, p) {
 
 // --------------------------- Hintergrund und Wände ---------------------------
 
-function malUnten() {
-  const [cv, c] = neueLeinwand();
+function malUnten(T, th, kp, versatz) {
+  const [cv, c] = neueLeinwand(kp, versatz);
   // Anzeige-Hintergrund
   c.fillStyle = '#04040d';
   c.fillRect(0, 0, VB, VH);
-  c.translate(0, HUDH);
+  c.translate(0, versatz);
 
   // Spielfläche: Umriss des Tisches
   const flaeche = () => {
@@ -1720,62 +2569,27 @@ function malUnten() {
   flaeche();
   c.clip();
   const v = c.createLinearGradient(0, 80, 0, TH);
-  v.addColorStop(0, '#0b0b2e');
-  v.addColorStop(0.5, '#090620');
-  v.addColorStop(1, '#05040f');
+  v.addColorStop(0, th.grund[0]);
+  v.addColorStop(0.5, th.grund[1]);
+  v.addColorStop(1, th.grund[2]);
   c.fillStyle = v;
   c.fillRect(0, 0, TB, TH + 20);
-
-  // Sechseck-Raster
-  c.strokeStyle = 'rgba(80, 120, 255, 0.07)';
-  c.lineWidth = 1;
-  const r = 18, hx = r * Math.sqrt(3);
-  for (let y = 60, z = 0; y < TH + 40; y += r * 1.5, z++) {
-    for (let x = (z % 2) * hx / 2 - hx; x < TB + hx; x += hx) {
-      c.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const w = Math.PI / 3 * i + Math.PI / 6;
-        c[i ? 'lineTo' : 'moveTo'](x + r * Math.cos(w), y + r * Math.sin(w));
-      }
-      c.closePath();
-      c.stroke();
-    }
-  }
-
-  // Große Orbit-Ringe als Tisch-Kunst
-  c.globalCompositeOperation = 'lighter';
-  for (const [rr, a, f] of [[150, 0.08, '#6a4dff'], [205, 0.06, '#38f3ff'], [95, 0.07, '#ff4fd8']]) {
-    c.strokeStyle = f; c.globalAlpha = a; c.lineWidth = 2;
-    c.beginPath(); c.ellipse(MITTE, 420, rr, rr * 0.62, -0.25, 0, Math.PI * 2); c.stroke();
-  }
-  c.globalAlpha = 1;
-  leuchte(c, MITTE, 420, 260, '#3b1d9a', 0.35);
-  leuchte(c, MITTE, 800, 220, '#0c3a7a', 0.35);
-  // Leiterbahnen
-  c.strokeStyle = 'rgba(56, 243, 255, 0.10)';
-  c.lineWidth = 1.5;
-  for (const p of [[[120, 560], [180, 600], [180, 660]], [[384, 560], [324, 600], [324, 660]], [[252, 540], [252, 600]], [[200, 600], [304, 600]]]) { pfad(c, p); c.stroke(); }
-  c.globalCompositeOperation = 'source-over';
-
-  // Schriftzug unten in der Mitte
-  c.fillStyle = 'rgba(56, 243, 255, 0.10)';
-  c.font = '12px ' + SCHRIFT;
-  c.textAlign = 'center';
-  c.fillText('ORBIT', MITTE, 640);
+  th.male(c, T);
   c.restore();
 
   // Rand-Leuchten um den Tisch
   c.save();
-  c.shadowColor = '#5b3dff';
+  c.shadowColor = th.rand;
   c.shadowBlur = 24;
-  c.strokeStyle = 'rgba(120, 90, 255, 0.5)';
+  c.strokeStyle = th.rand;
+  c.globalAlpha = 0.6;
   c.lineWidth = 3;
   flaeche();
   c.stroke();
   c.restore();
 
   // Schatten der Rampen auf dem Tisch
-  for (const ra of s.T.rampen) {
+  for (const ra of T.rampen) {
     c.save();
     c.translate(7, 9);
     pfad(c, ra.bahn.p);
@@ -1793,48 +2607,47 @@ function malUnten() {
     c.moveTo(X(20), 1000); c.lineTo(X(20), 905); c.lineTo(X(58), 905); c.lineTo(X(58), 775); c.lineTo(X(146), 826); c.lineTo(X(146), 1000);
     c.closePath();
     const m = c.createLinearGradient(X(20), 820, X(146), 960);
-    m.addColorStop(0, '#20263e'); m.addColorStop(1, '#0d1020');
+    m.addColorStop(0, th.blech[0]); m.addColorStop(1, th.blech[1]);
     c.fillStyle = m;
     c.fill();
-    c.strokeStyle = 'rgba(160, 180, 230, 0.35)';
+    c.strokeStyle = th.blech[2];
     c.lineWidth = 1.5;
     c.stroke();
   }
 
   // Wände
-  for (const w of s.T.waende) malWand(c, w);
+  for (const w of T.waende) malWand(c, w, th);
 
   // Abschussbahn-Rillen
   c.strokeStyle = 'rgba(255,255,255,0.05)';
   for (let y = 360; y < 880; y += 22) { c.beginPath(); c.moveTo(SCHUSS.innen + 6, y); c.lineTo(SCHUSS.aussen - 6, y); c.stroke(); }
 
   // Schleudern
-  for (const sl of s.T.schleudern) {
+  for (const sl of T.schleudern) {
     c.beginPath();
     c.moveTo(...sl.A); c.lineTo(...sl.B); c.lineTo(...sl.C); c.closePath();
     const m = c.createLinearGradient(sl.A[0], sl.A[1], sl.C[0], sl.C[1]);
-    m.addColorStop(0, '#2c3456'); m.addColorStop(1, '#141830');
+    m.addColorStop(0, th.schleuder[0]); m.addColorStop(1, th.schleuder[1]);
     c.fillStyle = m;
     c.fill();
     c.lineJoin = 'round';
-    c.strokeStyle = '#d9e2ff';
+    c.strokeStyle = th.schleuder[2];
     c.lineWidth = 8;
     c.stroke();
-    c.strokeStyle = '#3d4666';
+    c.strokeStyle = th.schleuder[3];
     c.lineWidth = 4;
     c.stroke();
   }
 
   // Blech hinter den Fallzielen
-  pfad(c, s.T.dach);
-  c.strokeStyle = '#5a6488'; c.lineWidth = 3; c.lineJoin = 'round'; c.stroke();
+  if (T.dach) { pfad(c, T.dach); c.strokeStyle = th.schiene.hell; c.lineWidth = 3; c.lineJoin = 'round'; c.stroke(); }
 
   // Löcher: dunkler Schacht
-  for (const l of s.T.loecher) {
+  for (const l of T.loecher) {
     const g = c.createRadialGradient(l.x, l.y, 2, l.x, l.y, l.r + 4);
     g.addColorStop(0, '#000');
     g.addColorStop(0.7, '#05050c');
-    g.addColorStop(1, '#2a3050');
+    g.addColorStop(1, th.schiene.dunkel);
     c.fillStyle = g;
     c.beginPath(); c.arc(l.x, l.y, l.r + 4, 0, Math.PI * 2); c.fill();
   }
@@ -1842,105 +2655,129 @@ function malUnten() {
   // Tunnel unter dem Tisch: gestrichelte Leuchtspur
   c.save();
   c.setLineDash([4, 7]);
-  c.strokeStyle = 'rgba(77, 255, 154, 0.25)';
+  c.strokeStyle = th.f.gruen;
+  c.globalAlpha = 0.3;
   c.lineWidth = 3;
-  pfad(c, s.T.tunnel.p);
+  pfad(c, T.tunnel.p);
   c.stroke();
   c.restore();
 
   // Spinner-Halter
-  c.fillStyle = '#9aa6c8';
-  for (const x of [22, 64]) { c.beginPath(); c.arc(x, s.T.spinner.y, 3.5, 0, Math.PI * 2); c.fill(); }
-  return [cv, c];
+  c.fillStyle = th.schiene.hell;
+  for (const x of [22, 64]) { c.beginPath(); c.arc(x, T.spinner.y, 3.5, 0, Math.PI * 2); c.fill(); }
+  return cv;
 }
 
-function malWand(c, w) {
+function malWand(c, w, th) {
+  const sch = th.schiene;
   c.save();
   c.lineCap = 'round'; c.lineJoin = 'round';
   pfad(c, w.p);
   if (w.art === 'gummi') {
-    c.strokeStyle = 'rgba(255, 79, 216, 0.25)'; c.lineWidth = w.r * 2 + 8; c.stroke();
-    c.strokeStyle = '#f2e8ff'; c.lineWidth = w.r * 2; c.stroke();
+    c.strokeStyle = th.gummi[0]; c.lineWidth = w.r * 2 + 8; c.stroke();
+    c.strokeStyle = th.gummi[1]; c.lineWidth = w.r * 2; c.stroke();
   } else if (w.art === 'lippe') {
-    c.strokeStyle = '#c9d2ee'; c.lineWidth = w.r * 2; c.stroke();
+    c.strokeStyle = sch.hell; c.lineWidth = w.r * 2; c.stroke();
+    c.strokeStyle = sch.kante; c.lineWidth = 1; c.stroke();
   } else if (w.art === 'stift') {
-    c.strokeStyle = 'rgba(56, 243, 255, 0.25)'; c.lineWidth = w.r * 2 + 7; c.stroke();
-    c.strokeStyle = '#e6f6ff'; c.lineWidth = w.r * 2; c.stroke();
+    c.strokeStyle = sch.glow; c.lineWidth = w.r * 2 + 7; c.stroke();
+    c.strokeStyle = sch.kante; c.lineWidth = w.r * 2; c.stroke();
   } else {
-    // Metallschiene mit Neonkante
-    c.strokeStyle = 'rgba(56, 243, 255, 0.18)'; c.lineWidth = w.r * 2 + 9; c.stroke();
-    c.strokeStyle = '#2b3150'; c.lineWidth = w.r * 2 + 2; c.stroke();
-    c.strokeStyle = '#a9b6d8'; c.lineWidth = w.r * 2 - 2; c.stroke();
-    c.strokeStyle = '#eaf2ff'; c.lineWidth = 1; c.stroke();
+    // Schiene im Material der Welt mit leuchtender Kante
+    c.strokeStyle = sch.glow; c.lineWidth = w.r * 2 + 9; c.stroke();
+    c.strokeStyle = sch.dunkel; c.lineWidth = w.r * 2 + 2; c.stroke();
+    c.strokeStyle = sch.hell; c.lineWidth = w.r * 2 - 2; c.stroke();
+    c.strokeStyle = sch.kante; c.lineWidth = 1; c.stroke();
   }
   c.restore();
 }
 
 // --------------------------- Rampen (oberste Ebene) ---------------------------
 
-function malRampen() {
-  const [cv, c] = neueLeinwand();
-  c.translate(0, HUDH);
+function malRampen(T, th, kp, versatz) {
+  const [cv, c] = neueLeinwand(kp, versatz);
+  c.translate(0, versatz);
   c.lineCap = 'round'; c.lineJoin = 'round';
-  // die rechte (violette) liegt tiefer und wird zuerst gemalt
-  for (const ra of [...s.T.rampen].reverse()) {
-    const [rgb, voll] = RAMPENFARBE[ra.farbe];
+  // die rechte liegt tiefer und wird zuerst gemalt
+  for (const ra of [...T.rampen].reverse()) {
+    const { rgb, voll } = th.rampen[ra.nr];
     const p = ra.bahn.p;
-    // durchsichtige Fahrbahn
-    pfad(c, p);
-    c.strokeStyle = 'rgba(8, 10, 30, 0.55)'; c.lineWidth = 34; c.stroke();
-    c.strokeStyle = `rgba(${rgb}, 0.13)`; c.lineWidth = 34; c.stroke();
-    // Querstreben
-    c.strokeStyle = `rgba(${rgb}, 0.22)`;
-    c.lineWidth = 1.5;
-    for (let sPos = 30; sPos < ra.bahn.L - 10; sPos += 26) {
-      const [x, y, tx, ty] = ra.bahn.ort(sPos);
-      c.beginPath(); c.moveTo(x - ty * 16, y + tx * 16); c.lineTo(x + ty * 16, y - tx * 16); c.stroke();
-    }
-    // zwei leuchtende Seitenschienen
-    for (const seite of [-1, 1]) {
-      const q = p.map((pt, i) => {
-        const a = p[Math.max(0, i - 1)], b = p[Math.min(p.length - 1, i + 1)];
-        const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
-        return [pt[0] - (b[1] - a[1]) / l * 16 * seite, pt[1] + (b[0] - a[0]) / l * 16 * seite];
-      });
-      pfad(c, q);
-      c.strokeStyle = `rgba(${rgb}, 0.25)`; c.lineWidth = 8; c.stroke();
-      c.strokeStyle = voll; c.lineWidth = 2.5; c.stroke();
-      c.strokeStyle = '#ffffff'; c.lineWidth = 0.8; c.stroke();
+    const kanten = [-1, 1].map(seite => p.map((pt, i) => {
+      const a = p[Math.max(0, i - 1)], b = p[Math.min(p.length - 1, i + 1)];
+      const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      return [pt[0] - (b[1] - a[1]) / l * 16 * seite, pt[1] + (b[0] - a[0]) / l * 16 * seite];
+    }));
+    const streben = (farbe, breite, abstand = 26) => {
+      c.strokeStyle = farbe; c.lineWidth = breite;
+      for (let sPos = 30; sPos < ra.bahn.L - 10; sPos += abstand) {
+        const [x, y, tx, ty] = ra.bahn.ort(sPos);
+        c.beginPath(); c.moveTo(x - ty * 16, y + tx * 16); c.lineTo(x + ty * 16, y - tx * 16); c.stroke();
+      }
+    };
+    if (th.rampenStil === 'stein') {
+      // Steinrinne mit Wasser darin
+      pfad(c, p); c.strokeStyle = 'rgba(70,56,36,0.9)'; c.lineWidth = 36; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 16; c.stroke();
+      streben('rgba(30,22,12,0.6)', 2, 22);
+      for (const q of kanten) { pfad(c, q); c.strokeStyle = '#c9a46a'; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = voll; c.lineWidth = 1; c.stroke(); }
+    } else if (th.rampenStil === 'glas') {
+      // Glasröhre
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.12)`; c.lineWidth = 34; c.stroke();
+      pfad(c, p); c.strokeStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 12; c.stroke();
+      for (const q of kanten) { pfad(c, q); c.strokeStyle = `rgba(${rgb},0.35)`; c.lineWidth = 6; c.stroke(); pfad(c, q); c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 1.5; c.stroke(); }
+      c.fillStyle = 'rgba(255,255,255,0.35)';
+      for (let sPos = 20; sPos < ra.bahn.L; sPos += 37) { const [x, y] = ra.bahn.ort(sPos); c.beginPath(); c.arc(x + ((sPos * 7) % 11) - 5, y, 2, 0, Math.PI * 2); c.fill(); }
+    } else if (th.rampenStil === 'lava') {
+      // Eisenrinne mit glühender Lava
+      pfad(c, p); c.strokeStyle = 'rgba(26,16,12,0.92)'; c.lineWidth = 36; c.stroke();
+      c.globalCompositeOperation = 'lighter';
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.25)`; c.lineWidth = 20; c.stroke();
+      pfad(c, p); c.strokeStyle = `rgba(${rgb},0.8)`; c.lineWidth = 6; c.stroke();
+      c.globalCompositeOperation = 'source-over';
+      streben('rgba(90,70,60,0.8)', 2.5, 30);
+      for (const q of kanten) { pfad(c, q); c.strokeStyle = '#5a4a44'; c.lineWidth = 4; c.stroke(); pfad(c, q); c.strokeStyle = voll; c.lineWidth = 1; c.stroke(); }
+    } else {
+      // Neon (Klassik, Weltraum, Cyberpunk)
+      pfad(c, p);
+      c.strokeStyle = 'rgba(8, 10, 30, 0.55)'; c.lineWidth = 34; c.stroke();
+      c.strokeStyle = `rgba(${rgb}, 0.13)`; c.lineWidth = 34; c.stroke();
+      streben(`rgba(${rgb}, 0.22)`, 1.5);
+      for (const q of kanten) {
+        pfad(c, q);
+        c.strokeStyle = `rgba(${rgb}, 0.25)`; c.lineWidth = 8; c.stroke();
+        c.strokeStyle = voll; c.lineWidth = 2.5; c.stroke();
+        c.strokeStyle = '#ffffff'; c.lineWidth = 0.8; c.stroke();
+      }
     }
   }
-  return [cv, c];
+  return cv;
 }
 
 // --------------------------- Kugel ---------------------------
 
-function malBall() {
-  const R = PH.ballR, gr = Math.ceil(R * 2 * ansicht.k * ansicht.dpr * 1.6) + 4;
+function malBall(th, kp) {
+  const kb = th.ball;
+  const R = PH.ballR, gr = Math.ceil(R * 2 * kp * 1.6) + 4;
   const c = document.createElement('canvas');
   c.width = c.height = gr;
   const g = c.getContext('2d');
   const m = gr / 2, r = gr / 2 - 2;
   // Grundkörper: dunkler Stahl
   let v = g.createRadialGradient(m - r * 0.35, m - r * 0.4, r * 0.05, m, m, r);
-  v.addColorStop(0, '#ffffff');
-  v.addColorStop(0.18, '#dfe7f5');
-  v.addColorStop(0.5, '#7d889f');
-  v.addColorStop(0.85, '#2a3042');
-  v.addColorStop(1, '#151a26');
+  [0, 0.18, 0.5, 0.85, 1].forEach((p, i) => v.addColorStop(p, kb.stops[i]));
   g.fillStyle = v;
   g.beginPath(); g.arc(m, m, r, 0, Math.PI * 2); g.fill();
   // Spiegelung des Tisches: cyan unten, violett seitlich
   g.save();
   g.beginPath(); g.arc(m, m, r, 0, Math.PI * 2); g.clip();
   v = g.createLinearGradient(0, m + r * 0.2, 0, m + r);
-  v.addColorStop(0, 'rgba(56,243,255,0)');
-  v.addColorStop(1, 'rgba(56,243,255,0.75)');
+  v.addColorStop(0, `rgba(${kb.unten},0)`);
+  v.addColorStop(1, `rgba(${kb.unten},0.75)`);
   g.fillStyle = v;
   g.fillRect(0, 0, gr, gr);
   v = g.createLinearGradient(m + r, 0, m + r * 0.3, 0);
-  v.addColorStop(0, 'rgba(176,102,255,0.6)');
-  v.addColorStop(1, 'rgba(176,102,255,0)');
+  v.addColorStop(0, `rgba(${kb.seite},0.6)`);
+  v.addColorStop(1, `rgba(${kb.seite},0)`);
   g.fillStyle = v;
   g.fillRect(0, 0, gr, gr);
   // Horizont-Streifen
@@ -1953,20 +2790,20 @@ function malBall() {
   g.strokeStyle = 'rgba(0,0,0,0.5)';
   g.lineWidth = Math.max(1, r * 0.06);
   g.beginPath(); g.arc(m, m, r - g.lineWidth / 2, 0, Math.PI * 2); g.stroke();
-  c.radius = r / (ansicht.k * ansicht.dpr); // Zeichengröße in Tisch-Einheiten passend zum Bild
   c.mitte = m;
   return c;
 }
 
 function zeichneKugel(c, b, groesse = 1) {
-  const R = PH.ballR * groesse;
-  c.drawImage(ballBild, b.x - R * (ballBild.width / 2) / (ballBild.width / 2 - 2), b.y - R * (ballBild.width / 2) / (ballBild.width / 2 - 2),
-    R * 2 * (ballBild.width / 2) / (ballBild.width / 2 - 2), R * 2 * (ballBild.width / 2) / (ballBild.width / 2 - 2));
+  // Im Bild hat die Kugel den Radius (Breite/2 - 2); das Bild wird passend skaliert
+  const halb = PH.ballR * groesse * (ballBild.width / 2) / (ballBild.width / 2 - 2);
+  c.drawImage(ballBild, b.x - halb, b.y - halb, halb * 2, halb * 2);
 }
 
 // --------------------------- Bewegliche Teile ---------------------------
 
-function zeichneFlipper(c, f) {
+function zeichneFlipper(c, f, th) {
+  const fl = th.flipper;
   const [tx, ty] = f.spitze();
   const w = Math.atan2(ty - f.y, tx - f.x);
   const L = Math.hypot(tx - f.x, ty - f.y);
@@ -1985,23 +2822,20 @@ function zeichneFlipper(c, f) {
   c.globalCompositeOperation = 'lighter';
   c.shadowBlur = 0;
   form();
-  c.strokeStyle = `rgba(56,243,255,${0.18 * aktiv + 0.08})`;
+  c.strokeStyle = `rgba(${fl.glow},${0.18 * aktiv + 0.08})`;
   c.lineWidth = 9;
   c.stroke();
   c.globalCompositeOperation = 'source-over';
   form();
   const m = c.createLinearGradient(0, -f.r0, 0, f.r0);
-  m.addColorStop(0, '#f4f8ff');
-  m.addColorStop(0.35, '#a9b5cf');
-  m.addColorStop(0.6, '#4a5470');
-  m.addColorStop(1, '#1d2236');
+  [0, 0.35, 0.6, 1].forEach((p, i) => m.addColorStop(p, fl.stops[i]));
   c.fillStyle = m;
   c.fill();
-  c.strokeStyle = FARBE.cyan;
+  c.strokeStyle = fl.kante;
   c.lineWidth = 2;
   c.stroke();
   // Gummi-Leuchtstreifen
-  c.strokeStyle = `rgba(185,251,255,${0.5 + aktiv * 0.5})`;
+  c.strokeStyle = `rgba(${fl.glow},${0.5 + aktiv * 0.5})`;
   c.lineWidth = 1.2;
   c.beginPath(); c.moveTo(4, -f.r0 * 0.25); c.lineTo(L - 6, -f.r1 * 0.2); c.stroke();
   c.fillStyle = '#0b0e1c';
@@ -2010,64 +2844,151 @@ function zeichneFlipper(c, f) {
   c.restore();
 }
 
-function zeichneTeile(c, zeit) {
-  const T = s.T;
+// --------------------------- Bumper je Welt ---------------------------
+
+function malBumper(c, bu, th, zeit) {
+  const hell = bu.blitz, r = bu.r, x = bu.x, y = bu.y;
+  const B = th.bumper;
+  // Schatten
+  c.fillStyle = 'rgba(0,0,0,0.45)';
+  c.beginPath(); c.arc(x + 3, y + 4, r + 2, 0, Math.PI * 2); c.fill();
+  let g;
+  if (B.stil === 'planet') {
+    const [a, m, d] = B.farben[bu.nr % B.farben.length];
+    g = c.createRadialGradient(x - r * 0.4, y - r * 0.4, 2, x, y, r);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : a); g.addColorStop(0.55, m); g.addColorStop(1, d);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.18)'; c.lineWidth = 3;
+    c.beginPath(); c.arc(x, y, r * 0.55, 0.3, 2.2); c.stroke();
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : B.ring; c.lineWidth = 2.5;
+    c.beginPath(); c.ellipse(x, y, r + 8, r * 0.32, -0.35, 0, Math.PI * 2); c.stroke();
+  } else if (B.stil === 'holo') {
+    const sechs = rr => { c.beginPath(); for (let i = 0; i < 6; i++) { const w = i * Math.PI / 3 + Math.PI / 6; c[i ? 'lineTo' : 'moveTo'](x + Math.cos(w) * rr, y + Math.sin(w) * rr); } c.closePath(); };
+    sechs(r); c.fillStyle = hell > 0.3 ? '#ff9ad8' : '#1a0626'; c.fill();
+    c.strokeStyle = B.glow; c.lineWidth = 3; c.stroke();
+    sechs(r * 0.6); c.strokeStyle = B.ring; c.lineWidth = 2; c.stroke();
+    c.save(); c.translate(x, y); c.rotate(zeit * 1.5);
+    c.strokeStyle = 'rgba(46,249,255,0.6)'; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(-r * 0.3, 0); c.lineTo(r * 0.3, 0); c.moveTo(0, -r * 0.3); c.lineTo(0, r * 0.3); c.stroke();
+    c.restore();
+  } else if (B.stil === 'stein') {
+    g = c.createRadialGradient(x - r * 0.3, y - r * 0.3, 2, x, y, r);
+    g.addColorStop(0, B.kappe[0]); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = hell > 0.2 ? '#fff6c0' : B.ring; c.lineWidth = 3;
+    c.beginPath(); c.arc(x, y, r - 2, 0, Math.PI * 2); c.stroke();
+    // Auge als Glyphe
+    c.fillStyle = hell > 0.2 ? '#fff6c0' : B.ring;
+    c.beginPath(); c.ellipse(x, y, r * 0.5, r * 0.26, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#2a1e10'; c.beginPath(); c.arc(x, y, r * 0.17, 0, Math.PI * 2); c.fill();
+  } else if (B.stil === 'qualle') {
+    g = c.createRadialGradient(x, y - r * 0.3, 2, x, y, r);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : 'rgba(230,255,255,0.95)'); g.addColorStop(0.6, 'rgba(127,240,255,0.75)'); g.addColorStop(1, 'rgba(26,106,138,0.85)');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.8)'; c.lineWidth = 2;
+    c.beginPath(); c.arc(x, y, r - 1, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = 'rgba(255,143,200,0.8)'; c.lineWidth = 1.5;
+    for (let k = -2; k <= 2; k++) {
+      c.beginPath(); c.moveTo(x + k * r * 0.22, y - r * 0.1);
+      c.quadraticCurveTo(x + k * r * 0.22 + Math.sin(zeit * 3 + k) * 4, y + r * 0.35, x + k * r * 0.18, y + r * 0.7); c.stroke();
+    }
+  } else if (B.stil === 'magma') {
+    c.fillStyle = '#2a1a14';
+    c.beginPath();
+    for (let k = 0; k < 9; k++) { const w = k / 9 * Math.PI * 2; const rr = r * (0.88 + ((k * 37) % 10) / 80); c[k ? 'lineTo' : 'moveTo'](x + Math.cos(w) * rr, y + Math.sin(w) * rr); }
+    c.closePath(); c.fill();
+    c.strokeStyle = hell > 0.2 ? '#fff2a0' : B.ring; c.lineWidth = 2.5; c.stroke();
+    g = c.createRadialGradient(x, y, 1, x, y, r * 0.6);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : B.kappe[0]); g.addColorStop(0.6, B.kappe[1]); g.addColorStop(1, 'rgba(58,12,4,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r * 0.6, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,150,40,0.8)'; c.lineWidth = 1.5;
+    for (let k = 0; k < 4; k++) { const w = k * 1.7 + 0.4; c.beginPath(); c.moveTo(x + Math.cos(w) * r * 0.4, y + Math.sin(w) * r * 0.4); c.lineTo(x + Math.cos(w + 0.3) * r * 0.85, y + Math.sin(w + 0.3) * r * 0.85); c.stroke(); }
+  } else {
+    // Klassik: Metallring mit Leuchtkappe
+    g = c.createRadialGradient(x - 8, y - 8, 2, x, y, r);
+    g.addColorStop(0, '#f2f5ff'); g.addColorStop(0.6, '#6f7a98'); g.addColorStop(1, '#232840');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    g = c.createRadialGradient(x - 4, y - 5, 1, x, y, r * 0.72);
+    g.addColorStop(0, hell > 0.3 ? '#ffffff' : B.kappe[0]);
+    g.addColorStop(0.5, hell > 0.3 ? '#d2b4ff' : B.kappe[1]);
+    g.addColorStop(1, B.kappe[2]);
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r * 0.72 * (1 - hell * 0.08), 0, Math.PI * 2); c.fill();
+    c.strokeStyle = hell > 0.2 ? '#ffffff' : B.ring; c.lineWidth = 2;
+    c.beginPath(); c.arc(x, y, r - 1, 0, Math.PI * 2); c.stroke();
+  }
+}
+
+// --------------------------- Alle Teile auf dem Tisch ---------------------------
+// live = false für Vorschaubilder: dann ohne Lichter, die vom Spielstand abhängen
+
+function zeichneTeile(c, zeit, T, th, live) {
+  const F = th.f;
   const puls = 0.5 + 0.5 * Math.sin(zeit * 6);
   c.globalCompositeOperation = 'lighter';
 
-  // Pfeile vor den Schüssen
-  const auftrag = auftragJetzt().art;
-  const pfeil = (x, y, w, farbe, an) => {
-    c.save(); c.translate(x, y); c.rotate(w);
-    c.beginPath(); c.moveTo(0, -11); c.lineTo(9, 7); c.lineTo(0, 2); c.lineTo(-9, 7); c.closePath();
-    c.fillStyle = an ? farbe : 'rgba(120,130,170,0.18)';
-    c.globalAlpha = an ? 0.55 + 0.45 * puls : 1;
-    c.fill();
-    c.globalAlpha = 1;
-    c.restore();
-    if (an) leuchte(c, x, y, 26, farbe, 0.45 * puls);
-  };
-  const jackpotAn = s.multiball;
-  pfeil(114, 548, -0.25, jackpotAn ? FARBE.gold : FARBE.cyan, jackpotAn || auftrag === 'rampe' || T.rampen[0].blitz > 0);
-  pfeil(spiegel(114), 548, 0.25, jackpotAn ? FARBE.gold : FARBE.violett, jackpotAn || auftrag === 'rampe' || T.rampen[1].blitz > 0);
-  pfeil(43, 590, -0.15, FARBE.cyan, auftrag === 'orbit' || auftrag === 'spin');
-  pfeil(spiegel(43), 590, 0.15, FARBE.cyan, auftrag === 'orbit');
-  pfeil(MITTE, 548, 0, FARBE.gruen, auftrag === 'wurmloch' || auftrag === 'fallbank' || T.fallziele.every(z => z.unten));
-  pfeil(T.reaktor.x + 12, 476, 0.25, FARBE.pink, s.lockBereit || auftrag === 'multiball');
-  pfeil(T.kapsel.x - 12, 476, -0.25, FARBE.gold, true);
+  if (live) {
+    // Pfeile vor den Schüssen: leuchten, wenn der Schuss gerade zählt
+    const ziel = zielArt();
+    const pfeil = (x, y, w, farbe, an) => {
+      c.save(); c.translate(x, y); c.rotate(w);
+      c.beginPath(); c.moveTo(0, -11); c.lineTo(9, 7); c.lineTo(0, 2); c.lineTo(-9, 7); c.closePath();
+      c.fillStyle = an ? farbe : 'rgba(150,150,180,0.2)';
+      c.globalAlpha = an ? 0.55 + 0.45 * puls : 1;
+      c.fill();
+      c.globalAlpha = 1;
+      c.restore();
+      if (an) leuchte(c, x, y, 26, farbe, 0.45 * puls);
+    };
+    const jackpotAn = s.multiball;
+    for (const ra of T.rampen) {
+      const an = jackpotAn || ziel === 'rampe' || ziel === 'rampe-' + ra.name || ra.blitz > 0 || (ra.loch && ziel === ra.loch.name);
+      pfeil(ra.name === 'links' ? 114 : spiegel(114), 548, ra.name === 'links' ? -0.25 : 0.25, jackpotAn ? F.gold : th.rampen[ra.nr].voll, an);
+    }
+    pfeil(43, 590, -0.15, F.haupt, ziel === 'orbit' || ziel === 'spin' || ziel === 'orbit-links');
+    pfeil(spiegel(43), 590, 0.15, F.haupt, ziel === 'orbit' || ziel === 'orbit-rechts');
+    pfeil(MITTE, 548, 0, F.gruen, ziel === 'wurmloch' || ziel === 'fallbank' || (T.fallziele.length > 0 && T.fallziele.every(z => z.unten)));
+    pfeil(T.reaktor.x + 12, 476, 0.25, F.pink, s.lockBereit || ziel === 'multiball' || ziel === 'reaktor');
+    pfeil(T.kapsel.x - 12, 476, -0.25, F.gold, true);
 
-  // Bonus-Leiter und Lock-Lichter
-  for (let i = 0; i < 2; i++) {
-    const an = i < s.gesperrt;
-    c.fillStyle = an ? FARBE.pink : 'rgba(255,79,216,0.15)';
-    c.beginPath(); c.arc(T.reaktor.x - 8 + i * 16, T.reaktor.y + 30, 4, 0, Math.PI * 2); c.fill();
-    if (an) leuchte(c, T.reaktor.x - 8 + i * 16, T.reaktor.y + 30, 14, FARBE.pink, 0.7);
-  }
-  for (let i = 1; i <= 6; i++) {
-    const an = s.multi >= i;
-    const x = MITTE - 50 + (i - 1) * 20, y = 690;
-    c.fillStyle = an ? FARBE.cyan : 'rgba(56,243,255,0.12)';
-    c.font = '7px ' + SCHRIFT; c.textAlign = 'center';
-    c.fillText(i + 'X', x, y);
-    if (an) leuchte(c, x, y - 3, 14, FARBE.cyan, 0.35);
+    // Lock-Lichter und Bonus-Leiter
+    for (let i = 0; i < 2; i++) {
+      const an = i < s.gesperrt;
+      c.fillStyle = an ? F.pink : 'rgba(255,255,255,0.12)';
+      c.beginPath(); c.arc(T.reaktor.x - 8 + i * 16, T.reaktor.y + 30, 4, 0, Math.PI * 2); c.fill();
+      if (an) leuchte(c, T.reaktor.x - 8 + i * 16, T.reaktor.y + 30, 14, F.pink, 0.7);
+    }
+    for (let i = 1; i <= 6; i++) {
+      const an = s.multi >= i;
+      const x = MITTE - 50 + (i - 1) * 20, y = 690;
+      c.fillStyle = an ? F.haupt : 'rgba(255,255,255,0.12)';
+      c.font = '7px ' + SCHRIFT; c.textAlign = 'center';
+      c.fillText(i + 'X', x, y);
+      if (an) leuchte(c, x, y - 3, 14, F.haupt, 0.35);
+    }
+    // Kickback-Lichter in den Außenbahnen
+    for (const kb of T.kickback) {
+      c.fillStyle = kb.an ? F.gruen : 'rgba(255,255,255,0.12)';
+      c.beginPath(); c.moveTo(kb.x, kb.y - 12); c.lineTo(kb.x + 7, kb.y); c.lineTo(kb.x - 7, kb.y); c.closePath(); c.fill();
+      if (kb.an || kb.blitz) leuchte(c, kb.x, kb.y - 4, 22, F.gruen, (kb.an ? 0.3 + 0.3 * puls : 0) + kb.blitz);
+    }
   }
 
   // Rollbahnen O R B
   T.roll.forEach((r, i) => {
-    const skill = s.skill === i && kugelImKolben();
+    const skill = live && s.skill === i && kugelImKolben();
     const an = r.an || skill && puls > 0.5;
-    const farbe = skill ? FARBE.gold : FARBE.cyan;
-    c.fillStyle = an ? farbe : 'rgba(56,243,255,0.14)';
+    const farbe = skill ? F.gold : F.haupt;
+    c.fillStyle = an ? farbe : 'rgba(255,255,255,0.16)';
     c.font = '11px ' + SCHRIFT; c.textAlign = 'center';
     c.fillText(r.buchst, r.x, r.y + 5);
     if (an || r.blitz) leuchte(c, r.x, r.y, 26, farbe, (an ? 0.6 : 0) + r.blitz);
   });
 
   // Löcher
-  const lochFarbe = { kapsel: FARBE.gold, wurmloch: FARBE.gruen, reaktor: FARBE.pink };
+  const lochFarbe = { kapsel: F.gold, wurmloch: F.gruen, reaktor: F.pink };
   for (const l of T.loecher) {
     const f = lochFarbe[l.name];
-    const offen = l.name !== 'reaktor' || s.lockBereit || s.multiball;
+    const offen = !live || l.name !== 'reaktor' || s.lockBereit || s.multiball;
     c.save(); c.translate(l.x, l.y); c.rotate(l.dreh);
     c.strokeStyle = f;
     c.globalAlpha = offen ? 0.8 : 0.3;
@@ -2077,102 +2998,129 @@ function zeichneTeile(c, zeit) {
     c.globalAlpha = 1;
     leuchte(c, l.x, l.y, 34, f, (offen ? 0.25 + 0.2 * puls : 0.08) + l.blitz);
     c.fillStyle = f; c.font = '6px ' + SCHRIFT; c.textAlign = 'center';
-    c.globalAlpha = 0.8;
+    c.globalAlpha = 0.85;
     c.fillText(l.name.toUpperCase(), l.x, l.y - l.r - 9);
     c.globalAlpha = 1;
   }
 
-  // Bumper
-  for (const bu of T.bumper) {
-    leuchte(c, bu.x, bu.y, 70, '#7a4dff', 0.25 + bu.blitz * 0.9);
-  }
+  // Bumper und Pfosten
+  for (const bu of T.bumper) leuchte(c, bu.x, bu.y, 70, th.bumper.glow, 0.25 + bu.blitz * 0.9);
+  for (const p of T.pfosten) if (p.blitz > 0) leuchte(c, p.x, p.y, 34, F.zweit, p.blitz);
   c.globalCompositeOperation = 'source-over';
-  for (const bu of T.bumper) {
-    c.fillStyle = '#0a0b18';
-    c.beginPath(); c.arc(bu.x + 3, bu.y + 4, bu.r + 2, 0, Math.PI * 2); c.fill();
-    // Metallring
-    let g = c.createRadialGradient(bu.x - 8, bu.y - 8, 2, bu.x, bu.y, bu.r);
-    g.addColorStop(0, '#f2f5ff'); g.addColorStop(0.6, '#6f7a98'); g.addColorStop(1, '#232840');
-    c.fillStyle = g;
-    c.beginPath(); c.arc(bu.x, bu.y, bu.r, 0, Math.PI * 2); c.fill();
-    // Leuchtkappe
-    const hell = bu.blitz;
-    g = c.createRadialGradient(bu.x - 4, bu.y - 5, 1, bu.x, bu.y, bu.r * 0.72);
-    g.addColorStop(0, hell > 0.3 ? '#ffffff' : '#e3d3ff');
-    g.addColorStop(0.5, hell > 0.3 ? '#d2b4ff' : '#9a63ff');
-    g.addColorStop(1, '#3b1a8a');
-    c.fillStyle = g;
-    c.beginPath(); c.arc(bu.x, bu.y, bu.r * 0.72 * (1 - hell * 0.08), 0, Math.PI * 2); c.fill();
-    c.strokeStyle = hell > 0.2 ? '#ffffff' : FARBE.cyan;
-    c.lineWidth = 2;
-    c.beginPath(); c.arc(bu.x, bu.y, bu.r - 1, 0, Math.PI * 2); c.stroke();
+  for (const bu of T.bumper) malBumper(c, bu, th, zeit);
+  for (const p of T.pfosten) {
+    c.fillStyle = 'rgba(0,0,0,0.4)'; c.beginPath(); c.arc(p.x + 2, p.y + 3, p.r + 1, 0, Math.PI * 2); c.fill();
+    c.fillStyle = th.gummi[1]; c.beginPath(); c.arc(p.x, p.y, p.r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = p.blitz > 0.2 ? '#ffffff' : F.zweit; c.beginPath(); c.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2); c.fill();
   }
 
   // Fallziele
   for (const z of T.fallziele) {
-    if (z.unten) {
-      c.fillStyle = '#05050c';
-      c.fillRect(z.x - 14, z.y - 2, 28, 4);
-      continue;
-    }
-    c.fillStyle = '#fff3b0';
+    if (z.unten) { c.fillStyle = '#05050c'; c.fillRect(z.x - 14, z.y - 2, 28, 4); continue; }
+    c.fillStyle = '#fff8d0';
     c.fillRect(z.x - 14, z.y - 4, 28, 8);
-    c.fillStyle = FARBE.gold;
+    c.fillStyle = F.gold;
     c.fillRect(z.x - 13, z.y - 1, 26, 5);
   }
   // Stehziele
   for (const z of T.stehziele) {
     c.lineCap = 'round';
-    c.strokeStyle = z.an ? '#ffd0f4' : '#7a2b6a';
+    c.strokeStyle = z.an ? '#ffffff' : 'rgba(255,255,255,0.35)';
     c.lineWidth = 8;
     c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
-    c.strokeStyle = FARBE.pink; c.lineWidth = 3;
+    c.strokeStyle = F.pink; c.lineWidth = 3;
     c.beginPath(); c.moveTo(z.ax, z.ay); c.lineTo(z.bx, z.by); c.stroke();
   }
   // Schleudern blitzen
+  c.globalCompositeOperation = 'lighter';
   for (const sl of T.schleudern) {
     if (sl.blitz <= 0) continue;
-    c.globalCompositeOperation = 'lighter';
-    c.strokeStyle = `rgba(56,243,255,${sl.blitz})`;
+    c.globalAlpha = sl.blitz;
+    c.strokeStyle = F.haupt;
     c.lineWidth = 6; c.lineCap = 'round';
     c.beginPath(); c.moveTo(...sl.A); c.lineTo(...sl.C); c.stroke();
-    leuchte(c, (sl.A[0] + sl.C[0]) / 2, (sl.A[1] + sl.C[1]) / 2, 60, FARBE.cyan, sl.blitz * 0.8);
-    c.globalCompositeOperation = 'source-over';
+    c.globalAlpha = 1;
+    leuchte(c, (sl.A[0] + sl.C[0]) / 2, (sl.A[1] + sl.C[1]) / 2, 60, F.haupt, sl.blitz * 0.8);
   }
-  c.globalCompositeOperation = 'lighter';
-  for (const z of [...T.fallziele, ...T.stehziele]) if (z.blitz > 0 || z.an) leuchte(c, z.x, z.y, 30, z.an ? FARBE.pink : FARBE.gold, z.blitz + (z.an ? 0.4 : 0));
-  for (const z of T.fallziele) if (!z.unten) leuchte(c, z.x, z.y, 20, FARBE.gold, 0.3);
+  for (const z of [...T.fallziele, ...T.stehziele]) if (z.blitz > 0 || z.an) leuchte(c, z.x, z.y, 30, z.an ? F.pink : F.gold, z.blitz + (z.an ? 0.4 : 0));
+  for (const z of T.fallziele) if (!z.unten) leuchte(c, z.x, z.y, 20, F.gold, 0.3);
   c.globalCompositeOperation = 'source-over';
 
   // Spinner: dreht sich um die waagerechte Achse
   const sp = T.spinner;
   const tiefe = Math.abs(Math.cos(sp.w)) * 9 + 1;
-  c.fillStyle = Math.cos(sp.w) > 0 ? '#d7e2ff' : '#7f8bb0';
+  c.fillStyle = Math.cos(sp.w) > 0 ? th.schiene.kante : th.schiene.hell;
   c.fillRect(24, sp.y - tiefe / 2, 38, tiefe);
-  c.strokeStyle = FARBE.cyan; c.lineWidth = 1;
+  c.strokeStyle = F.haupt; c.lineWidth = 1;
   c.strokeRect(24, sp.y - tiefe / 2, 38, tiefe);
-  c.fillStyle = '#e8f0ff'; c.fillRect(22, sp.y - 1, 42, 2);
-  if (sp.tempo > 2) { c.globalCompositeOperation = 'lighter'; leuchte(c, 43, sp.y, 40, FARBE.cyan, Math.min(0.8, sp.tempo / 40)); c.globalCompositeOperation = 'source-over'; }
+  c.fillStyle = th.schiene.kante; c.fillRect(22, sp.y - 1, 42, 2);
+  if (sp.tempo > 2) { c.globalCompositeOperation = 'lighter'; leuchte(c, 43, sp.y, 40, F.haupt, Math.min(0.8, sp.tempo / 40)); c.globalCompositeOperation = 'source-over'; }
 
   // Kolben
   const kol = T.kolben;
   const ky = kol.ay - (kol.zugAnim || 0) * 20;
   const g = c.createLinearGradient(SCHUSS.innen, 0, SCHUSS.aussen, 0);
-  g.addColorStop(0, '#596486'); g.addColorStop(0.5, '#eef3ff'); g.addColorStop(1, '#596486');
+  g.addColorStop(0, th.schiene.dunkel); g.addColorStop(0.5, th.schiene.kante); g.addColorStop(1, th.schiene.dunkel);
   c.fillStyle = g;
   c.fillRect(SCHUSS.innen + 4, ky - 3, SCHUSS.aussen - SCHUSS.innen - 8, 7);
-  c.fillStyle = '#3a4260';
+  c.fillStyle = th.schiene.hell;
   c.fillRect(SCHUSS.x - 3, ky + 4, 6, 60);
-  if (s.kolbenZug > 0) {
+  if (live && s.kolbenZug > 0) {
     c.globalCompositeOperation = 'lighter';
-    leuchte(c, SCHUSS.x, ky, 30 + s.kolbenZug * 30, FARBE.gold, s.kolbenZug);
+    leuchte(c, SCHUSS.x, ky, 30 + s.kolbenZug * 30, F.gold, s.kolbenZug);
     c.globalCompositeOperation = 'source-over';
   }
 
-  for (const f of T.flipper) zeichneFlipper(c, f);
+  for (const f of T.flipper) zeichneFlipper(c, f, th);
+}
+
+// --------------------------- Vorschaubilder für die Auswahl ---------------------------
+
+const vorschauCache = new Map();
+function vorschau(levelIndex, breite) {
+  const schluessel = levelIndex + ':' + breite;
+  if (vorschauCache.has(schluessel)) return vorschauCache.get(schluessel);
+  const lv = levelIndex < 0 ? null : LEVEL[levelIndex];
+  const th = THEMEN[lv ? lv.welt : 'klassik'];
+  const T = baueTisch(lv ? lv.tisch : KLASSIK_PLAN);
+  const kp = breite / TB;
+  const grund = malUnten(T, th, kp, 0);
+  const deckel = malRampen(T, th, kp, 0);
+  const c = grund.getContext('2d');
+  c.setTransform(kp, 0, 0, kp, 0, 0);
+  th.ambient(c, 1.3);
+  zeichneTeile(c, 0, T, th, false);
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.drawImage(deckel, 0, 0);
+  // nur der Tisch, ohne den leeren unteren Rand
+  const bild = document.createElement('canvas');
+  bild.width = grund.width; bild.height = Math.round(grund.height * 0.97);
+  bild.getContext('2d').drawImage(grund, 0, 0);
+  vorschauCache.set(schluessel, bild);
+  return bild;
 }
 
 // --------------------------- Ein ganzes Bild ---------------------------
+
+function malTeilchen(c, t) {
+  const a = 1 - t.zeit / t.leben;
+  c.globalAlpha = a;
+  c.fillStyle = t.farbe; c.strokeStyle = t.farbe;
+  const g = t.groesse;
+  if (t.form === 'stern') {
+    c.fillRect(t.x - g * 1.5, t.y - 0.6, g * 3, 1.2); c.fillRect(t.x - 0.6, t.y - g * 1.5, 1.2, g * 3);
+  } else if (t.form === 'blase') {
+    c.lineWidth = 1; c.beginPath(); c.arc(t.x, t.y, g * 1.2, 0, Math.PI * 2); c.stroke();
+  } else if (t.form === 'blatt') {
+    c.save(); c.translate(t.x, t.y); c.rotate(t.dreh);
+    c.beginPath(); c.ellipse(0, 0, g * 1.6, g * 0.7, 0, 0, Math.PI * 2); c.fill();
+    c.restore();
+  } else if (t.form === 'glut') {
+    c.beginPath(); c.arc(t.x, t.y, g * 0.8, 0, Math.PI * 2); c.fill();
+  } else {
+    c.fillRect(t.x - g / 2, t.y - g / 2, g, g);
+  }
+}
 
 function zeichne(zeit) {
   const { k, ox, oy, dpr } = ansicht;
@@ -2180,6 +3128,7 @@ function zeichne(zeit) {
   ctx.fillStyle = '#04040d';
   ctx.fillRect(0, 0, leinwand.width, leinwand.height);
   if (!s || !unten) return;
+  const th = s.thema;
   let wx = 0, wy = 0;
   if (s.wackeln > 0) { wx = (Math.random() - 0.5) * s.wackeln * 14; wy = (Math.random() - 0.5) * s.wackeln * 14; }
   ctx.setTransform(1, 0, 0, 1, Math.round((ox + wx * k) * dpr), Math.round((oy + wy * k) * dpr));
@@ -2187,14 +3136,15 @@ function zeichne(zeit) {
   ctx.setTransform(k * dpr, 0, 0, k * dpr, (ox + wx * k) * dpr, (oy + wy * k + HUDH * k) * dpr);
   const c = ctx;
 
-  zeichneTeile(c, zeit);
+  th.ambient(c, zeit);
+  zeichneTeile(c, zeit, s.T, th, true);
 
   const baelle = s.welt.baelle;
   // Kugeln im Tunnel: schwach unter dem Tisch
   c.globalCompositeOperation = 'lighter';
-  for (const b of baelle) if (b.ort === 'tunnel') leuchte(c, b.x, b.y, 26, FARBE.gruen, 0.9);
+  for (const b of baelle) if (b.ort === 'tunnel') leuchte(c, b.x, b.y, 26, th.f.gruen, 0.9);
   // Licht der Kugeln auf dem Tisch
-  for (const b of baelle) if (b.ort === 'tisch') leuchte(c, b.x, b.y, 34, '#4a7dff', 0.35);
+  for (const b of baelle) if (b.ort === 'tisch') leuchte(c, b.x, b.y, 34, th.ball.licht, 0.35);
   // Leuchtspur
   for (const b of baelle) {
     if (b.ort !== 'tisch' && b.ort !== 'rampe') { b.spur.length = 0; continue; }
@@ -2204,7 +3154,7 @@ function zeichne(zeit) {
     if (b.ort === 'tisch' && v < 500) continue;
     for (let i = 0; i < b.spur.length - 1; i++) {
       const a = (i + 1) / b.spur.length;
-      c.strokeStyle = `rgba(80,200,255,${a * 0.35})`;
+      c.strokeStyle = `rgba(${th.ball.spur},${a * 0.35})`;
       c.lineWidth = PH.ballR * 1.6 * a;
       c.lineCap = 'round';
       c.beginPath(); c.moveTo(b.spur[i][0], b.spur[i][1]); c.lineTo(b.spur[i + 1][0], b.spur[i + 1][1]); c.stroke();
@@ -2229,7 +3179,7 @@ function zeichne(zeit) {
   for (const ra of s.T.rampen) {
     if (ra.blitz <= 0) continue;
     pfad(c, ra.bahn.p);
-    c.strokeStyle = RAMPENFARBE[ra.farbe][1];
+    c.strokeStyle = th.rampen[ra.nr].voll;
     c.globalAlpha = ra.blitz * 0.5;
     c.lineWidth = 30; c.lineCap = 'round'; c.lineJoin = 'round';
     c.stroke();
@@ -2252,12 +3202,7 @@ function zeichne(zeit) {
     c.beginPath(); c.arc(w.x, w.y, w.r * (0.4 + w.zeit / 0.45), 0, Math.PI * 2); c.stroke();
   }
   c.globalAlpha = 1;
-  for (const t of s.teilchen) {
-    const a = 1 - t.zeit / t.leben;
-    c.fillStyle = t.farbe;
-    c.globalAlpha = a;
-    c.fillRect(t.x - t.groesse / 2, t.y - t.groesse / 2, t.groesse, t.groesse);
-  }
+  for (const t of s.teilchen) malTeilchen(c, t);
   c.globalAlpha = 1;
   c.globalCompositeOperation = 'source-over';
   c.textAlign = 'center';
@@ -2276,17 +3221,17 @@ function zeichne(zeit) {
 }
 
 function zeichneMeldung(c, zeit) {
-  const m = s.meldung;
+  const m = s.meldung, F = s.thema.f;
   if (s.bonusAnzeige) {
     const b = s.bonusAnzeige;
-    kasten(c, MITTE, 600, 330, 110, FARBE.cyan);
+    kasten(c, MITTE, 600, 330, 110, F.haupt);
     c.textAlign = 'center';
-    c.fillStyle = FARBE.cyan; c.font = '14px ' + SCHRIFT;
+    c.fillStyle = F.haupt; c.font = '14px ' + SCHRIFT;
     c.fillText('BONUS', MITTE, 580);
     c.fillStyle = '#fff'; c.font = '11px ' + SCHRIFT;
     const zaehl = Math.min(1, b.zeit / 1.2);
     c.fillText(zahl(b.bonus * zaehl) + ' X ' + b.multi, MITTE, 606);
-    c.fillStyle = FARBE.gold;
+    c.fillStyle = F.gold;
     if (b.zeit > 1.2) c.fillText('= ' + zahl(b.bonus * b.multi), MITTE, 630);
     return;
   }
@@ -2294,29 +3239,30 @@ function zeichneMeldung(c, zeit) {
   const ein = Math.min(1, m.zeit * 6), aus = Math.min(1, (m.dauer - m.zeit) * 5);
   c.globalAlpha = Math.max(0, Math.min(ein, aus));
   const y = 610;
-  kasten(c, MITTE, y, 370, m.text ? 74 : 50, m.farbe);
+  kasten(c, MITTE, y, 380, m.text ? 74 : 50, m.farbe);
   c.textAlign = 'center';
   c.font = '15px ' + SCHRIFT;
   c.fillStyle = m.farbe;
-  c.fillText(m.titel, MITTE, y + (m.text ? -6 : 7));
+  c.fillText(m.titel, MITTE, y + (m.text ? -6 : 7), 360);
   if (m.text) {
     c.font = '600 14px ' + "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     c.fillStyle = '#eef2ff';
-    c.fillText(m.text, MITTE, y + 20, 350);
+    c.fillText(m.text, MITTE, y + 20, 360);
   }
   c.globalAlpha = 1;
 }
 
 function kasten(c, x, y, b, h, farbe) {
-  c.fillStyle = 'rgba(6, 6, 22, 0.82)';
+  const alpha = c.globalAlpha;
+  c.fillStyle = 'rgba(6, 6, 22, 0.85)';
   rund(c, x - b / 2, y - h / 2, b, h, 12);
   c.fill();
   c.strokeStyle = farbe; c.lineWidth = 2;
   c.stroke();
   c.globalCompositeOperation = 'lighter';
-  c.strokeStyle = farbe; c.globalAlpha *= 0.3; c.lineWidth = 7;
+  c.globalAlpha = alpha * 0.3; c.lineWidth = 7;
   c.stroke();
-  c.globalAlpha = Math.min(1, c.globalAlpha / 0.3);
+  c.globalAlpha = alpha;
   c.globalCompositeOperation = 'source-over';
 }
 function rund(c, x, y, b, h, r) {
@@ -2327,49 +3273,70 @@ function rund(c, x, y, b, h, r) {
 
 // --------------------------- Anzeige oben ---------------------------
 
+const KOERPER = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 function zeichneHud(zeit) {
   const { k, ox, oy, dpr } = ansicht;
-  const c = ctx;
+  const c = ctx, F = s.thema.f;
   c.setTransform(k * dpr, 0, 0, k * dpr, ox * dpr, oy * dpr);
   c.textAlign = 'left';
   c.font = '22px ' + SCHRIFT;
-  c.fillStyle = FARBE.cyan;
-  c.shadowColor = FARBE.cyan; c.shadowBlur = 0;
+  c.fillStyle = F.haupt;
   c.fillText(zahl(s.punkte), 16, 40);
   c.font = '8px ' + SCHRIFT;
-  c.fillStyle = '#b8b2d6';
+  c.fillStyle = '#c4c2dc';
   const multi = s.multi > 1 ? '  BONUS ' + s.multi + 'X' : '';
-  const extra = s.extraBaelle ? '  +' + s.extraBaelle : '';
-  c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
+  if (s.modus === 'level') {
+    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + multi + '  ' + s.level.name.toUpperCase(), 16, 62, 340);
+  } else {
+    const extra = s.extraBaelle ? '  +' + s.extraBaelle : '';
+    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
+  }
 
-  // Auftrag mit Fortschritt
-  const a = auftragJetzt();
-  const ziel = auftragZiel();
-  c.fillStyle = FARBE.gold;
+  // Aufgabe oder Auftrag mit Fortschritt
+  let titel, text, anteil, rest = 0;
+  if (s.modus === 'level') {
+    const a = aufgabeJetzt();
+    titel = a ? 'AUFGABE ' + (s.schritt + 1) + '/' + s.level.aufgaben.length : 'GESCHAFFT';
+    text = a ? aufgabeText(a) : 'Level geschafft!';
+    anteil = a ? Math.min(1, s.schrittStand / aufgabeZiel(a)) : 1;
+    if (a && a.zeit) rest = Math.max(0, s.schrittZeit);
+    if (a && a.art === 'folge') text = a.folge.map((n, i) => (i < s.schrittStand ? '✓ ' : '') + SCHUSS_NAMEN[n]).join(' → ');
+  } else {
+    titel = 'AUFTRAG';
+    text = auftragText();
+    anteil = Math.min(1, s.stand / auftragZiel());
+  }
+  c.fillStyle = F.gold;
   c.font = '8px ' + SCHRIFT;
-  c.fillText('AUFTRAG', 16, 86);
-  c.font = '600 13px ' + "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  c.fillText(titel, 16, 86);
+  c.font = '600 13px ' + KOERPER;
   c.fillStyle = '#eef2ff';
-  c.fillText(auftragText(), 90, 87, 300);
-  const anteil = Math.min(1, s.stand / ziel);
-  c.fillStyle = 'rgba(255,216,74,0.18)';
-  c.fillRect(16, 96, 330, 5);
-  c.fillStyle = FARBE.gold;
-  c.fillRect(16, 96, 330 * anteil, 5);
+  const tx = 16 + c.measureText(titel).width * 0 + (s.modus === 'level' ? 112 : 90);
+  // Platz bis x = 322, rechts davon stehen die Kästchen der Spezialfähigkeiten
+  c.fillText(text, tx, 87, 322 - tx + (rest ? -40 : 0));
+  if (rest) {
+    c.textAlign = 'right';
+    c.font = '9px ' + SCHRIFT;
+    c.fillStyle = rest < 10 && Math.sin(zeit * 12) > 0 ? F.pink : F.gold;
+    c.fillText(Math.ceil(rest) + 's', 322, 87);
+    c.textAlign = 'left';
+  }
+  c.fillStyle = 'rgba(255,255,255,0.12)';
+  c.fillRect(16, 96, 306, 5);
+  c.fillStyle = F.gold;
+  c.fillRect(16, 96, 306 * anteil, 5);
 
   // Spezialfähigkeiten mit Restzeit
   const aktiv = [];
-  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push(['SCHILD', Math.max(s.schutz, s.effekt.schild), FARBE.gruen]);
-  if (s.effekt.doppelt > 0) aktiv.push(['2X', s.effekt.doppelt, FARBE.gold]);
-  if (s.effekt.zeitlupe > 0) aktiv.push(['ZEIT', s.effekt.zeitlupe, FARBE.pink]);
-  if (s.multiball) aktiv.push(['MULTI', 0, FARBE.pink]);
-  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push(['KOMBO ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), FARBE.gold]);
-  let x = 360;
+  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push(['SCHILD', Math.max(s.schutz, s.effekt.schild), F.gruen]);
+  if (s.effekt.doppelt > 0) aktiv.push(['2X', s.effekt.doppelt, F.gold]);
+  if (s.effekt.zeitlupe > 0) aktiv.push(['ZEIT', s.effekt.zeitlupe, F.pink]);
+  if (s.multiball) aktiv.push(['MULTI', 0, F.pink]);
+  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push(['KOMBO ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), F.gold]);
   c.font = '7px ' + SCHRIFT;
   c.textAlign = 'center';
   aktiv.slice(0, 3).forEach(([name, rest, f], i) => {
-    const y = 76 + i * 0;
-    const xx = x + i * 58;
+    const y = 76, xx = 360 + i * 58;
     if (xx > 520) return;
     const blink = rest > 0 && rest < 3 && Math.sin(zeit * 20) > 0;
     c.globalAlpha = blink ? 0.4 : 1;
@@ -2391,10 +3358,13 @@ const tippGeraet = window.matchMedia('(pointer: coarse)').matches;
 
 // --------------------------- Spielablauf ---------------------------
 
-function starte() {
+let letzterModus = { art: 'klassik' };
+function starte(modus = letzterModus) {
+  letzterModus = modus;
   ton.an();
   spaeter.length = 0;
-  neuesSpiel();
+  neuesSpiel(modus);
+  ton.thema = s.thema.klang;
   baueBilder();
   daten.spiele++;
   speichere();
@@ -2402,38 +3372,66 @@ function starte() {
   musik.starte();
 }
 
-function spielEnde() {
+function spielEnde(sieg = false) {
+  if (s.phase === 'ende') return;
   s.phase = 'ende';
+  s.sieg = sieg;
+  if (sieg && s.level) {
+    const vorher = daten.sterne[s.level.id] || 0;
+    s.neuFrei = vorher === 0 && levelNr(s.level.id) + 1 < LEVEL.length;
+    daten.sterne[s.level.id] = Math.max(vorher, s.sterne);
+  }
   merkeRekord();
   musik.stoppe();
   setTimeout(zeigeEnde, 600);
 }
 
 function merkeRekord() {
-  if (!s) return;
-  if (s.punkte > daten.rekorde[s.stufe]) {
-    daten.rekorde[s.stufe] = s.punkte;
+  if (!s || s.phase === 'menue') return;
+  const b = daten.bestwerte[s.tisch] = daten.bestwerte[s.tisch] || {};
+  if (s.punkte > (b[s.stufe] || 0)) {
+    b[s.stufe] = s.punkte;
     s.neuerRekord = true;
-    speichere();
   }
+  speichere();
 }
 
 function zeigeEnde() {
+  const lv = s.level;
+  $('eTitel').textContent = s.sieg ? 'LEVEL GESCHAFFT' : 'GAME OVER';
+  $('eTisch').textContent = tischName(s.tisch);
+  $('eSterne').hidden = !s.sieg;
+  $('eSterne').textContent = '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne);
+  $('eSterneText').hidden = !s.sieg;
+  $('eSterneText').textContent = s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.';
+  $('eFrei').hidden = !s.neuFrei;
+  if (s.neuFrei) {
+    const n = LEVEL[levelNr(lv.id) + 1];
+    $('eFrei').textContent = (n.welt !== lv.welt ? 'Neue Welt frei: ' + THEMEN[n.welt].name + '!' : 'Neues Level frei: ' + n.name + '!');
+  }
   $('ePunkte').textContent = zahl(s.punkte);
+  $('eRangZeile').hidden = !!lv;
   $('eRang').textContent = RAENGE[s.rang];
-  $('eAuftraege').textContent = s.auftraegeGeschafft;
+  $('eAuftraegeName').textContent = lv ? 'Aufgaben' : 'Aufträge';
+  $('eAuftraege').textContent = lv ? Math.min(s.schritt, lv.aufgaben.length) + ' von ' + lv.aufgaben.length : s.auftraegeGeschafft;
   $('eRampen').textContent = s.statistik.rampen;
   $('eKombo').textContent = s.statistik.maxKombo > 1 ? 'x' + s.statistik.maxKombo : '–';
-  $('eRekord').textContent = zahl(daten.rekorde[s.stufe]);
+  $('eRekord').textContent = zahl(bestwert(s.tisch, s.stufe));
   $('neuerRekord').hidden = !s.neuerRekord;
+  const naechstes = lv ? levelNr(lv.id) + 1 : -1;
+  $('weiterLevel').hidden = !(lv && naechstes < LEVEL.length && levelFrei(naechstes));
+  $('nochmalKnopf').classList.toggle('main', $('weiterLevel').hidden);
+  $('zurAuswahl').hidden = !lv;
   const d = offenesDuell;
-  $('eDuell').hidden = !(d && d.stufe === s.stufe);
-  if (d && d.stufe === s.stufe) {
+  const passt = d && d.stufe === s.stufe && d.tisch === s.tisch;
+  $('eDuell').hidden = !passt;
+  if (passt) {
     $('eDuell').textContent = s.punkte > d.punkte
       ? 'Geschafft! Du hast ' + d.name + ' mit ' + zahl(s.punkte) + ' zu ' + zahl(d.punkte) + ' geschlagen.'
       : d.name + ' liegt noch vorne: ' + zahl(d.punkte) + ' Punkte. Versuch es nochmal!';
   }
   zeigeFenster('fEnde');
+  if (!$('weiterLevel').hidden && !tippGeraet) $('weiterLevel').focus({ preventScroll: true });
   if (s.neuerRekord) ton.extra();
 }
 
@@ -2449,14 +3447,14 @@ function weiter() {
   letzteZeit = performance.now();
 }
 function zumMenue() {
-  merkeRekord();
+  if (s && s.phase === 'lauf') merkeRekord();
   musik.stoppe();
   zeigeFenster('fStart');
 }
 
 // --------------------------- Fenster ---------------------------
 
-const FENSTER_IDS = ['fStart', 'fListe', 'fHilfe', 'fPause', 'fEnde', 'fTeilen'];
+const FENSTER_IDS = ['fStart', 'fWelten', 'fLevel', 'fListe', 'fHilfe', 'fPause', 'fEnde', 'fTeilen'];
 const ERSTER_KNOPF = { fStart: 'losKnopf', fPause: 'weiterKnopf', fEnde: 'nochmalKnopf' };
 
 function zeigeFenster(id) {
@@ -2466,6 +3464,8 @@ function zeigeFenster(id) {
   body.classList.remove('imSpiel');
   if (id === 'fStart') baueStart();
   if (id === 'fListe') baueListe();
+  if (id === 'fWelten') baueWelten();
+  if (id === 'fLevel') baueLevel();
   if (id === 'fHilfe') baueHilfe();
   baueStufen();
   if (ERSTER_KNOPF[id] && !tippGeraet) $(ERSTER_KNOPF[id]).focus({ preventScroll: true });
@@ -2493,7 +3493,79 @@ function baueStufen() {
     }
   }
   for (const t of document.querySelectorAll('.js-stufentext')) t.textContent = STUFEN[daten.stufe].text;
-  for (const t of document.querySelectorAll('.js-rekord')) t.textContent = zahl(daten.rekorde[daten.stufe]);
+  for (const t of document.querySelectorAll('.js-rekord')) t.textContent = zahl(bestwert('klassik'));
+  const offen = !$('fWelten').hidden ? 'fWelten' : !$('fLevel').hidden ? 'fLevel' : '';
+  if (offen === 'fWelten') baueWelten();
+  if (offen === 'fLevel') baueLevel();
+}
+
+// --------------------------- Welt- und Levelauswahl ---------------------------
+
+let gewaehlteWelt = 'weltraum';
+function weltLevel(welt) { return LEVEL.map((l, i) => [l, i]).filter(([l]) => l.welt === welt); }
+function sterneVon(welt) { return weltLevel(welt).reduce((n, [l]) => n + (daten.sterne[l.id] || 0), 0); }
+
+function bildElement(levelIndex, breite) {
+  // Vorschau als <img>, damit sie wie ein normales Bild skaliert
+  const img = document.createElement('img');
+  img.alt = '';
+  img.width = breite;
+  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.82); } catch (e) {}
+  return img;
+}
+
+function baueWelten() {
+  const liste = $('weltListe');
+  liste.textContent = '';
+  const gesamt = Object.values(daten.sterne).reduce((a, b) => a + b, 0);
+  $('sterneGesamt').textContent = gesamt + ' / ' + LEVEL.length * 3;
+  for (const w of WELTEN) {
+    const [[, ersterIndex]] = weltLevel(w.id);
+    const frei = levelFrei(ersterIndex);
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'weltKarte' + (frei ? '' : ' zu');
+    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
+    knopf.append(bildElement(ersterIndex, 96));
+    const info = document.createElement('span');
+    info.className = 'weltInfo';
+    const name = document.createElement('strong'); name.textContent = w.name;
+    const text = document.createElement('span'); text.textContent = frei ? w.text : '🔒 Schaff zuerst das letzte Level der Welt davor.';
+    const sterne = document.createElement('span'); sterne.className = 'sterneZeile'; sterne.textContent = '★ ' + sterneVon(w.id) + ' / ' + weltLevel(w.id).length * 3;
+    info.append(name, text, sterne);
+    knopf.append(info);
+    knopf.disabled = !frei;
+    knopf.addEventListener('click', () => { gewaehlteWelt = w.id; ton.an(); ton.klick(); zeigeFenster('fLevel'); });
+    liste.appendChild(knopf);
+  }
+}
+
+function baueLevel() {
+  const w = WELTEN.find(x => x.id === gewaehlteWelt);
+  $('levelTitel').textContent = w.name.toUpperCase();
+  $('levelTitel').style.color = THEMEN[w.id].f.haupt;
+  const liste = $('levelListe');
+  liste.textContent = '';
+  for (const [l, i] of weltLevel(w.id)) {
+    const frei = levelFrei(i);
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'levelKarte' + (frei ? '' : ' zu');
+    knopf.append(bildElement(i, 72));
+    const info = document.createElement('span');
+    info.className = 'weltInfo';
+    const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
+    const auf = document.createElement('span');
+    auf.textContent = frei ? l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') : '🔒 Schaff zuerst das Level davor.';
+    const st = daten.sterne[l.id] || 0;
+    const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
+    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');
+    info.append(name, auf, zeile);
+    knopf.append(info);
+    knopf.disabled = !frei;
+    knopf.addEventListener('click', () => starte({ art: 'level', nr: i }));
+    liste.appendChild(knopf);
+  }
 }
 
 function baueStart() {
@@ -2501,15 +3573,23 @@ function baueStart() {
   $('duell').hidden = !d;
   if (d) {
     $('duellTitel').textContent = d.name + ' FORDERT DICH HERAUS';
-    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf Stufe ' + STUFEN[d.stufe].name + '.';
+    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf dem Tisch ' + tischName(d.tisch) + ', Stufe ' + STUFEN[d.stufe].name + '.' + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? ' Dieses Level musst du erst freischalten.' : '');
   }
 }
 
 function baueListe() {
+  // Auswahl des Tisches: Klassik und alle freigeschalteten Level
+  const wahl = $('listeTisch');
+  const tische = ['klassik', ...LEVEL.filter((l, i) => levelFrei(i)).map(l => l.id)];
+  if (!tische.includes(daten.listeTisch)) daten.listeTisch = 'klassik';
+  wahl.textContent = '';
+  for (const id of tische) { const o = document.createElement('option'); o.value = id; o.textContent = tischName(id); wahl.appendChild(o); }
+  wahl.value = daten.listeTisch;
+  const tisch = daten.listeTisch;
   const liste = $('liste');
   liste.textContent = '';
-  const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
-  zeilen.push({ name: daten.name || 'Du', punkte: daten.rekorde[daten.stufe], ich: true });
+  const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe && x.tisch === tisch).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
+  zeilen.push({ name: daten.name || 'Du', punkte: bestwert(tisch), ich: true });
   zeilen.sort((a, b) => b.punkte - a.punkte);
   zeilen.forEach((z, i) => {
     const li = document.createElement('li');
@@ -2526,7 +3606,7 @@ function baueListe() {
       weg.setAttribute('aria-label', z.name + ' entfernen');
       weg.textContent = '×';
       weg.addEventListener('click', () => {
-        daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe));
+        daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe && x.tisch === tisch));
         speichere();
         baueListe();
       });
@@ -2554,23 +3634,25 @@ function reinerName(text) {
   const sauber = String(text == null ? '' : text).normalize('NFC').replace(/[\p{C}<>]/gu, '').trim();
   return Array.from(sauber).slice(0, 12).join('');
 }
+let teilTisch = 'klassik';
 function linkBauen() {
-  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: daten.rekorde[daten.stufe], stufe: daten.stufe });
+  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
   return SPIEL_ADRESSE + '#' + teile.toString();
 }
-function oeffneTeilen(zurueck) {
+function oeffneTeilen(zurueck, tisch) {
   vorTeilen = zurueck;
+  teilTisch = tisch;
   $('nameFeld').value = daten.name;
   $('teilenStatus').textContent = '';
   $('linkFeld').hidden = true;
-  $('teilenText').textContent = 'Du teilst deinen Rekord: ' + zahl(daten.rekorde[daten.stufe]) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
+  $('teilenText').textContent = 'Du teilst deinen Rekord auf dem Tisch ' + tischName(tisch) + ': ' + zahl(bestwert(tisch)) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
   zeigeFenster('fTeilen');
 }
 async function teile() {
   daten.name = reinerName($('nameFeld').value);
   speichere();
   const adresse = linkBauen();
-  const text = 'Ich habe ' + zahl(daten.rekorde[daten.stufe]) + ' Punkte in Orbitflipper (Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
+  const text = 'Ich habe ' + zahl(bestwert(teilTisch)) + ' Punkte in Orbitflipper (' + tischName(teilTisch) + ', Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
   const status = $('teilenStatus');
   status.textContent = '';
   try {
@@ -2590,17 +3672,20 @@ function leseHerausforderung() {
   const name = reinerName(teile.get('name'));
   const punkte = Number(teile.get('punkte'));
   const stufe = teile.get('stufe');
+  const tisch = teile.get('tisch') || 'klassik';
   try { history.replaceState(null, '', location.pathname + location.search); } catch (error) {}
   if (!name || !Number.isInteger(punkte) || punkte < 1 || punkte > 999999999) return;
   if (!Object.prototype.hasOwnProperty.call(STUFEN, stufe)) return;
-  const bekannt = daten.freunde.find(f => f.name === name && f.stufe === stufe);
+  if (tisch !== 'klassik' && levelNr(tisch) < 0) return;
+  const bekannt = daten.freunde.find(f => f.name === name && f.stufe === stufe && f.tisch === tisch);
   if (bekannt) bekannt.punkte = Math.max(bekannt.punkte, punkte);
-  else daten.freunde.push({ name, punkte, stufe });
+  else daten.freunde.push({ name, punkte, stufe, tisch });
   daten.freunde.sort((a, b) => b.punkte - a.punkte);
-  daten.freunde = daten.freunde.slice(0, 30);
+  daten.freunde = daten.freunde.slice(0, 60);
   daten.stufe = stufe;
+  daten.listeTisch = tisch;
   speichere();
-  offenesDuell = { name, punkte, stufe };
+  offenesDuell = { name, punkte, stufe, tisch };
 }
 
 // --------------------------- Ton-Knöpfe ---------------------------
@@ -2624,16 +3709,21 @@ for (const k of document.querySelectorAll('[data-oeffne]')) {
     zeigeFenster(k.dataset.oeffne);
   });
 }
-$('losKnopf').addEventListener('click', starte);
+$('losKnopf').addEventListener('click', () => { ton.an(); zeigeFenster('fWelten'); });
+$('klassikKnopf').addEventListener('click', () => starte({ art: 'klassik' }));
+$('weiterLevel').addEventListener('click', () => starte({ art: 'level', nr: levelNr(s.level.id) + 1 }));
+$('zurAuswahl').addEventListener('click', () => { gewaehlteWelt = s.level ? s.level.welt : gewaehlteWelt; zeigeFenster('fLevel'); });
+$('listeTisch').addEventListener('change', e => { daten.listeTisch = e.target.value; speichere(); baueListe(); });
 $('tonKnopf').addEventListener('click', schalteTon);
 $('pauseKnopf').addEventListener('click', () => { ton.an(); pausiere(); });
 $('weiterKnopf').addEventListener('click', weiter);
 $('pauseMusik').addEventListener('click', () => { daten.musik = !daten.musik; speichere(); zeigeMusikKnopf(); });
 $('pauseNeu').addEventListener('click', () => { merkeRekord(); starte(); });
+$('pauseAuswahl').addEventListener('click', () => { merkeRekord(); musik.stoppe(); zeigeFenster(s.level ? 'fLevel' : 'fWelten'); });
 $('pauseMenue').addEventListener('click', zumMenue);
-$('nochmalKnopf').addEventListener('click', starte);
-$('endeTeilen').addEventListener('click', () => oeffneTeilen('fEnde'));
-$('listeTeilen').addEventListener('click', () => oeffneTeilen('fListe'));
+$('nochmalKnopf').addEventListener('click', () => starte());
+$('endeTeilen').addEventListener('click', () => oeffneTeilen('fEnde', s.tisch));
+$('listeTeilen').addEventListener('click', () => oeffneTeilen('fListe', daten.listeTisch));
 $('teilenKnopf').addEventListener('click', teile);
 $('teilenZurueck').addEventListener('click', () => zeigeFenster(vorTeilen));
 
@@ -2767,7 +3857,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 }
 
 // Für automatische Tests
-if (TEST) window.spiel = { get s() { return s; }, starte, logikSchritt, feuere, kugelImKolben, ballInBahn, neuerBall, PH, regeln, zeichne, baueBilder, aktualisiereFlipper, rampenSchritt };
+if (TEST) window.spiel = { get s() { return s; }, starte, neuesSpiel, vorschau, levelEreignis, spielEnde, logikSchritt, feuere, kugelImKolben, ballInBahn, neuerBall, PH, regeln, zeichne, baueBilder, aktualisiereFlipper, rampenSchritt };
 
 </script>
 </body>

@@ -7,10 +7,13 @@ const tippGeraet = window.matchMedia('(pointer: coarse)').matches;
 
 // --------------------------- Spielablauf ---------------------------
 
-function starte() {
+let letzterModus = { art: 'klassik' };
+function starte(modus = letzterModus) {
+  letzterModus = modus;
   ton.an();
   spaeter.length = 0;
-  neuesSpiel();
+  neuesSpiel(modus);
+  ton.thema = s.thema.klang;
   baueBilder();
   daten.spiele++;
   speichere();
@@ -18,38 +21,66 @@ function starte() {
   musik.starte();
 }
 
-function spielEnde() {
+function spielEnde(sieg = false) {
+  if (s.phase === 'ende') return;
   s.phase = 'ende';
+  s.sieg = sieg;
+  if (sieg && s.level) {
+    const vorher = daten.sterne[s.level.id] || 0;
+    s.neuFrei = vorher === 0 && levelNr(s.level.id) + 1 < LEVEL.length;
+    daten.sterne[s.level.id] = Math.max(vorher, s.sterne);
+  }
   merkeRekord();
   musik.stoppe();
   setTimeout(zeigeEnde, 600);
 }
 
 function merkeRekord() {
-  if (!s) return;
-  if (s.punkte > daten.rekorde[s.stufe]) {
-    daten.rekorde[s.stufe] = s.punkte;
+  if (!s || s.phase === 'menue') return;
+  const b = daten.bestwerte[s.tisch] = daten.bestwerte[s.tisch] || {};
+  if (s.punkte > (b[s.stufe] || 0)) {
+    b[s.stufe] = s.punkte;
     s.neuerRekord = true;
-    speichere();
   }
+  speichere();
 }
 
 function zeigeEnde() {
+  const lv = s.level;
+  $('eTitel').textContent = s.sieg ? 'LEVEL GESCHAFFT' : 'GAME OVER';
+  $('eTisch').textContent = tischName(s.tisch);
+  $('eSterne').hidden = !s.sieg;
+  $('eSterne').textContent = '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne);
+  $('eSterneText').hidden = !s.sieg;
+  $('eSterneText').textContent = s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.';
+  $('eFrei').hidden = !s.neuFrei;
+  if (s.neuFrei) {
+    const n = LEVEL[levelNr(lv.id) + 1];
+    $('eFrei').textContent = (n.welt !== lv.welt ? 'Neue Welt frei: ' + THEMEN[n.welt].name + '!' : 'Neues Level frei: ' + n.name + '!');
+  }
   $('ePunkte').textContent = zahl(s.punkte);
+  $('eRangZeile').hidden = !!lv;
   $('eRang').textContent = RAENGE[s.rang];
-  $('eAuftraege').textContent = s.auftraegeGeschafft;
+  $('eAuftraegeName').textContent = lv ? 'Aufgaben' : 'Aufträge';
+  $('eAuftraege').textContent = lv ? Math.min(s.schritt, lv.aufgaben.length) + ' von ' + lv.aufgaben.length : s.auftraegeGeschafft;
   $('eRampen').textContent = s.statistik.rampen;
   $('eKombo').textContent = s.statistik.maxKombo > 1 ? 'x' + s.statistik.maxKombo : '–';
-  $('eRekord').textContent = zahl(daten.rekorde[s.stufe]);
+  $('eRekord').textContent = zahl(bestwert(s.tisch, s.stufe));
   $('neuerRekord').hidden = !s.neuerRekord;
+  const naechstes = lv ? levelNr(lv.id) + 1 : -1;
+  $('weiterLevel').hidden = !(lv && naechstes < LEVEL.length && levelFrei(naechstes));
+  $('nochmalKnopf').classList.toggle('main', $('weiterLevel').hidden);
+  $('zurAuswahl').hidden = !lv;
   const d = offenesDuell;
-  $('eDuell').hidden = !(d && d.stufe === s.stufe);
-  if (d && d.stufe === s.stufe) {
+  const passt = d && d.stufe === s.stufe && d.tisch === s.tisch;
+  $('eDuell').hidden = !passt;
+  if (passt) {
     $('eDuell').textContent = s.punkte > d.punkte
       ? 'Geschafft! Du hast ' + d.name + ' mit ' + zahl(s.punkte) + ' zu ' + zahl(d.punkte) + ' geschlagen.'
       : d.name + ' liegt noch vorne: ' + zahl(d.punkte) + ' Punkte. Versuch es nochmal!';
   }
   zeigeFenster('fEnde');
+  if (!$('weiterLevel').hidden && !tippGeraet) $('weiterLevel').focus({ preventScroll: true });
   if (s.neuerRekord) ton.extra();
 }
 
@@ -65,14 +96,14 @@ function weiter() {
   letzteZeit = performance.now();
 }
 function zumMenue() {
-  merkeRekord();
+  if (s && s.phase === 'lauf') merkeRekord();
   musik.stoppe();
   zeigeFenster('fStart');
 }
 
 // --------------------------- Fenster ---------------------------
 
-const FENSTER_IDS = ['fStart', 'fListe', 'fHilfe', 'fPause', 'fEnde', 'fTeilen'];
+const FENSTER_IDS = ['fStart', 'fWelten', 'fLevel', 'fListe', 'fHilfe', 'fPause', 'fEnde', 'fTeilen'];
 const ERSTER_KNOPF = { fStart: 'losKnopf', fPause: 'weiterKnopf', fEnde: 'nochmalKnopf' };
 
 function zeigeFenster(id) {
@@ -82,6 +113,8 @@ function zeigeFenster(id) {
   body.classList.remove('imSpiel');
   if (id === 'fStart') baueStart();
   if (id === 'fListe') baueListe();
+  if (id === 'fWelten') baueWelten();
+  if (id === 'fLevel') baueLevel();
   if (id === 'fHilfe') baueHilfe();
   baueStufen();
   if (ERSTER_KNOPF[id] && !tippGeraet) $(ERSTER_KNOPF[id]).focus({ preventScroll: true });
@@ -109,7 +142,79 @@ function baueStufen() {
     }
   }
   for (const t of document.querySelectorAll('.js-stufentext')) t.textContent = STUFEN[daten.stufe].text;
-  for (const t of document.querySelectorAll('.js-rekord')) t.textContent = zahl(daten.rekorde[daten.stufe]);
+  for (const t of document.querySelectorAll('.js-rekord')) t.textContent = zahl(bestwert('klassik'));
+  const offen = !$('fWelten').hidden ? 'fWelten' : !$('fLevel').hidden ? 'fLevel' : '';
+  if (offen === 'fWelten') baueWelten();
+  if (offen === 'fLevel') baueLevel();
+}
+
+// --------------------------- Welt- und Levelauswahl ---------------------------
+
+let gewaehlteWelt = 'weltraum';
+function weltLevel(welt) { return LEVEL.map((l, i) => [l, i]).filter(([l]) => l.welt === welt); }
+function sterneVon(welt) { return weltLevel(welt).reduce((n, [l]) => n + (daten.sterne[l.id] || 0), 0); }
+
+function bildElement(levelIndex, breite) {
+  // Vorschau als <img>, damit sie wie ein normales Bild skaliert
+  const img = document.createElement('img');
+  img.alt = '';
+  img.width = breite;
+  try { img.src = vorschau(levelIndex, breite * 2).toDataURL('image/jpeg', 0.82); } catch (e) {}
+  return img;
+}
+
+function baueWelten() {
+  const liste = $('weltListe');
+  liste.textContent = '';
+  const gesamt = Object.values(daten.sterne).reduce((a, b) => a + b, 0);
+  $('sterneGesamt').textContent = gesamt + ' / ' + LEVEL.length * 3;
+  for (const w of WELTEN) {
+    const [[, ersterIndex]] = weltLevel(w.id);
+    const frei = levelFrei(ersterIndex);
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'weltKarte' + (frei ? '' : ' zu');
+    knopf.style.setProperty('--welt', THEMEN[w.id].f.haupt);
+    knopf.append(bildElement(ersterIndex, 96));
+    const info = document.createElement('span');
+    info.className = 'weltInfo';
+    const name = document.createElement('strong'); name.textContent = w.name;
+    const text = document.createElement('span'); text.textContent = frei ? w.text : '🔒 Schaff zuerst das letzte Level der Welt davor.';
+    const sterne = document.createElement('span'); sterne.className = 'sterneZeile'; sterne.textContent = '★ ' + sterneVon(w.id) + ' / ' + weltLevel(w.id).length * 3;
+    info.append(name, text, sterne);
+    knopf.append(info);
+    knopf.disabled = !frei;
+    knopf.addEventListener('click', () => { gewaehlteWelt = w.id; ton.an(); ton.klick(); zeigeFenster('fLevel'); });
+    liste.appendChild(knopf);
+  }
+}
+
+function baueLevel() {
+  const w = WELTEN.find(x => x.id === gewaehlteWelt);
+  $('levelTitel').textContent = w.name.toUpperCase();
+  $('levelTitel').style.color = THEMEN[w.id].f.haupt;
+  const liste = $('levelListe');
+  liste.textContent = '';
+  for (const [l, i] of weltLevel(w.id)) {
+    const frei = levelFrei(i);
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'levelKarte' + (frei ? '' : ' zu');
+    knopf.append(bildElement(i, 72));
+    const info = document.createElement('span');
+    info.className = 'weltInfo';
+    const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
+    const auf = document.createElement('span');
+    auf.textContent = frei ? l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') : '🔒 Schaff zuerst das Level davor.';
+    const st = daten.sterne[l.id] || 0;
+    const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
+    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');
+    info.append(name, auf, zeile);
+    knopf.append(info);
+    knopf.disabled = !frei;
+    knopf.addEventListener('click', () => starte({ art: 'level', nr: i }));
+    liste.appendChild(knopf);
+  }
 }
 
 function baueStart() {
@@ -117,15 +222,23 @@ function baueStart() {
   $('duell').hidden = !d;
   if (d) {
     $('duellTitel').textContent = d.name + ' FORDERT DICH HERAUS';
-    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf Stufe ' + STUFEN[d.stufe].name + '.';
+    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf dem Tisch ' + tischName(d.tisch) + ', Stufe ' + STUFEN[d.stufe].name + '.' + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? ' Dieses Level musst du erst freischalten.' : '');
   }
 }
 
 function baueListe() {
+  // Auswahl des Tisches: Klassik und alle freigeschalteten Level
+  const wahl = $('listeTisch');
+  const tische = ['klassik', ...LEVEL.filter((l, i) => levelFrei(i)).map(l => l.id)];
+  if (!tische.includes(daten.listeTisch)) daten.listeTisch = 'klassik';
+  wahl.textContent = '';
+  for (const id of tische) { const o = document.createElement('option'); o.value = id; o.textContent = tischName(id); wahl.appendChild(o); }
+  wahl.value = daten.listeTisch;
+  const tisch = daten.listeTisch;
   const liste = $('liste');
   liste.textContent = '';
-  const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
-  zeilen.push({ name: daten.name || 'Du', punkte: daten.rekorde[daten.stufe], ich: true });
+  const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe && x.tisch === tisch).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
+  zeilen.push({ name: daten.name || 'Du', punkte: bestwert(tisch), ich: true });
   zeilen.sort((a, b) => b.punkte - a.punkte);
   zeilen.forEach((z, i) => {
     const li = document.createElement('li');
@@ -142,7 +255,7 @@ function baueListe() {
       weg.setAttribute('aria-label', z.name + ' entfernen');
       weg.textContent = '×';
       weg.addEventListener('click', () => {
-        daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe));
+        daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe && x.tisch === tisch));
         speichere();
         baueListe();
       });
@@ -170,23 +283,25 @@ function reinerName(text) {
   const sauber = String(text == null ? '' : text).normalize('NFC').replace(/[\p{C}<>]/gu, '').trim();
   return Array.from(sauber).slice(0, 12).join('');
 }
+let teilTisch = 'klassik';
 function linkBauen() {
-  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: daten.rekorde[daten.stufe], stufe: daten.stufe });
+  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
   return SPIEL_ADRESSE + '#' + teile.toString();
 }
-function oeffneTeilen(zurueck) {
+function oeffneTeilen(zurueck, tisch) {
   vorTeilen = zurueck;
+  teilTisch = tisch;
   $('nameFeld').value = daten.name;
   $('teilenStatus').textContent = '';
   $('linkFeld').hidden = true;
-  $('teilenText').textContent = 'Du teilst deinen Rekord: ' + zahl(daten.rekorde[daten.stufe]) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
+  $('teilenText').textContent = 'Du teilst deinen Rekord auf dem Tisch ' + tischName(tisch) + ': ' + zahl(bestwert(tisch)) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
   zeigeFenster('fTeilen');
 }
 async function teile() {
   daten.name = reinerName($('nameFeld').value);
   speichere();
   const adresse = linkBauen();
-  const text = 'Ich habe ' + zahl(daten.rekorde[daten.stufe]) + ' Punkte in Orbitflipper (Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
+  const text = 'Ich habe ' + zahl(bestwert(teilTisch)) + ' Punkte in Orbitflipper (' + tischName(teilTisch) + ', Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
   const status = $('teilenStatus');
   status.textContent = '';
   try {
@@ -206,17 +321,20 @@ function leseHerausforderung() {
   const name = reinerName(teile.get('name'));
   const punkte = Number(teile.get('punkte'));
   const stufe = teile.get('stufe');
+  const tisch = teile.get('tisch') || 'klassik';
   try { history.replaceState(null, '', location.pathname + location.search); } catch (error) {}
   if (!name || !Number.isInteger(punkte) || punkte < 1 || punkte > 999999999) return;
   if (!Object.prototype.hasOwnProperty.call(STUFEN, stufe)) return;
-  const bekannt = daten.freunde.find(f => f.name === name && f.stufe === stufe);
+  if (tisch !== 'klassik' && levelNr(tisch) < 0) return;
+  const bekannt = daten.freunde.find(f => f.name === name && f.stufe === stufe && f.tisch === tisch);
   if (bekannt) bekannt.punkte = Math.max(bekannt.punkte, punkte);
-  else daten.freunde.push({ name, punkte, stufe });
+  else daten.freunde.push({ name, punkte, stufe, tisch });
   daten.freunde.sort((a, b) => b.punkte - a.punkte);
-  daten.freunde = daten.freunde.slice(0, 30);
+  daten.freunde = daten.freunde.slice(0, 60);
   daten.stufe = stufe;
+  daten.listeTisch = tisch;
   speichere();
-  offenesDuell = { name, punkte, stufe };
+  offenesDuell = { name, punkte, stufe, tisch };
 }
 
 // --------------------------- Ton-Knöpfe ---------------------------
@@ -240,16 +358,21 @@ for (const k of document.querySelectorAll('[data-oeffne]')) {
     zeigeFenster(k.dataset.oeffne);
   });
 }
-$('losKnopf').addEventListener('click', starte);
+$('losKnopf').addEventListener('click', () => { ton.an(); zeigeFenster('fWelten'); });
+$('klassikKnopf').addEventListener('click', () => starte({ art: 'klassik' }));
+$('weiterLevel').addEventListener('click', () => starte({ art: 'level', nr: levelNr(s.level.id) + 1 }));
+$('zurAuswahl').addEventListener('click', () => { gewaehlteWelt = s.level ? s.level.welt : gewaehlteWelt; zeigeFenster('fLevel'); });
+$('listeTisch').addEventListener('change', e => { daten.listeTisch = e.target.value; speichere(); baueListe(); });
 $('tonKnopf').addEventListener('click', schalteTon);
 $('pauseKnopf').addEventListener('click', () => { ton.an(); pausiere(); });
 $('weiterKnopf').addEventListener('click', weiter);
 $('pauseMusik').addEventListener('click', () => { daten.musik = !daten.musik; speichere(); zeigeMusikKnopf(); });
 $('pauseNeu').addEventListener('click', () => { merkeRekord(); starte(); });
+$('pauseAuswahl').addEventListener('click', () => { merkeRekord(); musik.stoppe(); zeigeFenster(s.level ? 'fLevel' : 'fWelten'); });
 $('pauseMenue').addEventListener('click', zumMenue);
-$('nochmalKnopf').addEventListener('click', starte);
-$('endeTeilen').addEventListener('click', () => oeffneTeilen('fEnde'));
-$('listeTeilen').addEventListener('click', () => oeffneTeilen('fListe'));
+$('nochmalKnopf').addEventListener('click', () => starte());
+$('endeTeilen').addEventListener('click', () => oeffneTeilen('fEnde', s.tisch));
+$('listeTeilen').addEventListener('click', () => oeffneTeilen('fListe', daten.listeTisch));
 $('teilenKnopf').addEventListener('click', teile);
 $('teilenZurueck').addEventListener('click', () => zeigeFenster(vorTeilen));
 
@@ -383,4 +506,4 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 }
 
 // Für automatische Tests
-if (TEST) window.spiel = { get s() { return s; }, starte, logikSchritt, feuere, kugelImKolben, ballInBahn, neuerBall, PH, regeln, zeichne, baueBilder, aktualisiereFlipper, rampenSchritt };
+if (TEST) window.spiel = { get s() { return s; }, starte, neuesSpiel, vorschau, levelEreignis, spielEnde, logikSchritt, feuere, kugelImKolben, ballInBahn, neuerBall, PH, regeln, zeichne, baueBilder, aktualisiereFlipper, rampenSchritt };

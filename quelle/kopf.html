@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orbitflipper – Pixelhafen</title>
-<meta name="description" content="Ein Flipper aus der Zukunft: echte Kugel-Physik, zwei Rampen, Wurmloch-Tunnel, Multiball, Aufträge und Neonlicht. Kostenlos, ohne Anmeldung, ohne Werbung.">
+<meta name="description" content="Ein Flipper aus der Zukunft: 5 Welten mit 20 Leveln, echte Kugel-Physik, Rampen, Wurmloch, Multiball und ein Klassik-Tisch. Kostenlos, ohne Anmeldung, ohne Werbung.">
 <!-- App-Einstellungen, damit sich das Spiel auf dem Handy wie eine App verhält -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#04040d">
@@ -166,6 +166,29 @@
     #quer { display: grid; place-items: center; position: fixed; inset: 0; z-index: 9; padding: 24px; background: var(--bg); color: var(--text); text-align: center; font: 12px/1.8 var(--retro); }
   }
   @media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+
+  /* Welt- und Levelauswahl */
+  .tafel.breit { width: min(520px, 100%); }
+  .auswahl { display: grid; gap: 10px; margin: 16px 0 0; }
+  .weltKarte, .levelKarte {
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px;
+    color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--welt, var(--accent)); border-radius: 12px;
+    font: inherit;
+  }
+  .weltKarte:hover:not(:disabled), .levelKarte:hover:not(:disabled) { filter: brightness(1.15); }
+  .weltKarte img, .levelKarte img { flex: none; height: auto; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); background: #000; }
+  .weltKarte img { width: 96px; }
+  .levelKarte img { width: 72px; }
+  .weltKarte.zu, .levelKarte.zu { cursor: default; opacity: 0.55; }
+  .weltKarte.zu img, .levelKarte.zu img { filter: grayscale(1) brightness(0.6); }
+  .weltInfo { display: grid; gap: 4px; min-width: 0; font-size: 14px; line-height: 1.35; color: var(--muted); }
+  .weltInfo strong { color: var(--text); font: 11px/1.4 var(--retro); }
+  .sterneZeile { color: #ffd84a; font-weight: 600; letter-spacing: 0.04em; }
+  .gesamt { margin: 10px 0 0; color: #ffd84a; font: 10px/1.6 var(--retro); }
+  #eSterne { margin: 14px 0 0; color: #ffd84a; font-size: 34px; letter-spacing: 0.1em; text-shadow: 0 0 14px rgba(255, 216, 74, 0.6); }
+  #eTisch { margin: 6px 0 0; color: var(--muted); font: 9px/1.6 var(--retro); }
+  select { width: 100%; min-height: 48px; margin-top: 14px; padding: 8px 12px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; font: 600 15px/1.3 var(--body); }
 </style>
 </head>
 <body>
@@ -194,13 +217,14 @@
     <section id="fStart">
       <p class="marke"><svg aria-hidden="true"><use href="#logo"/></svg>PIXELHAFEN</p>
       <h1>ORBIT&shy;FLIPPER</h1>
-      <p class="unterzeile">Ein Flipper aus der Zukunft. Rampen, Wurmloch, Reaktor und Multiball – wie viele Aufträge schaffst du mit drei Kugeln?</p>
+      <p class="unterzeile">Ein Flipper aus der Zukunft. Fünf Welten mit 20 Leveln, Rampen, Wurmloch und Multiball – oder der klassische Tisch für Highscore-Jagd.</p>
       <div id="duell" hidden><strong id="duellTitel"></strong><span id="duellText"></span></div>
       <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
       <p class="klein js-stufentext"></p>
-      <p class="rekord">REKORD <b class="js-rekord">0</b></p>
+      <p class="rekord">REKORD KLASSIK <b class="js-rekord">0</b></p>
       <div class="knoepfe">
-        <button class="btn main" id="losKnopf" type="button">Spielen</button>
+        <button class="btn main" id="losKnopf" type="button">Welten &amp; Level</button>
+        <button class="btn" id="klassikKnopf" type="button">Klassik spielen</button>
         <div class="paar">
           <button class="btn" type="button" data-oeffne="fListe">Rangliste</button>
           <button class="btn" type="button" data-oeffne="fHilfe">So geht's</button>
@@ -209,8 +233,24 @@
       </div>
     </section>
 
+    <section id="fWelten" hidden>
+      <h2>WELTEN</h2>
+      <p class="gesamt">STERNE <span id="sterneGesamt"></span></p>
+      <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
+      <div class="auswahl" id="weltListe"></div>
+      <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
+    </section>
+
+    <section id="fLevel" hidden>
+      <h2 id="levelTitel">LEVEL</h2>
+      <p class="klein">Jedes Level hat einen eigenen Tisch und eigene Aufgaben. Schaffst du es, ohne eine Kugel zu verlieren, gibt es 3 Sterne.</p>
+      <div class="auswahl" id="levelListe"></div>
+      <div class="knoepfe"><button class="btn" type="button" data-oeffne="fWelten">Zu den Welten</button></div>
+    </section>
+
     <section id="fListe" hidden>
       <h2>RANGLISTE</h2>
+      <select id="listeTisch" aria-label="Tisch"></select>
       <div class="stufen" role="group" aria-label="Schwierigkeit"></div>
       <ol id="liste"></ol>
       <p class="klein">Schick deinen Link an Freunde. Schicken sie dir ihren zurück, stehen sie hier in deiner Liste. Alles bleibt auf deinem Gerät.</p>
@@ -237,7 +277,15 @@
         <li><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
         <li><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
         <li><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
-        <li><b>Aufträge</b> stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+        <li><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+      </ul>
+      <p class="zwischen">WELTEN UND LEVEL</p>
+      <ul class="regeln">
+        <li>5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
+        <li>Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
+        <li><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
+        <li><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
+        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Ein geschafftes Level schaltet das nächste frei.</li>
       </ul>
       <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
     </section>
@@ -249,24 +297,31 @@
         <button class="btn main" id="weiterKnopf" type="button">Weiterspielen</button>
         <button class="btn" id="pauseMusik" type="button">Musik</button>
         <button class="btn" id="pauseNeu" type="button">Neu starten</button>
+        <button class="btn" id="pauseAuswahl" type="button">Levelauswahl</button>
         <button class="btn" id="pauseMenue" type="button">Spiel beenden</button>
       </div>
     </section>
 
     <section id="fEnde" hidden>
-      <h2>GAME OVER</h2>
+      <h2 id="eTitel">GAME OVER</h2>
+      <p id="eTisch"></p>
+      <p id="eSterne" hidden></p>
+      <p class="klein" id="eSterneText" hidden></p>
+      <p class="hervor" id="eFrei" hidden></p>
       <p class="hervor" id="neuerRekord" hidden>NEUER REKORD!</p>
       <dl class="zahlen">
         <div><dt>Punkte</dt><dd id="ePunkte"></dd></div>
-        <div><dt>Rang</dt><dd id="eRang"></dd></div>
-        <div><dt>Aufträge</dt><dd id="eAuftraege"></dd></div>
+        <div id="eRangZeile"><dt>Rang</dt><dd id="eRang"></dd></div>
+        <div><dt id="eAuftraegeName">Aufträge</dt><dd id="eAuftraege"></dd></div>
         <div><dt>Rampen</dt><dd id="eRampen"></dd></div>
         <div><dt>Beste Kombo</dt><dd id="eKombo"></dd></div>
         <div><dt>Dein Rekord</dt><dd id="eRekord"></dd></div>
       </dl>
       <p class="klein" id="eDuell" hidden></p>
       <div class="knoepfe">
+        <button class="btn main" id="weiterLevel" type="button" hidden>Nächstes Level</button>
         <button class="btn main" id="nochmalKnopf" type="button">Nochmal</button>
+        <button class="btn" id="zurAuswahl" type="button" hidden>Levelauswahl</button>
         <button class="btn" id="endeTeilen" type="button">Freunde herausfordern</button>
         <button class="btn" type="button" data-oeffne="fStart">Zum Menü</button>
       </div>

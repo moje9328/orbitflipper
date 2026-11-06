@@ -1,7 +1,7 @@
 {
   "name": "Orbitflipper",
   "short_name": "Orbitflipper",
-  "description": "Ein Flipper aus der Zukunft: echte Kugel-Physik, Rampen, Wurmloch, Multiball und Aufträge.",
+  "description": "Ein Flipper aus der Zukunft: 5 Welten, 20 Level, echte Kugel-Physik, Multiball und ein Klassik-Tisch.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
