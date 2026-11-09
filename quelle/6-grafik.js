@@ -588,7 +588,7 @@ function zeichneTeile(c, zeit, T, th, live) {
     leuchte(c, l.x, l.y, 34, f, (offen ? 0.25 + 0.2 * puls : 0.08) + l.blitz);
     c.fillStyle = f; c.font = '6px ' + SCHRIFT; c.textAlign = 'center';
     c.globalAlpha = 0.85;
-    c.fillText(l.name.toUpperCase(), l.x, l.y - l.r - 9);
+    c.fillText(uebersetze(l.name.toUpperCase()), l.x, l.y - l.r - 9);
     c.globalAlpha = 1;
   }
 
@@ -890,23 +890,23 @@ function zeichneHud(zeit) {
   c.fillStyle = '#c4c2dc';
   const multi = s.multi > 1 ? '  BONUS ' + s.multi + 'X' : '';
   if (s.modus === 'level') {
-    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + multi + '  ' + s.level.name.toUpperCase(), 16, 62, 340);
+    c.fillText(uebersetze('KUGEL') + ' ' + s.ballNr + '/' + BAELLE + multi + '  ' + s.level.name.toUpperCase(), 16, 62, 340);
   } else {
     const extra = s.extraBaelle ? '  +' + s.extraBaelle : '';
-    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
+    c.fillText(uebersetze('KUGEL') + ' ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
   }
 
   // Aufgabe oder Auftrag mit Fortschritt
   let titel, text, anteil, rest = 0;
   if (s.modus === 'level') {
     const a = aufgabeJetzt();
-    titel = a ? 'AUFGABE ' + (s.schritt + 1) + '/' + s.level.aufgaben.length : 'GESCHAFFT';
-    text = a ? aufgabeText(a) : 'Level geschafft!';
+    titel = a ? uebersetze('AUFGABE') + ' ' + (s.schritt + 1) + '/' + s.level.aufgaben.length : uebersetze('GESCHAFFT');
+    text = a ? aufgabeText(a) : uebersetze('Level geschafft!');
     anteil = a ? Math.min(1, s.schrittStand / aufgabeZiel(a)) : 1;
     if (a && a.zeit) rest = Math.max(0, s.schrittZeit);
     if (a && a.art === 'folge') text = a.folge.map((n, i) => (i < s.schrittStand ? '✓ ' : '') + SCHUSS_NAMEN[n]).join(' → ');
   } else {
-    titel = 'AUFTRAG';
+    titel = uebersetze('AUFTRAG');
     text = auftragText();
     anteil = Math.min(1, s.stand / auftragZiel());
   }
@@ -932,11 +932,11 @@ function zeichneHud(zeit) {
 
   // Spezialfähigkeiten mit Restzeit
   const aktiv = [];
-  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push(['SCHILD', Math.max(s.schutz, s.effekt.schild), F.gruen]);
+  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push([uebersetze('SCHILD'), Math.max(s.schutz, s.effekt.schild), F.gruen]);
   if (s.effekt.doppelt > 0) aktiv.push(['2X', s.effekt.doppelt, F.gold]);
-  if (s.effekt.zeitlupe > 0) aktiv.push(['ZEIT', s.effekt.zeitlupe, F.pink]);
+  if (s.effekt.zeitlupe > 0) aktiv.push([uebersetze('ZEIT'), s.effekt.zeitlupe, F.pink]);
   if (s.multiball) aktiv.push(['MULTI', 0, F.pink]);
-  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push(['KOMBO ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), F.gold]);
+  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push([uebersetze('KOMBO') + ' ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), F.gold]);
   c.font = '7px ' + SCHRIFT;
   c.textAlign = 'center';
   aktiv.slice(0, 3).forEach(([name, rest, f], i) => {

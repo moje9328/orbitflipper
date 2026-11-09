@@ -1,5 +1,11 @@
 # Orbitflipper – Übergabe
 
+## Runde 9. November 2026 (abends): Deutsch/Englisch und Portal-Version
+
+**Neu:** `quelle/0-sprache.js` mit `uebersetze('deutscher Text', {platzhalter})` (Alias `T`, aber im Spielcode heißt der Tisch auch `T` – darum überall `uebersetze` verwenden!) und dem Wörterbuch `EN`. Sprache: `?lang=en|de` > gespeicherte Wahl (`pixelhafen.sprache`) > Browsersprache. Knopf „English/Deutsch“ im Startmenü. HTML-Texte mit Fettdruck haben `data-en`.
+**Portal-Version:** `python3 quelle/baue.py` baut zusätzlich `portal/index.html` + `portal/orbitflipper-portal.zip` (`PORTAL = true`: ohne Pixelhafen-Link, Rangliste/Teilen, Service Worker, Manifest). `portal/` ist nicht in Git. Einreichungsbilder und englische Beschreibung in `portal/einreichung/`.
+**Neue Texte** immer mit `uebersetze(...)` schreiben und in `EN` eintragen.
+
 ## Runde 9. November 2026: Ballstarter und rechter Flipper getrennt
 
 **Fehler:** Auf dem Handy bewegte sich beim Betätigen des Ballstarters (rechts) auch der rechte Flipper.

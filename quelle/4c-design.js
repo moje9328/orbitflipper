@@ -118,7 +118,7 @@ function schleuderMuster(c, T, f) {
 const WELT_DESIGN = {
   // ------------------------------------------------------------ KLASSIK (unverändert)
   klassik: {
-    name: 'Klassik', rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
+    name: uebersetze('Klassik'), rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
     f: { haupt: '#38f3ff', zweit: '#a066ff', gold: '#ffd84a', gruen: '#4dff9a', pink: '#ff4fd8', text: '#eef2ff', bumper: '#b48cff' },
     schiene: { glow: 'rgba(56,243,255,0.18)', dunkel: '#2b3150', hell: '#a9b6d8', kante: '#eaf2ff' },
     gummi: ['rgba(255,79,216,0.25)', '#f2e8ff'],
@@ -137,7 +137,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ WELTRAUM: Station Orbita
   weltraum: {
-    name: 'Weltraum', rand: '#4fa8ff', grund: ['#1b2272', '#151253', '#0b0b33'],
+    name: uebersetze('Weltraum'), rand: '#4fa8ff', grund: ['#1b2272', '#151253', '#0b0b33'],
     f: { haupt: '#4fe3ff', zweit: '#ffc94a', gold: '#ffd86a', gruen: '#6dffc4', pink: '#ff7ad9', text: '#eef4ff', bumper: '#9fdcff' },
     schiene: { glow: 'rgba(79,227,255,0.28)', dunkel: '#1d2a5a', hell: '#bfe9ff', kante: '#ffffff' },
     gummi: ['rgba(255,201,74,0.35)', '#fff2d6'],
@@ -180,7 +180,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ CYBERPUNK: Neon City
   cyber: {
-    name: 'Cyberpunk', rand: '#ff2bd6', grund: ['#2c0b4a', '#200838', '#0c1446'],
+    name: uebersetze('Cyberpunk'), rand: '#ff2bd6', grund: ['#2c0b4a', '#200838', '#0c1446'],
     f: { haupt: '#00e5ff', zweit: '#ff2bd6', gold: '#ffe84a', gruen: '#3dff9a', pink: '#ff2bd6', text: '#fff0fb', bumper: '#ff6fe0' },
     schiene: { glow: 'rgba(255,43,214,0.38)', dunkel: '#1e0a30', hell: '#ff7ae6', kante: '#ffe3f8' },
     gummi: ['rgba(0,229,255,0.4)', '#d9fdff'],
@@ -246,7 +246,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ DSCHUNGELTEMPEL
   dschungel: {
-    name: 'Dschungeltempel', rand: '#19c878', grund: ['#0f5a42', '#0c4a4c', '#07303a'],
+    name: uebersetze('Dschungeltempel'), rand: '#19c878', grund: ['#0f5a42', '#0c4a4c', '#07303a'],
     f: { haupt: '#19c878', zweit: '#20d9c2', gold: '#ffc857', gruen: '#7dff6a', pink: '#ff6f91', text: '#f4fff2', bumper: '#ffc857' },
     schiene: { glow: 'rgba(255,200,87,0.28)', dunkel: '#2c4a3c', hell: '#b8a46a', kante: '#ffe2a0' },
     gummi: ['rgba(25,200,120,0.35)', '#e8ffe0'],
@@ -294,7 +294,7 @@ const WELT_DESIGN = {
       c.globalCompositeOperation = 'source-over';
     },
     deko(c, T, th) {
-      schild(c, 'TEMPEL\nDER AHNEN', th.f.gold, '#173430', g => {
+      schild(c, uebersetze('TEMPEL\nDER AHNEN'), th.f.gold, '#173430', g => {
         g.fillStyle = '#ffc857'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
         g.fillStyle = '#20d9c2'; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 2); g.fill();
       });
@@ -305,7 +305,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ UNTERWASSER: Atlantis
   wasser: {
-    name: 'Unterwasser', rand: '#20e0d0', grund: ['#2ab4e0', '#167cd0', '#0c55a8'],
+    name: uebersetze('Unterwasser'), rand: '#20e0d0', grund: ['#2ab4e0', '#167cd0', '#0c55a8'],
     f: { haupt: '#20e0d0', zweit: '#ff718d', gold: '#ffe08a', gruen: '#7dffc6', pink: '#c27bff', text: '#f0ffff', bumper: '#c8fbff' },
     schiene: { glow: 'rgba(255,255,255,0.25)', dunkel: '#3a5a8a', hell: '#e8f4ff', kante: '#ffffff' },
     gummi: ['rgba(255,113,141,0.4)', '#ffe8ee'],
@@ -365,7 +365,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ VULKAN: Glutkern
   vulkan: {
-    name: 'Vulkan', rand: '#ff6a00', grund: ['#5a1630', '#3e1222', '#26181e'],
+    name: uebersetze('Vulkan'), rand: '#ff6a00', grund: ['#5a1630', '#3e1222', '#26181e'],
     f: { haupt: '#ff6a00', zweit: '#ffd447', gold: '#ffd447', gruen: '#b6ff4a', pink: '#ff3040', text: '#fff1e6', bumper: '#ff8a2a' },
     schiene: { glow: 'rgba(255,106,0,0.4)', dunkel: '#2a2026', hell: '#6a5a60', kante: '#ffb070' },
     gummi: ['rgba(255,48,64,0.4)', '#ffd9c8'],
@@ -421,7 +421,7 @@ const WELT_DESIGN = {
       c.globalCompositeOperation = 'source-over';
     },
     deko(c, T, th) {
-      schild(c, 'GLUT-\nKERN', th.f.gold, '#26121a', g => {
+      schild(c, uebersetze('GLUT-\nKERN'), th.f.gold, '#26121a', g => {
         g.fillStyle = '#ff6a00';
         g.beginPath(); g.moveTo(0, -16); g.quadraticCurveTo(12, 0, 6, 12); g.lineTo(-6, 12); g.quadraticCurveTo(-12, 0, 0, -16); g.fill();
         g.fillStyle = '#ffd447'; g.beginPath(); g.moveTo(0, -4); g.quadraticCurveTo(6, 4, 3, 12); g.lineTo(-3, 12); g.quadraticCurveTo(-6, 4, 0, -4); g.fill();
@@ -543,7 +543,7 @@ const MOTIVE = {
       c.strokeStyle = farben[(i + 1) % 4]; c.lineWidth = 2; c.strokeRect(x - 28, y + 24, 56, 18);
     }
     c.font = '11px ' + SCHRIFT; c.textAlign = 'center';
-    for (const [x, y, t, f, w] of [[120, 300, 'NUDELN', '#ffe84a', -0.1], [400, 340, 'ARCADE', '#00e5ff', 0.1], [MITTE, 760, '24/7', '#ff2bd6', 0]]) {
+    for (const [x, y, t, f, w] of [[120, 300, uebersetze('NUDELN'), '#ffe84a', -0.1], [400, 340, 'ARCADE', '#00e5ff', 0.1], [MITTE, 760, '24/7', '#ff2bd6', 0]]) {
       c.save(); c.translate(x, y); c.rotate(w);
       const b = c.measureText(t).width + 18;
       c.fillStyle = 'rgba(20,6,40,0.75)'; rund(c, -b / 2, -16, b, 24, 5); c.fill();

@@ -244,11 +244,12 @@
         <button class="btn main" id="losKnopf" type="button">Welten &amp; Level</button>
         <button class="btn" id="klassikKnopf" type="button">Klassik spielen</button>
         <div class="paar">
-          <button class="btn" type="button" data-oeffne="fListe">Rangliste</button>
+          <button class="btn" id="listeKnopf" type="button" data-oeffne="fListe">Rangliste</button>
           <button class="btn" type="button" data-oeffne="fHilfe">So geht's</button>
         </div>
         <button class="btn" type="button" data-oeffne="fTon">Ton und Musik</button>
-        <a class="btn" href="https://moje9328.github.io/spiele/">Zur Pixelhafen-Seite</a>
+        <a class="btn" id="pixelhafenLink" href="https://moje9328.github.io/spiele/">Zur Pixelhafen-Seite</a>
+        <button class="btn" id="spracheKnopf" type="button" lang="en">English</button>
       </div>
     </section>
 
@@ -291,23 +292,23 @@
       </ul>
       <p class="zwischen">DER TISCH</p>
       <ul class="regeln">
-        <li><b>Rampen</b> (Cyan und Violett): Mit Schwung hinauf, die Kugel saust über den Tisch zum anderen Flipper. Jede Rampe macht den Reaktor bereit.</li>
-        <li><b>Reaktor</b> (rechts): Fang dort 2 Kugeln, dann startet der <b>Multiball</b> mit 3 Kugeln. Im Multiball bringt jede Rampe einen Jackpot.</li>
-        <li><b>Fallziele</b> (gelb): Räum alle drei ab, dann ist das <b>Wurmloch</b> offen. Es schickt die Kugel durch einen Tunnel unter dem Tisch.</li>
-        <li><b>Kapsel</b> (links): Jeder Treffer gibt einen Preis: Zeitlupe, Schild, doppelte Punkte und mehr.</li>
-        <li><b>O-R-B</b> oben: Rolle durch alle drei Bahnen für mehr Bonus und doppelte Punkte. Mit den Flippern verschiebst du die Lichter.</li>
-        <li><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
-        <li><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
-        <li><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
-        <li><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+        <li data-en="&lt;b&gt;Ramps&lt;/b&gt; (cyan and violet): Hit them with speed and the ball races across the table to the other flipper. Every ramp gets the reactor ready."><b>Rampen</b> (Cyan und Violett): Mit Schwung hinauf, die Kugel saust über den Tisch zum anderen Flipper. Jede Rampe macht den Reaktor bereit.</li>
+        <li data-en="&lt;b&gt;Reactor&lt;/b&gt; (right): Lock 2 balls there to start &lt;b&gt;multiball&lt;/b&gt; with 3 balls. During multiball every ramp scores a jackpot."><b>Reaktor</b> (rechts): Fang dort 2 Kugeln, dann startet der <b>Multiball</b> mit 3 Kugeln. Im Multiball bringt jede Rampe einen Jackpot.</li>
+        <li data-en="&lt;b&gt;Drop targets&lt;/b&gt; (yellow): Clear all three to open the &lt;b&gt;wormhole&lt;/b&gt;. It sends the ball through a tunnel under the table."><b>Fallziele</b> (gelb): Räum alle drei ab, dann ist das <b>Wurmloch</b> offen. Es schickt die Kugel durch einen Tunnel unter dem Tisch.</li>
+        <li data-en="&lt;b&gt;Capsule&lt;/b&gt; (left): Every hit gives a prize: slow motion, shield, double points and more."><b>Kapsel</b> (links): Jeder Treffer gibt einen Preis: Zeitlupe, Schild, doppelte Punkte und mehr.</li>
+        <li data-en="&lt;b&gt;O-R-B&lt;/b&gt; at the top: Roll through all three lanes for more bonus and double points. Use the flippers to shift the lights."><b>O-R-B</b> oben: Rolle durch alle drei Bahnen für mehr Bonus und doppelte Punkte. Mit den Flippern verschiebst du die Lichter.</li>
+        <li data-en="&lt;b&gt;Shield targets&lt;/b&gt; (pink): Hit all three and a lost ball comes back for 20 seconds."><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
+        <li data-en="&lt;b&gt;Spinner and orbits&lt;/b&gt;: Shoot the ball around the outside. 40 spinner turns give slow motion."><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
+        <li data-en="&lt;b&gt;Combos&lt;/b&gt;: Hit ramps, orbits and the wormhole in quick succession for extra points."><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
+        <li data-en="&lt;b&gt;Missions&lt;/b&gt; (Classic) are shown at the top. Every completed mission gives points and a higher rank, every third one an extra ball."><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
       </ul>
       <p class="zwischen">WELTEN UND LEVEL</p>
       <ul class="regeln">
-        <li>5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
-        <li>Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
-        <li><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
-        <li><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
-        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Alle Welten und Level kannst du sofort spielen.</li>
+        <li data-en="5 worlds with 4 levels each. Every level has its own table layout and its own tasks, shown at the top.">5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
+        <li data-en="Some tasks have a &lt;b&gt;time limit&lt;/b&gt;. When it runs out, only that task starts over – you keep playing normally.">Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
+        <li data-en="&lt;b&gt;Shot sequence&lt;/b&gt;: Hit the targets in the given order. The next shot lights up."><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
+        <li data-en="&lt;b&gt;Kickback&lt;/b&gt; (green arrow in the outlanes): shoots a lost ball back once. The shield targets recharge it."><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
+        <li data-en="Stars: 3 without losing a ball, 2 with one lost, 1 otherwise. You can play all worlds and levels right away.">Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Alle Welten und Level kannst du sofort spielen.</li>
       </ul>
       <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
     </section>

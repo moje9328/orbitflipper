@@ -244,11 +244,12 @@
         <button class="btn main" id="losKnopf" type="button">Welten &amp; Level</button>
         <button class="btn" id="klassikKnopf" type="button">Klassik spielen</button>
         <div class="paar">
-          <button class="btn" type="button" data-oeffne="fListe">Rangliste</button>
+          <button class="btn" id="listeKnopf" type="button" data-oeffne="fListe">Rangliste</button>
           <button class="btn" type="button" data-oeffne="fHilfe">So geht's</button>
         </div>
         <button class="btn" type="button" data-oeffne="fTon">Ton und Musik</button>
-        <a class="btn" href="https://moje9328.github.io/spiele/">Zur Pixelhafen-Seite</a>
+        <a class="btn" id="pixelhafenLink" href="https://moje9328.github.io/spiele/">Zur Pixelhafen-Seite</a>
+        <button class="btn" id="spracheKnopf" type="button" lang="en">English</button>
       </div>
     </section>
 
@@ -291,23 +292,23 @@
       </ul>
       <p class="zwischen">DER TISCH</p>
       <ul class="regeln">
-        <li><b>Rampen</b> (Cyan und Violett): Mit Schwung hinauf, die Kugel saust über den Tisch zum anderen Flipper. Jede Rampe macht den Reaktor bereit.</li>
-        <li><b>Reaktor</b> (rechts): Fang dort 2 Kugeln, dann startet der <b>Multiball</b> mit 3 Kugeln. Im Multiball bringt jede Rampe einen Jackpot.</li>
-        <li><b>Fallziele</b> (gelb): Räum alle drei ab, dann ist das <b>Wurmloch</b> offen. Es schickt die Kugel durch einen Tunnel unter dem Tisch.</li>
-        <li><b>Kapsel</b> (links): Jeder Treffer gibt einen Preis: Zeitlupe, Schild, doppelte Punkte und mehr.</li>
-        <li><b>O-R-B</b> oben: Rolle durch alle drei Bahnen für mehr Bonus und doppelte Punkte. Mit den Flippern verschiebst du die Lichter.</li>
-        <li><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
-        <li><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
-        <li><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
-        <li><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
+        <li data-en="&lt;b&gt;Ramps&lt;/b&gt; (cyan and violet): Hit them with speed and the ball races across the table to the other flipper. Every ramp gets the reactor ready."><b>Rampen</b> (Cyan und Violett): Mit Schwung hinauf, die Kugel saust über den Tisch zum anderen Flipper. Jede Rampe macht den Reaktor bereit.</li>
+        <li data-en="&lt;b&gt;Reactor&lt;/b&gt; (right): Lock 2 balls there to start &lt;b&gt;multiball&lt;/b&gt; with 3 balls. During multiball every ramp scores a jackpot."><b>Reaktor</b> (rechts): Fang dort 2 Kugeln, dann startet der <b>Multiball</b> mit 3 Kugeln. Im Multiball bringt jede Rampe einen Jackpot.</li>
+        <li data-en="&lt;b&gt;Drop targets&lt;/b&gt; (yellow): Clear all three to open the &lt;b&gt;wormhole&lt;/b&gt;. It sends the ball through a tunnel under the table."><b>Fallziele</b> (gelb): Räum alle drei ab, dann ist das <b>Wurmloch</b> offen. Es schickt die Kugel durch einen Tunnel unter dem Tisch.</li>
+        <li data-en="&lt;b&gt;Capsule&lt;/b&gt; (left): Every hit gives a prize: slow motion, shield, double points and more."><b>Kapsel</b> (links): Jeder Treffer gibt einen Preis: Zeitlupe, Schild, doppelte Punkte und mehr.</li>
+        <li data-en="&lt;b&gt;O-R-B&lt;/b&gt; at the top: Roll through all three lanes for more bonus and double points. Use the flippers to shift the lights."><b>O-R-B</b> oben: Rolle durch alle drei Bahnen für mehr Bonus und doppelte Punkte. Mit den Flippern verschiebst du die Lichter.</li>
+        <li data-en="&lt;b&gt;Shield targets&lt;/b&gt; (pink): Hit all three and a lost ball comes back for 20 seconds."><b>Schild-Ziele</b> (pink): Triff alle drei, dann kommt eine verlorene Kugel 20 Sekunden lang zurück.</li>
+        <li data-en="&lt;b&gt;Spinner and orbits&lt;/b&gt;: Shoot the ball around the outside. 40 spinner turns give slow motion."><b>Spinner und Orbits</b>: Schieß die Kugel außen herum. 40 Spinner-Drehungen geben eine Zeitlupe.</li>
+        <li data-en="&lt;b&gt;Combos&lt;/b&gt;: Hit ramps, orbits and the wormhole in quick succession for extra points."><b>Kombos</b>: Triff Rampen, Orbits und Wurmloch schnell hintereinander für Extrapunkte.</li>
+        <li data-en="&lt;b&gt;Missions&lt;/b&gt; (Classic) are shown at the top. Every completed mission gives points and a higher rank, every third one an extra ball."><b>Aufträge</b> (Klassik) stehen oben. Jeder geschaffte Auftrag bringt Punkte und einen höheren Rang, jeder dritte eine Extrakugel.</li>
       </ul>
       <p class="zwischen">WELTEN UND LEVEL</p>
       <ul class="regeln">
-        <li>5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
-        <li>Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
-        <li><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
-        <li><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
-        <li>Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Alle Welten und Level kannst du sofort spielen.</li>
+        <li data-en="5 worlds with 4 levels each. Every level has its own table layout and its own tasks, shown at the top.">5 Welten mit je 4 Leveln. Jedes Level hat einen eigenen Tischaufbau und eigene Aufgaben, die oben stehen.</li>
+        <li data-en="Some tasks have a &lt;b&gt;time limit&lt;/b&gt;. When it runs out, only that task starts over – you keep playing normally.">Manche Aufgaben haben ein <b>Zeitlimit</b>. Läuft es ab, beginnt nur diese Aufgabe von vorn – du spielst ganz normal weiter.</li>
+        <li data-en="&lt;b&gt;Shot sequence&lt;/b&gt;: Hit the targets in the given order. The next shot lights up."><b>Schussfolge</b>: Triff die Ziele in der angegebenen Reihenfolge. Der nächste Schuss leuchtet.</li>
+        <li data-en="&lt;b&gt;Kickback&lt;/b&gt; (green arrow in the outlanes): shoots a lost ball back once. The shield targets recharge it."><b>Kickback</b> (grüner Pfeil in den Außenbahnen): schießt eine verlorene Kugel einmal zurück. Die Schild-Ziele laden ihn wieder auf.</li>
+        <li data-en="Stars: 3 without losing a ball, 2 with one lost, 1 otherwise. You can play all worlds and levels right away.">Sterne: 3 ohne verlorene Kugel, 2 mit einer, 1 sonst. Alle Welten und Level kannst du sofort spielen.</li>
       </ul>
       <div class="knoepfe"><button class="btn" type="button" data-oeffne="fStart">Zurück</button></div>
     </section>
@@ -381,6 +382,322 @@
 </div>
 
 <script>
+// ===================================================================
+// 0 · SPRACHE (Deutsch / Englisch)
+// Alle Texte stehen im Code auf Deutsch. T('deutscher Text') liefert im
+// englischen Modus die Übersetzung aus EN (unten), sonst den Text selbst.
+// Platzhalter: T('Level {nr}', { nr: 3 }).
+// Die Sprache kommt aus der gespeicherten Wahl, sonst aus dem Browser:
+// Deutsch für deutschsprachige Browser, für alle anderen Englisch.
+// PORTAL ist nur in der Version für Spieleportale (CrazyGames, Poki) wahr:
+// dort fehlen Links nach außen, Teilen und der Offline-Speicher.
+// ===================================================================
+
+const PORTAL = /*PORTAL*/false;
+
+const Sprache = (() => {
+  const SCHLUESSEL = 'pixelhafen.sprache';
+  function gespeichert() {
+    // ?lang=en in der Adresse geht vor (falls der Browser den Speicher sperrt)
+    try { const u = new URLSearchParams(location.search).get('lang'); if (u === 'de' || u === 'en') return u; } catch (e) { /* weiter */ }
+    try { const w = window.localStorage.getItem(SCHLUESSEL); return w === 'de' || w === 'en' ? w : ''; } catch (e) { return ''; }
+  }
+  function ausBrowser() {
+    try {
+      const liste = (typeof navigator !== 'undefined' && (navigator.languages || [navigator.language])) || [];
+      return String(liste[0] || 'de').toLowerCase().startsWith('de') ? 'de' : 'en';
+    } catch (e) { return 'de'; }
+  }
+  // Ohne Browser (automatische Tests) immer Deutsch
+  const aktuell = typeof document === 'undefined' ? 'de' : (gespeichert() || ausBrowser());
+  return {
+    aktuell,
+    wechsle() {
+      const neu = aktuell === 'de' ? 'en' : 'de';
+      try { window.localStorage.setItem(SCHLUESSEL, neu); } catch (e) { /* dann nur über die Adresse */ }
+      const u = new URL(location.href);
+      u.searchParams.set('lang', neu);
+      location.replace(u.href);
+    },
+  };
+})();
+
+function T(de, werte) {
+  let text = (Sprache.aktuell === 'en' && Object.prototype.hasOwnProperty.call(EN, de)) ? EN[de] : de;
+  if (werte) text = text.replace(/\{(\w+)\}/g, (m, k) => (k in werte ? werte[k] : m));
+  return text;
+}
+
+// Zweiter Name für T, wo im Spielcode eine Variable T (der Tisch) die Funktion verdeckt
+const uebersetze = T;
+
+// Übersetzt die festen Texte im HTML: Elemente mit data-en bekommen deren Inhalt
+// (für Texte mit Fettdruck darin), sonst werden einzelne Textstücke und die
+// Attribute aria-label, title und content (Beschreibung) über EN ersetzt.
+function uebersetzeSeite() {
+  document.documentElement.lang = Sprache.aktuell;
+  if (Sprache.aktuell !== 'en') return;
+  for (const el of document.querySelectorAll('[data-en]')) el.innerHTML = el.dataset.en;
+  const gang = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const stuecke = [];
+  while (gang.nextNode()) stuecke.push(gang.currentNode);
+  for (const n of stuecke) {
+    const roh = n.nodeValue;
+    const kern = roh.trim();
+    if (kern && Object.prototype.hasOwnProperty.call(EN, kern)) n.nodeValue = roh.replace(kern, EN[kern]);
+  }
+  for (const el of document.querySelectorAll('[aria-label], [title], [placeholder], meta[name="description"]')) {
+    for (const a of ['aria-label', 'title', 'placeholder', 'content']) {
+      const w = el.getAttribute(a);
+      if (w && Object.prototype.hasOwnProperty.call(EN, w)) el.setAttribute(a, EN[w]);
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(EN, document.title)) document.title = EN[document.title];
+}
+
+const EN = {
+  // ---------- Seite ----------
+  'Orbitflipper – Pixelhafen': 'Orbitflipper – Pixelhafen',
+  'Ein Flipper aus der Zukunft: 5 Welten mit 20 Leveln, echte Kugel-Physik, Rampen, Wurmloch, Multiball und ein Klassik-Tisch. Kostenlos, ohne Anmeldung, ohne Werbung.':
+    'A pinball machine from the future: 5 worlds with 20 levels, real ball physics, ramps, a wormhole, multiball and a classic table.',
+  'Flippertisch von Orbitflipper': 'Orbitflipper pinball table',
+  'Ton an oder aus': 'Sound on or off',
+  'Ton ausschalten': 'Mute sound',
+  'Ton einschalten': 'Unmute sound',
+  'Pause': 'Pause',
+  'Ein Flipper aus der Zukunft. Fünf Welten mit 20 Leveln, Rampen, Wurmloch und Multiball – oder der klassische Tisch für Highscore-Jagd.':
+    'A pinball machine from the future. Five worlds with 20 levels, ramps, a wormhole and multiball – or the classic table for chasing high scores.',
+  'Schwierigkeit': 'Difficulty',
+  'REKORD KLASSIK': 'CLASSIC BEST',
+  'Welten & Level': 'Worlds & levels',
+  'Klassik spielen': 'Play classic',
+  'Rangliste': 'Leaderboard',
+  "So geht's": 'How to play',
+  'Ton und Musik': 'Sound & music',
+  'Zur Pixelhafen-Seite': 'More Pixelhafen games',
+  'LEVEL WÄHLEN': 'CHOOSE A LEVEL',
+  'WELTEN': 'WORLDS',
+  'STERNE': 'STARS',
+  'Zurück': 'Back',
+  'Zu den Welten': 'Back to worlds',
+  'RANGLISTE': 'LEADERBOARD',
+  'Tisch': 'Table',
+  'Schick deinen Link an Freunde. Schicken sie dir ihren zurück, stehen sie hier in deiner Liste. Alles bleibt auf deinem Gerät.':
+    'Send your link to friends. When they send theirs back, they show up in your list. Everything stays on your device.',
+  'Freunde herausfordern': 'Challenge friends',
+  "SO GEHT'S": 'HOW TO PLAY',
+  'Fällt die Kugel unten durch, ist sie weg. Du hast 3 Kugeln. Kurz nach dem Abschuss schützt dich ein Schild.':
+    'If the ball drains at the bottom, it is gone. You have 3 balls. Right after launch a shield protects you.',
+  'DER TISCH': 'THE TABLE',
+  'WELTEN UND LEVEL': 'WORLDS AND LEVELS',
+  'TON UND MUSIK': 'SOUND AND MUSIC',
+  'Jede Welt hat ihr eigenes fröhliches Stück. Es begleitet dich leise im Hintergrund und wird lebhafter, je mehr auf dem Tisch los ist, ohne lauter zu werden. Bei Jackpots und Spezial-Geräuschen tritt die Musik kurz zurück.':
+    'Every world has its own cheerful tune. It plays quietly in the background and gets livelier the more is happening on the table, without getting louder. During jackpots and special sounds the music briefly steps back.',
+  'Musik': 'Music',
+  'Effekte': 'Effects',
+  'PAUSE': 'PAUSE',
+  'PUNKTE': 'SCORE',
+  'Weiterspielen': 'Continue',
+  'Neu starten': 'Restart',
+  'Levelauswahl': 'Select level',
+  'Spiel beenden': 'Quit game',
+  'NEUER REKORD!': 'NEW BEST!',
+  'Punkte': 'Score',
+  'Rang': 'Rank',
+  'Aufträge': 'Missions',
+  'Aufgaben': 'Tasks',
+  'Rampen': 'Ramps',
+  'Beste Kombo': 'Best combo',
+  'Dein Rekord': 'Your best',
+  'Nächstes Level': 'Next level',
+  'Nochmal': 'Play again',
+  'Zum Menü': 'Main menu',
+  'HERAUSFORDERN': 'CHALLENGE',
+  'Dein Name für den Link': 'Your name for the link',
+  'zum Beispiel Sam': 'for example Sam',
+  'Dein Name und deine Punkte stehen im Link. Mehr nicht, und du entscheidest, wem du ihn schickst.':
+    'The link contains your name and your score. Nothing else, and you decide who gets it.',
+  'Dein Link zum Kopieren': 'Your link to copy',
+  'Link teilen': 'Share link',
+  'Bitte dreh dein Handy hochkant.': 'Please turn your phone upright.',
+  'Der Flipper ist ein Hochformat-Tisch.': 'This pinball table is played in portrait.',
+  // ---------- Stufen ----------
+  'Leicht': 'Easy',
+  'Normal': 'Normal',
+  'Schwer': 'Hard',
+  'Der Tisch ist flacher, und nach jedem Abschuss bist du 15 Sekunden lang geschützt.': 'The table is flatter, and after every launch you are protected for 15 seconds.',
+  'Wie ein echter Automat in der Spielhalle. 8 Sekunden Schutz nach dem Abschuss.': 'Like a real arcade machine. 8 seconds of protection after launch.',
+  'Steiler Tisch, schnelle Kugel und kaum Schutz. Nur für Profis.': 'Steep table, fast ball and hardly any protection. For pros only.',
+  // ---------- Aufträge, Ränge, Kapsel ----------
+  'RAMPEN-RAUSCH': 'RAMP RUSH',
+  'BUMPER-STURM': 'BUMPER STORM',
+  'WIRBELWIND': 'WHIRLWIND',
+  'ZIELÜBUNG': 'TARGET PRACTICE',
+  'UMLAUFBAHN': 'ORBITAL PATH',
+  'WURMLOCH': 'WORMHOLE',
+  'KOMBO-PILOT': 'COMBO PILOT',
+  'SCHILDWACHE': 'SHIELD GUARD',
+  'REAKTOR': 'REACTOR',
+  'Fahr {z} Rampen': 'Ride {z} ramps',
+  'Triff {z}-mal die Bumper': 'Hit the bumpers {z} times',
+  'Dreh den Spinner {z}-mal': 'Spin the spinner {z} times',
+  'Räum die Fallziele {z}-mal ab': 'Clear the drop targets {z} times',
+  'Schaff {z} Orbits': 'Make {z} orbits',
+  'Versenk die Kugel {z}-mal im Wurmloch': 'Sink the ball in the wormhole {z} times',
+  'Schaff eine {z}er-Kombo': 'Get a {z}x combo',
+  'Triff alle 3 Schild-Ziele': 'Hit all 3 shield targets',
+  'Starte den Multiball': 'Start multiball',
+  'Triff {z}-mal die Kapsel': 'Hit the capsule {z} times',
+  'Triff {z}-mal den Reaktor': 'Hit the reactor {z} times',
+  'Triff alle Schild-Ziele': 'Hit all shield targets',
+  'Hol {z} Jackpots im Multiball': 'Score {z} jackpots in multiball',
+  'Sammle {z} Punkte': 'Score {z} points',
+  'KADETT': 'CADET',
+  'PILOT': 'PILOT',
+  'KAPITÄN': 'CAPTAIN',
+  'KOMMANDANT': 'COMMANDER',
+  'ADMIRAL': 'ADMIRAL',
+  'STERNENLEGENDE': 'STAR LEGEND',
+  'ZEITLUPE': 'SLOW-MO',
+  '25.000 PUNKTE': '25,000 POINTS',
+  'SCHILD': 'SHIELD',
+  'DOPPELTE PUNKTE': 'DOUBLE POINTS',
+  'BONUS +1X': 'BONUS +1X',
+  'LOCK BEREIT': 'LOCK READY',
+  // ---------- Welten und Level ----------
+  'Klassik': 'Classic',
+  'Weltraum': 'Space',
+  'Cyberpunk': 'Cyberpunk',
+  'Dschungeltempel': 'Jungle Temple',
+  'Unterwasser': 'Underwater',
+  'Vulkan': 'Volcano',
+  'Station Orbita zwischen Ringplaneten und Energiebahnen.': 'Station Orbita among ringed planets and energy lanes.',
+  'Nachts in Neon City: Hologramme, Regen und fliegende Autos.': 'Night in Neon City: holograms, rain and flying cars.',
+  'Der Tempel der Ahnen: Ruinen, Wasserfall und alte Steinmechanik.': 'The Temple of the Ancestors: ruins, a waterfall and ancient stone machinery.',
+  'Das versunkene Atlantis mit Korallen, Quallen und Fischschwärmen.': 'Sunken Atlantis with corals, jellyfish and schools of fish.',
+  'Im Glutkern: glühende Rampen, Lavaströme und fliegende Funken.': 'In the molten core: glowing ramps, lava flows and flying sparks.',
+  'Startrampe': 'Launch Pad',
+  'Asteroidengürtel': 'Asteroid Belt',
+  'Raumstation': 'Space Station',
+  'Schwarzes Loch': 'Black Hole',
+  'Neonmarkt': 'Neon Market',
+  'Datenautobahn': 'Data Highway',
+  'Hologramm-Turm': 'Hologram Tower',
+  'Mitternachts-Hack': 'Midnight Hack',
+  'Rankenpfad': 'Vine Path',
+  'Wasserfall': 'Waterfall',
+  'Tempelkammer': 'Temple Chamber',
+  'Götzenauge': 'Idol’s Eye',
+  'Korallenriff': 'Coral Reef',
+  'Quallengarten': 'Jellyfish Garden',
+  'Versunkene Stadt': 'Sunken City',
+  'Tiefseegraben': 'Deep Sea Trench',
+  'Aschefeld': 'Ash Field',
+  'Lavastrom': 'Lava Flow',
+  'Magmakammer': 'Magma Chamber',
+  'Herz des Vulkans': 'Heart of the Volcano',
+  'Rampe links': 'Left ramp',
+  'Rampe rechts': 'Right ramp',
+  'Orbit links': 'Left orbit',
+  'Orbit rechts': 'Right orbit',
+  'Wurmloch': 'Wormhole',
+  'Kapsel': 'Capsule',
+  'Reaktor': 'Reactor',
+  'Weniger Schwerkraft: Die Kugel fliegt länger.': 'Less gravity: the ball flies longer.',
+  'Überladene Neon-Bumper schießen härter.': 'Overcharged neon bumpers kick harder.',
+  'Schwere Steinbumper, kräftige Holzschleudern.': 'Heavy stone bumpers, strong wooden slingshots.',
+  'Im Wasser schwebt die Kugel langsamer.': 'Under water the ball drifts more slowly.',
+  'Steiler Hang und glühend heiße Bumper.': 'A steep slope and red-hot bumpers.',
+  'Orbit-Fieber': 'Orbit Fever',
+  'Sternenstation': 'Star Station',
+  'Neonpuls': 'Neon Pulse',
+  'Tempelpfad': 'Temple Trail',
+  'Atlantis': 'Atlantis',
+  'Glutkern': 'Molten Core',
+  'TEMPEL\nDER AHNEN': 'TEMPLE OF\nANCESTORS',
+  'GLUT-\nKERN': 'MOLTEN\nCORE',
+  'NUDELN': 'NOODLES',
+  // ---------- Meldungen im Spiel ----------
+  'AUFGABE': 'TASK',
+  'AUFTRAG': 'MISSION',
+  'GESCHAFFT': 'DONE',
+  'Level geschafft!': 'Level complete!',
+  ' (in {z} s)': ' (within {z} s)',
+  'Halten zum Spannen, loslassen zum Abschießen': 'Hold to pull back, release to launch',
+  'AUFTRAG GESCHAFFT': 'MISSION COMPLETE',
+  'NEUER RANG': 'NEW RANK',
+  'EXTRABALL': 'EXTRA BALL',
+  'Du bekommst eine Kugel mehr': 'You get one more ball',
+  'NEUER AUFTRAG': 'NEW MISSION',
+  'RICHTIG!': 'CORRECT!',
+  'Jetzt:': 'Next:',
+  'LEVEL GESCHAFFT': 'LEVEL COMPLETE',
+  'ZEIT UM': 'TIME UP',
+  'Die Aufgabe beginnt von vorn': 'The task starts over',
+  'SCHILD AN': 'SHIELD ON',
+  'Verlorene Kugeln kommen zurück': 'Lost balls come back',
+  'Alles zählt doppelt': 'Everything counts double',
+  'Die Zeit läuft langsamer': 'Time runs slower',
+  'Schild-Ziele laden ihn wieder auf': 'Shield targets recharge it',
+  'WURMLOCH OFFEN': 'WORMHOLE OPEN',
+  'Schieß in die Mitte!': 'Shoot up the middle!',
+  'O-R-B KOMPLETT': 'O-R-B COMPLETE',
+  'Bonus jetzt {x}x': 'Bonus now {x}x',
+  'Schieß in den Reaktor rechts': 'Shoot into the reactor on the right',
+  'Ab durch den Tunnel!': 'Off through the tunnel!',
+  'KAPSEL': 'CAPSULE',
+  'KUGEL GESPERRT': 'BALL LOCKED',
+  'Noch eine für den Multiball': 'One more for multiball',
+  'Rampen bringen Jackpots!': 'Ramps score jackpots!',
+  'KUGEL GERETTET': 'BALL SAVED',
+  "Weiter geht's!": 'Keep going!',
+  'MULTIBALL VORBEI': 'MULTIBALL OVER',
+  'Nächstes Mal mehr Jackpots': 'More jackpots next time',
+  'Gleiche Kugel noch einmal': 'Same ball again',
+  'KUGEL': 'BALL',
+  'Die letzte Kugel!': 'Last ball!',
+  'RÜTTELN': 'TILT',
+  'Der Tisch schubst die Kugel an': 'The table nudges the ball',
+  'ZEIT': 'TIME',
+  'KOMBO X': 'COMBO X',
+  'KOMBO': 'COMBO',
+  // ---------- Menüs ----------
+  'Ohne eine Kugel zu verlieren!': 'Without losing a single ball!',
+  'Nur eine Kugel verloren.': 'Only one ball lost.',
+  'Geschafft! Für mehr Sterne weniger Kugeln verlieren.': 'Done! Lose fewer balls for more stars.',
+  'Neue Welt frei: {name}!': 'New world unlocked: {name}!',
+  'Neues Level frei: {name}!': 'New level unlocked: {name}!',
+  '{a} von {b}': '{a} of {b}',
+  'Geschafft! Du hast {name} mit {du} zu {er} geschlagen.': 'You did it! You beat {name} {du} to {er}.',
+  '{name} liegt noch vorne: {punkte} Punkte. Versuch es nochmal!': '{name} is still ahead: {punkte} points. Try again!',
+  'GESPERRT': 'LOCKED',
+  'WELT {nr}': 'WORLD {nr}',
+  'WELT {nr} VON {n}': 'WORLD {nr} OF {n}',
+  ' Schaff zuerst das letzte Level der Welt davor.': ' First beat the last level of the previous world.',
+  ' – Schaff zuerst das Level davor.': ' – First beat the level before.',
+  ' Musik: „{name}“.': ' Music: “{name}”.',
+  'Best:': 'Best:',
+  '{name} FORDERT DICH HERAUS': '{name} CHALLENGES YOU',
+  'Schlage {punkte} Punkte auf dem Tisch {tisch}, Stufe {stufe}.': 'Beat {punkte} points on the {tisch} table, {stufe} difficulty.',
+  ' Dieses Level musst du erst freischalten.': ' You need to unlock this level first.',
+  'Du': 'You',
+  '{name} entfernen': 'Remove {name}',
+  'Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.':
+    'Left half of the screen: left flipper. Right half: right flipper. Works with several fingers at once. Hold to keep the flipper up.',
+  'A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.':
+    'A or Left arrow: left flipper. D or Right arrow: right flipper. P pauses, M toggles sound.',
+  'Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.':
+    'When the ball sits in the launch lane on the right: hold your finger on the narrow lane at the far right to pull back, release to launch. This does not move a flipper.',
+  'Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.':
+    'When the ball sits in the launch lane on the right: hold Space or Down arrow to pull back, release to launch.',
+  'Ein Freund': 'A friend',
+  'Du teilst deinen Rekord auf dem Tisch {tisch}: {punkte} Punkte auf Stufe {stufe}. Wer den Link öffnet, kann dich herausfordern.':
+    'You are sharing your best on the {tisch} table: {punkte} points on {stufe}. Anyone who opens the link can challenge you.',
+  'Ich habe {punkte} Punkte in Orbitflipper ({tisch}, Stufe {stufe}). Schaffst du mehr?': 'I scored {punkte} points in Orbitflipper ({tisch}, {stufe}). Can you beat that?',
+  'Link kopiert! Füge ihn jetzt im Chat ein.': 'Link copied! Paste it into a chat now.',
+  'Kopiere diesen Link:': 'Copy this link:',
+};
+
 'use strict';
 // =====================================================================
 //  ORBITFLIPPER – Einstellungen, Speichern und Töne
@@ -390,40 +707,40 @@ const $ = id => document.getElementById(id);
 const SPIEL_ADRESSE = 'https://moje9328.github.io/orbitflipper/';
 const SPEICHER = 'orbitflipper';
 const begrenzt = (w, a, b) => Math.max(a, Math.min(b, w));
-const zahl = n => Math.round(n).toLocaleString('de-DE');
+const zahl = n => Math.round(n).toLocaleString(Sprache.aktuell === 'en' ? 'en-US' : 'de-DE');
 const TEST = location.search.includes('test');
 
 // Schwierigkeit: Neigung des Tisches und wie lange der Ball nach dem Abschuss geschützt ist
 const STUFEN = {
-  leicht: { name: 'Leicht', schwerkraft: 1100, schutz: 15, text: 'Der Tisch ist flacher, und nach jedem Abschuss bist du 15 Sekunden lang geschützt.' },
-  normal: { name: 'Normal', schwerkraft: 1250, schutz: 8, text: 'Wie ein echter Automat in der Spielhalle. 8 Sekunden Schutz nach dem Abschuss.' },
-  schwer: { name: 'Schwer', schwerkraft: 1420, schutz: 3, text: 'Steiler Tisch, schnelle Kugel und kaum Schutz. Nur für Profis.' }
+  leicht: { name: uebersetze('Leicht'), schwerkraft: 1100, schutz: 15, text: uebersetze('Der Tisch ist flacher, und nach jedem Abschuss bist du 15 Sekunden lang geschützt.') },
+  normal: { name: uebersetze('Normal'), schwerkraft: 1250, schutz: 8, text: uebersetze('Wie ein echter Automat in der Spielhalle. 8 Sekunden Schutz nach dem Abschuss.') },
+  schwer: { name: uebersetze('Schwer'), schwerkraft: 1420, schutz: 3, text: uebersetze('Steiler Tisch, schnelle Kugel und kaum Schutz. Nur für Profis.') }
 };
 const STUFEN_NAMEN = Object.keys(STUFEN);
 const BAELLE = 3;
 
 // Aufträge: Einer ist immer aktiv. Sind alle geschafft, beginnt die Liste schwerer von vorn.
 const AUFTRAEGE = [
-  { name: 'RAMPEN-RAUSCH', text: 'Fahr {z} Rampen', art: 'rampe', ziel: 3 },
-  { name: 'BUMPER-STURM', text: 'Triff {z}-mal die Bumper', art: 'bumper', ziel: 25 },
-  { name: 'WIRBELWIND', text: 'Dreh den Spinner {z}-mal', art: 'spin', ziel: 30 },
-  { name: 'ZIELÜBUNG', text: 'Räum die Fallziele {z}-mal ab', art: 'fallbank', ziel: 2 },
-  { name: 'UMLAUFBAHN', text: 'Schaff {z} Orbits', art: 'orbit', ziel: 3 },
-  { name: 'WURMLOCH', text: 'Versenk die Kugel {z}-mal im Wurmloch', art: 'wurmloch', ziel: 2 },
-  { name: 'KOMBO-PILOT', text: 'Schaff eine {z}er-Kombo', art: 'kombo', ziel: 3 },
-  { name: 'SCHILDWACHE', text: 'Triff alle 3 Schild-Ziele', art: 'schild', ziel: 1 },
-  { name: 'REAKTOR', text: 'Starte den Multiball', art: 'multiball', ziel: 1 }
+  { name: uebersetze('RAMPEN-RAUSCH'), text: uebersetze('Fahr {z} Rampen'), art: 'rampe', ziel: 3 },
+  { name: uebersetze('BUMPER-STURM'), text: uebersetze('Triff {z}-mal die Bumper'), art: 'bumper', ziel: 25 },
+  { name: uebersetze('WIRBELWIND'), text: uebersetze('Dreh den Spinner {z}-mal'), art: 'spin', ziel: 30 },
+  { name: uebersetze('ZIELÜBUNG'), text: uebersetze('Räum die Fallziele {z}-mal ab'), art: 'fallbank', ziel: 2 },
+  { name: uebersetze('UMLAUFBAHN'), text: uebersetze('Schaff {z} Orbits'), art: 'orbit', ziel: 3 },
+  { name: uebersetze('WURMLOCH'), text: uebersetze('Versenk die Kugel {z}-mal im Wurmloch'), art: 'wurmloch', ziel: 2 },
+  { name: uebersetze('KOMBO-PILOT'), text: uebersetze('Schaff eine {z}er-Kombo'), art: 'kombo', ziel: 3 },
+  { name: uebersetze('SCHILDWACHE'), text: uebersetze('Triff alle 3 Schild-Ziele'), art: 'schild', ziel: 1 },
+  { name: uebersetze('REAKTOR'), text: uebersetze('Starte den Multiball'), art: 'multiball', ziel: 1 }
 ];
-const RAENGE = ['KADETT', 'PILOT', 'KAPITÄN', 'KOMMANDANT', 'ADMIRAL', 'STERNENLEGENDE'];
+const RAENGE = ['KADETT', 'PILOT', 'KAPITÄN', 'KOMMANDANT', 'ADMIRAL', 'STERNENLEGENDE'].map(r => uebersetze(r));
 
 // Preise der Kapsel, der Reihe nach
 const KAPSEL_PREISE = [
-  { name: 'ZEITLUPE', art: 'zeitlupe' },
-  { name: '25.000 PUNKTE', art: 'punkte' },
-  { name: 'SCHILD', art: 'schild' },
-  { name: 'DOPPELTE PUNKTE', art: 'doppelt' },
-  { name: 'BONUS +1X', art: 'multi' },
-  { name: 'LOCK BEREIT', art: 'lock' }
+  { name: uebersetze('ZEITLUPE'), art: 'zeitlupe' },
+  { name: uebersetze('25.000 PUNKTE'), art: 'punkte' },
+  { name: uebersetze('SCHILD'), art: 'schild' },
+  { name: uebersetze('DOPPELTE PUNKTE'), art: 'doppelt' },
+  { name: uebersetze('BONUS +1X'), art: 'multi' },
+  { name: uebersetze('LOCK BEREIT'), art: 'lock' }
 ];
 
 // --------------------------- Speichern ---------------------------
@@ -1271,11 +1588,11 @@ function zufall(saat) {
 // Aussehen der Welten und Level: siehe 4c-design.js
 
 const WELTEN = [
-  { id: 'weltraum', name: 'Weltraum', text: 'Station Orbita zwischen Ringplaneten und Energiebahnen.' },
-  { id: 'cyber', name: 'Cyberpunk', text: 'Nachts in Neon City: Hologramme, Regen und fliegende Autos.' },
-  { id: 'dschungel', name: 'Dschungeltempel', text: 'Der Tempel der Ahnen: Ruinen, Wasserfall und alte Steinmechanik.' },
-  { id: 'wasser', name: 'Unterwasser', text: 'Das versunkene Atlantis mit Korallen, Quallen und Fischschwärmen.' },
-  { id: 'vulkan', name: 'Vulkan', text: 'Im Glutkern: glühende Rampen, Lavaströme und fliegende Funken.' }
+  { id: 'weltraum', name: uebersetze('Weltraum'), text: uebersetze('Station Orbita zwischen Ringplaneten und Energiebahnen.') },
+  { id: 'cyber', name: uebersetze('Cyberpunk'), text: uebersetze('Nachts in Neon City: Hologramme, Regen und fliegende Autos.') },
+  { id: 'dschungel', name: uebersetze('Dschungeltempel'), text: uebersetze('Der Tempel der Ahnen: Ruinen, Wasserfall und alte Steinmechanik.') },
+  { id: 'wasser', name: uebersetze('Unterwasser'), text: uebersetze('Das versunkene Atlantis mit Korallen, Quallen und Fischschwärmen.') },
+  { id: 'vulkan', name: uebersetze('Vulkan'), text: uebersetze('Im Glutkern: glühende Rampen, Lavaströme und fliegende Funken.') }
 ];
 
 // --------------------------- Level ---------------------------
@@ -1285,90 +1602,91 @@ const WELTEN = [
 
 const LEVEL = [
   // ---------------- Weltraum: zum Kennenlernen
-  { id: 'w1-1', welt: 'weltraum', name: 'Startrampe', neigung: 0.95, schutz: 1.4,
+  { id: 'w1-1', welt: 'weltraum', name: uebersetze('Startrampe'), neigung: 0.95, schutz: 1.4,
     tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, rampenTempo: -80 },
     aufgaben: [{ art: 'rampe', ziel: 2 }, { art: 'bumper', ziel: 15 }, { art: 'fallbank', ziel: 1 }] },
-  { id: 'w1-2', welt: 'weltraum', name: 'Asteroidengürtel', neigung: 0.97, schutz: 1.3,
+  { id: 'w1-2', welt: 'weltraum', name: uebersetze('Asteroidengürtel'), neigung: 0.97, schutz: 1.3,
     tisch: { bumper: 'vier', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], kickback: true, rampenTempo: -60 },
     aufgaben: [{ art: 'orbit', ziel: 2 }, { art: 'folge', folge: ['rampe-links', 'rampe-rechts'] }, { art: 'wurmloch', ziel: 1 }] },
-  { id: 'w1-3', welt: 'weltraum', name: 'Raumstation', neigung: 1.0, schutz: 1.2,
+  { id: 'w1-3', welt: 'weltraum', name: uebersetze('Raumstation'), neigung: 1.0, schutz: 1.2,
     tisch: { bumper: 'reihe', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: false, rampenTempo: -40 },
     aufgaben: [{ art: 'kapsel', ziel: 2 }, { art: 'multiball', ziel: 1 }] },
-  { id: 'w1-4', welt: 'weltraum', name: 'Schwarzes Loch', neigung: 1.02, schutz: 1.1,
+  { id: 'w1-4', welt: 'weltraum', name: uebersetze('Schwarzes Loch'), neigung: 1.02, schutz: 1.1,
     tisch: { bumper: 'dreieck', rampen: { links: 'oben', rechts: 'innen' }, fallziele: false, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: -20 },
     aufgaben: [{ art: 'wurmloch', ziel: 3, zeit: 120 }, { art: 'punkte', ziel: 150000 }] },
 
   // ---------------- Cyberpunk
-  { id: 'w2-1', welt: 'cyber', name: 'Neonmarkt', neigung: 1.02, schutz: 1.1,
+  { id: 'w2-1', welt: 'cyber', name: uebersetze('Neonmarkt'), neigung: 1.02, schutz: 1.1,
     tisch: { bumper: 'reihe', rampen: { links: 'innen', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true },
     aufgaben: [{ art: 'rampe', ziel: 4 }, { art: 'kombo', ziel: 2 }] },
-  { id: 'w2-2', welt: 'cyber', name: 'Datenautobahn', neigung: 1.04, schutz: 1.0,
+  { id: 'w2-2', welt: 'cyber', name: uebersetze('Datenautobahn'), neigung: 1.04, schutz: 1.0,
     tisch: { bumper: 'zwei', rampen: { links: 'kehre', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'] },
     aufgaben: [{ art: 'spin', ziel: 30 }, { art: 'orbit', ziel: 3, zeit: 150 }] },
-  { id: 'w2-3', welt: 'cyber', name: 'Hologramm-Turm', neigung: 1.05, schutz: 1.0,
+  { id: 'w2-3', welt: 'cyber', name: uebersetze('Hologramm-Turm'), neigung: 1.05, schutz: 1.0,
     tisch: { bumper: 'vier', rampen: { links: 'oben', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'] },
     aufgaben: [{ art: 'folge', folge: ['orbit-links', 'rampe-links', 'reaktor'] }, { art: 'multiball', ziel: 1 }] },
-  { id: 'w2-4', welt: 'cyber', name: 'Mitternachts-Hack', neigung: 1.07, schutz: 0.9,
+  { id: 'w2-4', welt: 'cyber', name: uebersetze('Mitternachts-Hack'), neigung: 1.07, schutz: 0.9,
     tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: 20 },
     aufgaben: [{ art: 'punkte', ziel: 200000, zeit: 120 }, { art: 'jackpot', ziel: 2 }] },
 
   // ---------------- Dschungeltempel
-  { id: 'w3-1', welt: 'dschungel', name: 'Rankenpfad', neigung: 1.05, schutz: 1.0,
+  { id: 'w3-1', welt: 'dschungel', name: uebersetze('Rankenpfad'), neigung: 1.05, schutz: 1.0,
     tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: null }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, pfosten: ['oben'] },
     aufgaben: [{ art: 'rampe', ziel: 3 }, { art: 'fallbank', ziel: 2 }] },
-  { id: 'w3-2', welt: 'dschungel', name: 'Wasserfall', neigung: 1.07, schutz: 0.95,
+  { id: 'w3-2', welt: 'dschungel', name: uebersetze('Wasserfall'), neigung: 1.07, schutz: 0.95,
     tisch: { bumper: 'reihe', rampen: { links: 'oben', rechts: 'innen' }, fallziele: true, steh: ['links', 'rechts'] },
     aufgaben: [{ art: 'orbit', ziel: 2 }, { art: 'rampe', ziel: 3 }, { art: 'schild', ziel: 1 }] },
-  { id: 'w3-3', welt: 'dschungel', name: 'Tempelkammer', neigung: 1.08, schutz: 0.9,
+  { id: 'w3-3', welt: 'dschungel', name: uebersetze('Tempelkammer'), neigung: 1.08, schutz: 0.9,
     tisch: { bumper: 'vier', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], rampenTempo: 20 },
     aufgaben: [{ art: 'folge', folge: ['kapsel', 'reaktor', 'wurmloch'], zeit: 180 }, { art: 'multiball', ziel: 1 }] },
-  { id: 'w3-4', welt: 'dschungel', name: 'Götzenauge', neigung: 1.1, schutz: 0.85,
+  { id: 'w3-4', welt: 'dschungel', name: uebersetze('Götzenauge'), neigung: 1.1, schutz: 0.85,
     tisch: { bumper: 'zwei', rampen: { links: 'innen', rechts: 'innen' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 40 },
     aufgaben: [{ art: 'kombo', ziel: 3 }, { art: 'jackpot', ziel: 2 }] },
 
   // ---------------- Unterwasser
-  { id: 'w4-1', welt: 'wasser', name: 'Korallenriff', neigung: 1.08, schutz: 0.95,
+  { id: 'w4-1', welt: 'wasser', name: uebersetze('Korallenriff'), neigung: 1.08, schutz: 0.95,
     tisch: { bumper: 'reihe', rampen: { links: 'kehre', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], kickback: true, rampenTempo: 20 },
     aufgaben: [{ art: 'bumper', ziel: 30 }, { art: 'rampe', ziel: 4, zeit: 150 }] },
-  { id: 'w4-2', welt: 'wasser', name: 'Quallengarten', neigung: 1.1, schutz: 0.9,
+  { id: 'w4-2', welt: 'wasser', name: uebersetze('Quallengarten'), neigung: 1.1, schutz: 0.9,
     tisch: { bumper: 'vier', rampen: { links: 'oben', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten'], rampenTempo: 30 },
     aufgaben: [{ art: 'spin', ziel: 40 }, { art: 'multiball', ziel: 1 }] },
-  { id: 'w4-3', welt: 'wasser', name: 'Versunkene Stadt', neigung: 1.11, schutz: 0.85,
+  { id: 'w4-3', welt: 'wasser', name: uebersetze('Versunkene Stadt'), neigung: 1.11, schutz: 0.85,
     tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'innen' }, fallziele: false, steh: ['links', 'mitte', 'rechts'], rampenTempo: 40 },
     aufgaben: [{ art: 'wurmloch', ziel: 2 }, { art: 'folge', folge: ['rampe-rechts', 'rampe-links', 'rampe-rechts'], zeit: 120 }] },
-  { id: 'w4-4', welt: 'wasser', name: 'Tiefseegraben', neigung: 1.13, schutz: 0.8,
+  { id: 'w4-4', welt: 'wasser', name: uebersetze('Tiefseegraben'), neigung: 1.13, schutz: 0.8,
     tisch: { bumper: 'dreieck', rampen: { links: 'kehre', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke'], rampenTempo: 50 },
     aufgaben: [{ art: 'punkte', ziel: 250000, zeit: 150 }, { art: 'jackpot', ziel: 2 }] },
 
   // ---------------- Vulkan: am schwersten
-  { id: 'w5-1', welt: 'vulkan', name: 'Aschefeld', neigung: 1.11, schutz: 0.85,
+  { id: 'w5-1', welt: 'vulkan', name: uebersetze('Aschefeld'), neigung: 1.11, schutz: 0.85,
     tisch: { bumper: 'reihe', rampen: { links: 'innen', rechts: 'kehre' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['oben'], rampenTempo: 40 },
     aufgaben: [{ art: 'rampe', ziel: 5 }, { art: 'bumper', ziel: 30 }] },
-  { id: 'w5-2', welt: 'vulkan', name: 'Lavastrom', neigung: 1.13, schutz: 0.8,
+  { id: 'w5-2', welt: 'vulkan', name: uebersetze('Lavastrom'), neigung: 1.13, schutz: 0.8,
     tisch: { bumper: 'zwei', rampen: { links: 'kehre', rechts: 'oben' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['seiten', 'flanke'], rampenTempo: 50 },
     aufgaben: [{ art: 'orbit', ziel: 2, zeit: 180 }, { art: 'kombo', ziel: 3 }] },
-  { id: 'w5-3', welt: 'vulkan', name: 'Magmakammer', neigung: 1.14, schutz: 0.75,
+  { id: 'w5-3', welt: 'vulkan', name: uebersetze('Magmakammer'), neigung: 1.14, schutz: 0.75,
     tisch: { bumper: 'vier', rampen: { links: 'loch', rechts: 'loch' }, fallziele: true, steh: ['links', 'mitte', 'rechts'], pfosten: ['flanke'], rampenTempo: 60 },
     aufgaben: [{ art: 'multiball', ziel: 1 }, { art: 'jackpot', ziel: 3 }] },
-  { id: 'w5-4', welt: 'vulkan', name: 'Herz des Vulkans', neigung: 1.16, schutz: 0.7,
+  { id: 'w5-4', welt: 'vulkan', name: uebersetze('Herz des Vulkans'), neigung: 1.16, schutz: 0.7,
     tisch: { bumper: 'tief', rampen: { links: 'innen', rechts: 'loch' }, fallziele: true, steh: ['links', 'rechts'], pfosten: ['flanke', 'oben'], rampenTempo: 70 },
     aufgaben: [{ art: 'folge', folge: ['rampe-links', 'orbit-rechts', 'rampe-rechts', 'wurmloch'], zeit: 180 }, { art: 'punkte', ziel: 300000 }, { art: 'jackpot', ziel: 3 }] }
 ];
 
 const SCHUSS_NAMEN = {
-  'rampe-links': 'Rampe links', 'rampe-rechts': 'Rampe rechts', 'orbit-links': 'Orbit links', 'orbit-rechts': 'Orbit rechts',
-  wurmloch: 'Wurmloch', kapsel: 'Kapsel', reaktor: 'Reaktor'
+  'rampe-links': uebersetze('Rampe links'), 'rampe-rechts': uebersetze('Rampe rechts'), 'orbit-links': uebersetze('Orbit links'), 'orbit-rechts': uebersetze('Orbit rechts'),
+  wurmloch: uebersetze('Wurmloch'), kapsel: uebersetze('Kapsel'), reaktor: uebersetze('Reaktor')
 };
 const AUFGABEN_TEXT = {
-  rampe: 'Fahr {z} Rampen', bumper: 'Triff {z}-mal die Bumper', spin: 'Dreh den Spinner {z}-mal', fallbank: 'Räum die Fallziele {z}-mal ab',
-  orbit: 'Schaff {z} Orbits', wurmloch: 'Versenk die Kugel {z}-mal im Wurmloch', kapsel: 'Triff {z}-mal die Kapsel', reaktor: 'Triff {z}-mal den Reaktor',
-  schild: 'Triff alle Schild-Ziele', multiball: 'Starte den Multiball', jackpot: 'Hol {z} Jackpots im Multiball', kombo: 'Schaff eine {z}er-Kombo',
-  punkte: 'Sammle {z} Punkte'
+  rampe: uebersetze('Fahr {z} Rampen'), bumper: uebersetze('Triff {z}-mal die Bumper'), spin: uebersetze('Dreh den Spinner {z}-mal'), fallbank: uebersetze('Räum die Fallziele {z}-mal ab'),
+  orbit: uebersetze('Schaff {z} Orbits'), wurmloch: uebersetze('Versenk die Kugel {z}-mal im Wurmloch'), kapsel: uebersetze('Triff {z}-mal die Kapsel'), reaktor: uebersetze('Triff {z}-mal den Reaktor'),
+  schild: uebersetze('Triff alle Schild-Ziele'), multiball: uebersetze('Starte den Multiball'), jackpot: uebersetze('Hol {z} Jackpots im Multiball'), kombo: uebersetze('Schaff eine {z}er-Kombo'),
+  punkte: uebersetze('Sammle {z} Punkte')
 };
 function aufgabeText(a) {
   if (a.art === 'folge') return a.folge.map(n => SCHUSS_NAMEN[n]).join(' → ');
   let t = AUFGABEN_TEXT[a.art].replace('{z}', a.art === 'punkte' ? zahl(a.ziel) : a.ziel);
-  if (a.ziel === 1) t = t.replace('1-mal ', '').replace('1 Jackpots', '1 Jackpot').replace('1 Rampen', '1 Rampe').replace('1 Orbits', '1 Orbit');
+  if (a.ziel === 1 && Sprache.aktuell === 'en') t = t.replace(' 1 times', ' once').replace('1 jackpots', '1 jackpot').replace('1 ramps', '1 ramp').replace('1 orbits', '1 orbit');
+  else if (a.ziel === 1) t = t.replace('1-mal ', '').replace('1 Jackpots', '1 Jackpot').replace('1 Rampen', '1 Rampe').replace('1 Orbits', '1 Orbit');
   return t;
 }
 function aufgabeZiel(a) { return a.art === 'folge' ? a.folge.length : a.ziel; }
@@ -1376,7 +1694,7 @@ function levelNr(id) { return LEVEL.findIndex(l => l.id === id); }
 // Alle Welten und Level sind von Anfang an frei spielbar (Wunsch des Spielers)
 function levelFrei(i) { return true; }
 function tischName(id) {
-  if (id === 'klassik') return 'Klassik';
+  if (id === 'klassik') return uebersetze('Klassik');
   const l = LEVEL[levelNr(id)];
   return l ? THEMEN[l.welt].name + ' ' + l.id.slice(-1) + ': ' + l.name : id;
 }
@@ -1386,11 +1704,11 @@ function tischName(id) {
 // =====================================================================
 const WELT_PHYSIK = {
   klassik: { schwere: 1, zaeh: 0, bumperKick: 1, schleuderKick: 1 },
-  weltraum: { schwere: 0.9, zaeh: 0, bumperKick: 1, schleuderKick: 1, text: 'Weniger Schwerkraft: Die Kugel fliegt länger.' },
-  cyber: { schwere: 1, zaeh: 0, bumperKick: 1.18, schleuderKick: 1, text: 'Überladene Neon-Bumper schießen härter.' },
-  dschungel: { schwere: 1, zaeh: 0.05, bumperKick: 0.92, schleuderKick: 1.2, text: 'Schwere Steinbumper, kräftige Holzschleudern.' },
-  wasser: { schwere: 0.86, zaeh: 0.2, bumperKick: 1, schleuderKick: 1, text: 'Im Wasser schwebt die Kugel langsamer.' },
-  vulkan: { schwere: 1.06, zaeh: 0, bumperKick: 1.12, schleuderKick: 1.08, text: 'Steiler Hang und glühend heiße Bumper.' }
+  weltraum: { schwere: 0.9, zaeh: 0, bumperKick: 1, schleuderKick: 1, text: uebersetze('Weniger Schwerkraft: Die Kugel fliegt länger.') },
+  cyber: { schwere: 1, zaeh: 0, bumperKick: 1.18, schleuderKick: 1, text: uebersetze('Überladene Neon-Bumper schießen härter.') },
+  dschungel: { schwere: 1, zaeh: 0.05, bumperKick: 0.92, schleuderKick: 1.2, text: uebersetze('Schwere Steinbumper, kräftige Holzschleudern.') },
+  wasser: { schwere: 0.86, zaeh: 0.2, bumperKick: 1, schleuderKick: 1, text: uebersetze('Im Wasser schwebt die Kugel langsamer.') },
+  vulkan: { schwere: 1.06, zaeh: 0, bumperKick: 1.12, schleuderKick: 1.08, text: uebersetze('Steiler Hang und glühend heiße Bumper.') }
 };
 
 // =====================================================================
@@ -1513,7 +1831,7 @@ function schleuderMuster(c, T, f) {
 const WELT_DESIGN = {
   // ------------------------------------------------------------ KLASSIK (unverändert)
   klassik: {
-    name: 'Klassik', rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
+    name: uebersetze('Klassik'), rand: '#5b3dff', grund: ['#0b0b2e', '#090620', '#05040f'],
     f: { haupt: '#38f3ff', zweit: '#a066ff', gold: '#ffd84a', gruen: '#4dff9a', pink: '#ff4fd8', text: '#eef2ff', bumper: '#b48cff' },
     schiene: { glow: 'rgba(56,243,255,0.18)', dunkel: '#2b3150', hell: '#a9b6d8', kante: '#eaf2ff' },
     gummi: ['rgba(255,79,216,0.25)', '#f2e8ff'],
@@ -1532,7 +1850,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ WELTRAUM: Station Orbita
   weltraum: {
-    name: 'Weltraum', rand: '#4fa8ff', grund: ['#1b2272', '#151253', '#0b0b33'],
+    name: uebersetze('Weltraum'), rand: '#4fa8ff', grund: ['#1b2272', '#151253', '#0b0b33'],
     f: { haupt: '#4fe3ff', zweit: '#ffc94a', gold: '#ffd86a', gruen: '#6dffc4', pink: '#ff7ad9', text: '#eef4ff', bumper: '#9fdcff' },
     schiene: { glow: 'rgba(79,227,255,0.28)', dunkel: '#1d2a5a', hell: '#bfe9ff', kante: '#ffffff' },
     gummi: ['rgba(255,201,74,0.35)', '#fff2d6'],
@@ -1575,7 +1893,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ CYBERPUNK: Neon City
   cyber: {
-    name: 'Cyberpunk', rand: '#ff2bd6', grund: ['#2c0b4a', '#200838', '#0c1446'],
+    name: uebersetze('Cyberpunk'), rand: '#ff2bd6', grund: ['#2c0b4a', '#200838', '#0c1446'],
     f: { haupt: '#00e5ff', zweit: '#ff2bd6', gold: '#ffe84a', gruen: '#3dff9a', pink: '#ff2bd6', text: '#fff0fb', bumper: '#ff6fe0' },
     schiene: { glow: 'rgba(255,43,214,0.38)', dunkel: '#1e0a30', hell: '#ff7ae6', kante: '#ffe3f8' },
     gummi: ['rgba(0,229,255,0.4)', '#d9fdff'],
@@ -1641,7 +1959,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ DSCHUNGELTEMPEL
   dschungel: {
-    name: 'Dschungeltempel', rand: '#19c878', grund: ['#0f5a42', '#0c4a4c', '#07303a'],
+    name: uebersetze('Dschungeltempel'), rand: '#19c878', grund: ['#0f5a42', '#0c4a4c', '#07303a'],
     f: { haupt: '#19c878', zweit: '#20d9c2', gold: '#ffc857', gruen: '#7dff6a', pink: '#ff6f91', text: '#f4fff2', bumper: '#ffc857' },
     schiene: { glow: 'rgba(255,200,87,0.28)', dunkel: '#2c4a3c', hell: '#b8a46a', kante: '#ffe2a0' },
     gummi: ['rgba(25,200,120,0.35)', '#e8ffe0'],
@@ -1689,7 +2007,7 @@ const WELT_DESIGN = {
       c.globalCompositeOperation = 'source-over';
     },
     deko(c, T, th) {
-      schild(c, 'TEMPEL\nDER AHNEN', th.f.gold, '#173430', g => {
+      schild(c, uebersetze('TEMPEL\nDER AHNEN'), th.f.gold, '#173430', g => {
         g.fillStyle = '#ffc857'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
         g.fillStyle = '#20d9c2'; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 2); g.fill();
       });
@@ -1700,7 +2018,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ UNTERWASSER: Atlantis
   wasser: {
-    name: 'Unterwasser', rand: '#20e0d0', grund: ['#2ab4e0', '#167cd0', '#0c55a8'],
+    name: uebersetze('Unterwasser'), rand: '#20e0d0', grund: ['#2ab4e0', '#167cd0', '#0c55a8'],
     f: { haupt: '#20e0d0', zweit: '#ff718d', gold: '#ffe08a', gruen: '#7dffc6', pink: '#c27bff', text: '#f0ffff', bumper: '#c8fbff' },
     schiene: { glow: 'rgba(255,255,255,0.25)', dunkel: '#3a5a8a', hell: '#e8f4ff', kante: '#ffffff' },
     gummi: ['rgba(255,113,141,0.4)', '#ffe8ee'],
@@ -1760,7 +2078,7 @@ const WELT_DESIGN = {
 
   // ------------------------------------------------------------ VULKAN: Glutkern
   vulkan: {
-    name: 'Vulkan', rand: '#ff6a00', grund: ['#5a1630', '#3e1222', '#26181e'],
+    name: uebersetze('Vulkan'), rand: '#ff6a00', grund: ['#5a1630', '#3e1222', '#26181e'],
     f: { haupt: '#ff6a00', zweit: '#ffd447', gold: '#ffd447', gruen: '#b6ff4a', pink: '#ff3040', text: '#fff1e6', bumper: '#ff8a2a' },
     schiene: { glow: 'rgba(255,106,0,0.4)', dunkel: '#2a2026', hell: '#6a5a60', kante: '#ffb070' },
     gummi: ['rgba(255,48,64,0.4)', '#ffd9c8'],
@@ -1816,7 +2134,7 @@ const WELT_DESIGN = {
       c.globalCompositeOperation = 'source-over';
     },
     deko(c, T, th) {
-      schild(c, 'GLUT-\nKERN', th.f.gold, '#26121a', g => {
+      schild(c, uebersetze('GLUT-\nKERN'), th.f.gold, '#26121a', g => {
         g.fillStyle = '#ff6a00';
         g.beginPath(); g.moveTo(0, -16); g.quadraticCurveTo(12, 0, 6, 12); g.lineTo(-6, 12); g.quadraticCurveTo(-12, 0, 0, -16); g.fill();
         g.fillStyle = '#ffd447'; g.beginPath(); g.moveTo(0, -4); g.quadraticCurveTo(6, 4, 3, 12); g.lineTo(-3, 12); g.quadraticCurveTo(-6, 4, 0, -4); g.fill();
@@ -1938,7 +2256,7 @@ const MOTIVE = {
       c.strokeStyle = farben[(i + 1) % 4]; c.lineWidth = 2; c.strokeRect(x - 28, y + 24, 56, 18);
     }
     c.font = '11px ' + SCHRIFT; c.textAlign = 'center';
-    for (const [x, y, t, f, w] of [[120, 300, 'NUDELN', '#ffe84a', -0.1], [400, 340, 'ARCADE', '#00e5ff', 0.1], [MITTE, 760, '24/7', '#ff2bd6', 0]]) {
+    for (const [x, y, t, f, w] of [[120, 300, uebersetze('NUDELN'), '#ffe84a', -0.1], [400, 340, 'ARCADE', '#00e5ff', 0.1], [MITTE, 760, '24/7', '#ff2bd6', 0]]) {
       c.save(); c.translate(x, y); c.rotate(w);
       const b = c.measureText(t).width + 18;
       c.fillStyle = 'rgba(20,6,40,0.75)'; rund(c, -b / 2, -16, b, 24, 5); c.fill();
@@ -2192,7 +2510,7 @@ for (const id of Object.keys(WELT_DESIGN)) THEMEN[id] = Object.assign({}, WELT_D
 // damit die Musik atmet. Teil 4 jeder Schleife ist ein ruhiges Zwischenspiel.
 const LIEDER = {
   klassik: {
-    name: 'Orbit-Fieber', bpm: 118, grund: 48, skala: [0, 2, 4, 5, 7, 9, 11],
+    name: uebersetze('Orbit-Fieber'), bpm: 118, grund: 48, skala: [0, 2, 4, 5, 7, 9, 11],
     A: { akk: [0, 4, 5, 3, 0, 4, 3, 4], mot: [0, 1, 0, 2, 0, 1, 3, 5] },
     B: { akk: [3, 4, 2, 5, 3, 4, 1, 4], mot: [4, 6, 4, 7, 4, 6, 3, 5] },
     motive: ['4.4.2.0.2...4.__', '7...4.2.4...____', '2.2.0.x.0...____', '4.2.0.2.4.4.4.__', '7.7.9.7.4...2.__', '0.......____....', '9.7.4.__7.4.2.__', '4...2...0...____'],
@@ -2201,7 +2519,7 @@ const LIEDER = {
     bassArt: 'ganz', arp: [0, 2, 4, 7], arpTakt: 2
   },
   weltraum: {
-    name: 'Sternenstation', bpm: 108, grund: 50, skala: [0, 2, 4, 5, 7, 9, 11],
+    name: uebersetze('Sternenstation'), bpm: 108, grund: 50, skala: [0, 2, 4, 5, 7, 9, 11],
     A: { akk: [0, 3, 0, 3, 5, 3, 4, 4], mot: [0, 1, 0, 2, 4, 1, 3, 5] },
     B: { akk: [3, 4, 2, 5, 3, 4, 0, 0], mot: [6, 7, 6, 3, 4, 1, 3, 5] },
     motive: ['4...7...6.4.____', '2...4...2.0.____', '4...7...9.7.____', '7.....6.4.......', '0.2.4.7.9...7.__', '4.......____....', '7.6.4.2.0...____', '2.4.2.0.x...0...'],
@@ -2210,7 +2528,7 @@ const LIEDER = {
     bassArt: 'ganz', arp: [0, 4, 7, 9, 7, 4], arpTakt: 2, hall: 0.22
   },
   cyber: {
-    name: 'Neonpuls', bpm: 116, grund: 45, skala: [0, 2, 4, 5, 7, 9, 11],
+    name: uebersetze('Neonpuls'), bpm: 116, grund: 45, skala: [0, 2, 4, 5, 7, 9, 11],
     A: { akk: [0, 4, 5, 3, 0, 4, 5, 3], mot: [0, 1, 0, 3, 0, 1, 2, 5] },
     B: { akk: [3, 4, 2, 5, 3, 4, 0, 4], mot: [4, 6, 4, 7, 4, 6, 2, 5] },
     motive: ['4.4.4.2.4.__7.__', '4.4.4.2.0...____', '7.7.6.4.6...4.__', '2.2.2.0.2...____', '0.2.4.0.2.4.7.__', '4...2...0...____', '9...7...4.2.4.__', '7.6.4.2.0.......'],
@@ -2219,7 +2537,7 @@ const LIEDER = {
     bassArt: 'puls', arp: [0, 2, 4, 7], arpTakt: 2, immerPerk: true
   },
   dschungel: {
-    name: 'Tempelpfad', bpm: 104, grund: 55, skala: [0, 2, 4, 5, 7, 9, 10],
+    name: uebersetze('Tempelpfad'), bpm: 104, grund: 55, skala: [0, 2, 4, 5, 7, 9, 10],
     A: { akk: [0, 6, 0, 3, 0, 6, 4, 0], mot: [0, 1, 0, 3, 0, 1, 2, 5] },
     B: { akk: [3, 3, 0, 0, 3, 6, 4, 4], mot: [4, 6, 4, 7, 4, 6, 2, 5] },
     motive: ['0.2.4.__4.2.0.__', '7.6.4.__2...____', '4.4.7.4.2.0.2.__', '0...2...0...____', '7.__7.9.7.4.____', '0.......____....', '4.2.4.7.4.2.0.__', '2...4...2...____'],
@@ -2228,7 +2546,7 @@ const LIEDER = {
     bassArt: 'sync', arp: [0, 4, 2, 7], arpTakt: 2, immerPerk: true
   },
   wasser: {
-    name: 'Atlantis', bpm: 96, grund: 53, skala: [0, 2, 4, 5, 7, 9, 11],
+    name: uebersetze('Atlantis'), bpm: 96, grund: 53, skala: [0, 2, 4, 5, 7, 9, 11],
     A: { akk: [0, 5, 3, 4, 0, 5, 1, 4], mot: [0, 1, 0, 3, 0, 1, 2, 3] },
     B: { akk: [3, 4, 2, 5, 3, 4, 0, 0], mot: [4, 5, 4, 7, 4, 5, 2, 6] },
     motive: ['4.....2.4...____', '7.....6.4...____', '2.....0.2...____', '4.2.0.........__', '7.6.7.9.7...____', '4.6.4.2.0...____', '0...............', '2.4.2.0.x.0.____'],
@@ -2237,7 +2555,7 @@ const LIEDER = {
     bassArt: 'huepf', arp: [0, 2, 4, 7, 4, 2], arpTakt: 2, hall: 0.25
   },
   vulkan: {
-    name: 'Glutkern', bpm: 124, grund: 50, skala: [0, 2, 4, 5, 7, 9, 11],
+    name: uebersetze('Glutkern'), bpm: 124, grund: 50, skala: [0, 2, 4, 5, 7, 9, 11],
     A: { akk: [0, 4, 3, 4, 0, 4, 5, 4], mot: [0, 1, 0, 1, 2, 1, 3, 5] },
     B: { akk: [3, 4, 5, 3, 3, 4, 0, 0], mot: [4, 6, 4, 7, 4, 6, 3, 5] },
     motive: ['0.0.4.0.7.__4.__', '2.2.4.2.0...____', '4.4.7.4.9.7.4.__', '7...4...2...____', '7.9.7.4.7.9.7.__', '0.......____....', '4.4.4.7.4...2.__', '9.7.4.2.4...____'],
@@ -2677,10 +2995,10 @@ function neuesSpiel(modus = { art: 'klassik' }) {
   ballInBahn(false);
   if (level) {
     melde(level.name.toUpperCase(), THEMEN[level.welt].name + ' · Level ' + level.id.slice(-1), 2.4, s.thema.f.haupt);
-    melde('AUFGABE 1/' + level.aufgaben.length, aufgabeText(level.aufgaben[0]) + zeitHinweis(level.aufgaben[0]), 3, s.thema.f.gold);
+    melde(uebersetze('AUFGABE') + ' 1/' + level.aufgaben.length, aufgabeText(level.aufgaben[0]) + zeitHinweis(level.aufgaben[0]), 3, s.thema.f.gold);
   } else melde('ORBITFLIPPER', 'Halten zum Spannen, loslassen zum Abschießen', 3);
 }
-function zeitHinweis(a) { return a.zeit ? ' (in ' + a.zeit + ' s)' : ''; }
+function zeitHinweis(a) { return a.zeit ? uebersetze(' (in {z} s)', { z: a.zeit }) : ''; }
 
 // --------------------------- Hilfen ---------------------------
 
@@ -2693,6 +3011,7 @@ function punkte(n, x, y, farbe) {
 }
 function bonusDazu(n) { s.bonus += n; }
 function melde(titel, text = '', dauer = 2.2, farbe = '#7ef9ff') {
+  titel = uebersetze(titel); text = uebersetze(text);
   s.meldungen.push({ titel, text, dauer, farbe });
   if (!s.meldung) naechsteMeldung();
 }
@@ -2793,7 +3112,7 @@ function levelEreignis(art, menge = 1, wert) {
     if (art !== a.folge[s.schrittStand]) return;
     s.schrittStand++;
     ton.kombo(s.schrittStand + 1);
-    if (s.schrittStand < a.folge.length) melde('RICHTIG!', 'Jetzt: ' + SCHUSS_NAMEN[a.folge[s.schrittStand]], 1.5, s.thema.f.gold);
+    if (s.schrittStand < a.folge.length) melde('RICHTIG!', uebersetze('Jetzt:') + ' ' + SCHUSS_NAMEN[a.folge[s.schrittStand]], 1.5, s.thema.f.gold);
   } else if (a.art === art) {
     if (art === 'kombo') s.schrittStand = Math.max(s.schrittStand, wert);
     else if (art === 'punkte') s.schrittStand = s.schrittPunkte;
@@ -2827,7 +3146,7 @@ function schrittGeschafft() {
   }
   starteSchritt();
   const a = aufgabeJetzt();
-  melde('AUFGABE ' + (s.schritt + 1) + '/' + lv.aufgaben.length, aufgabeText(a) + zeitHinweis(a), 3, s.thema.f.gold);
+  melde(uebersetze('AUFGABE') + ' ' + (s.schritt + 1) + '/' + lv.aufgaben.length, aufgabeText(a) + zeitHinweis(a), 3, s.thema.f.gold);
 }
 
 // Zeitlimit läuft nur, solange eine Kugel im Spiel ist. Läuft es ab, beginnt die Aufgabe von vorn.
@@ -2849,7 +3168,7 @@ function schrittUhr(dt) {
 function spezial(art, sekunden) {
   s.effekt[art] = Math.max(s.effekt[art], sekunden);
   ton.spezial();
-  const namen = { schild: ['SCHILD AN', 'Verlorene Kugeln kommen zurück'], doppelt: ['DOPPELTE PUNKTE', 'Alles zählt doppelt'], zeitlupe: ['ZEITLUPE', 'Die Zeit läuft langsamer'] };
+  const namen = { schild: ['SCHILD AN', uebersetze('Verlorene Kugeln kommen zurück')], doppelt: ['DOPPELTE PUNKTE', uebersetze('Alles zählt doppelt')], zeitlupe: ['ZEITLUPE', uebersetze('Die Zeit läuft langsamer')] };
   melde(namen[art][0], namen[art][1] + ' (' + sekunden + ' s)', 2.2, '#ff7bf2');
 }
 
@@ -2862,7 +3181,7 @@ function kombiSchuss(art, x, y) {
     const p = punkte(5000 * s.kombo, x, y - 22, '#ffe46b');
     ton.kombo(s.kombo);
     musik.aktion(1.5);
-    melde('KOMBO X' + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
+    melde(uebersetze('KOMBO X') + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
     s.statistik.maxKombo = Math.max(s.statistik.maxKombo, s.kombo);
     ereignis('kombo', 0, s.kombo);
   }
@@ -2952,7 +3271,7 @@ const regeln = {
       s.T.roll.forEach(x => { x.an = false; x.blitz = 1; });
       s.multi = Math.min(6, s.multi + 1);
       spezial('doppelt', 20);
-      melde('O-R-B KOMPLETT', 'Bonus jetzt ' + s.multi + 'x', 2, '#7ef9ff');
+      melde('O-R-B KOMPLETT', uebersetze('Bonus jetzt {x}x', { x: s.multi }), 2, '#7ef9ff');
     }
   },
   spinner(b, k) {
@@ -3201,7 +3520,7 @@ function ballRaus(b) {
       ballInBahn(false);
     } else if (s.ballNr < BAELLE) {
       s.ballNr++;
-      melde('KUGEL ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : s.modus === 'level' ? aufgabeText(aufgabeJetzt()) : auftragText(), 2);
+      melde(uebersetze('KUGEL') + ' ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : s.modus === 'level' ? aufgabeText(aufgabeJetzt()) : auftragText(), 2);
       ballInBahn(false);
     } else {
       spielEnde();
@@ -3937,7 +4256,7 @@ function zeichneTeile(c, zeit, T, th, live) {
     leuchte(c, l.x, l.y, 34, f, (offen ? 0.25 + 0.2 * puls : 0.08) + l.blitz);
     c.fillStyle = f; c.font = '6px ' + SCHRIFT; c.textAlign = 'center';
     c.globalAlpha = 0.85;
-    c.fillText(l.name.toUpperCase(), l.x, l.y - l.r - 9);
+    c.fillText(uebersetze(l.name.toUpperCase()), l.x, l.y - l.r - 9);
     c.globalAlpha = 1;
   }
 
@@ -4239,23 +4558,23 @@ function zeichneHud(zeit) {
   c.fillStyle = '#c4c2dc';
   const multi = s.multi > 1 ? '  BONUS ' + s.multi + 'X' : '';
   if (s.modus === 'level') {
-    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + multi + '  ' + s.level.name.toUpperCase(), 16, 62, 340);
+    c.fillText(uebersetze('KUGEL') + ' ' + s.ballNr + '/' + BAELLE + multi + '  ' + s.level.name.toUpperCase(), 16, 62, 340);
   } else {
     const extra = s.extraBaelle ? '  +' + s.extraBaelle : '';
-    c.fillText('KUGEL ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
+    c.fillText(uebersetze('KUGEL') + ' ' + s.ballNr + '/' + BAELLE + extra + multi + '  ' + RAENGE[s.rang], 16, 62);
   }
 
   // Aufgabe oder Auftrag mit Fortschritt
   let titel, text, anteil, rest = 0;
   if (s.modus === 'level') {
     const a = aufgabeJetzt();
-    titel = a ? 'AUFGABE ' + (s.schritt + 1) + '/' + s.level.aufgaben.length : 'GESCHAFFT';
-    text = a ? aufgabeText(a) : 'Level geschafft!';
+    titel = a ? uebersetze('AUFGABE') + ' ' + (s.schritt + 1) + '/' + s.level.aufgaben.length : uebersetze('GESCHAFFT');
+    text = a ? aufgabeText(a) : uebersetze('Level geschafft!');
     anteil = a ? Math.min(1, s.schrittStand / aufgabeZiel(a)) : 1;
     if (a && a.zeit) rest = Math.max(0, s.schrittZeit);
     if (a && a.art === 'folge') text = a.folge.map((n, i) => (i < s.schrittStand ? '✓ ' : '') + SCHUSS_NAMEN[n]).join(' → ');
   } else {
-    titel = 'AUFTRAG';
+    titel = uebersetze('AUFTRAG');
     text = auftragText();
     anteil = Math.min(1, s.stand / auftragZiel());
   }
@@ -4281,11 +4600,11 @@ function zeichneHud(zeit) {
 
   // Spezialfähigkeiten mit Restzeit
   const aktiv = [];
-  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push(['SCHILD', Math.max(s.schutz, s.effekt.schild), F.gruen]);
+  if (s.schutz > 0 || s.effekt.schild > 0) aktiv.push([uebersetze('SCHILD'), Math.max(s.schutz, s.effekt.schild), F.gruen]);
   if (s.effekt.doppelt > 0) aktiv.push(['2X', s.effekt.doppelt, F.gold]);
-  if (s.effekt.zeitlupe > 0) aktiv.push(['ZEIT', s.effekt.zeitlupe, F.pink]);
+  if (s.effekt.zeitlupe > 0) aktiv.push([uebersetze('ZEIT'), s.effekt.zeitlupe, F.pink]);
   if (s.multiball) aktiv.push(['MULTI', 0, F.pink]);
-  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push(['KOMBO ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), F.gold]);
+  if (s.kombo >= 2 && s.welt.zeit - s.letzterSchuss < 5) aktiv.push([uebersetze('KOMBO') + ' ' + s.kombo, 5 - (s.welt.zeit - s.letzterSchuss), F.gold]);
   c.font = '7px ' + SCHRIFT;
   c.textAlign = 'center';
   aktiv.slice(0, 3).forEach(([name, rest, f], i) => {
@@ -4396,22 +4715,22 @@ function merkeRekord() {
 
 function zeigeEnde() {
   const lv = s.level;
-  $('eTitel').textContent = s.sieg ? 'LEVEL GESCHAFFT' : 'GAME OVER';
+  $('eTitel').textContent = s.sieg ? uebersetze('LEVEL GESCHAFFT') : 'GAME OVER';
   $('eTisch').textContent = tischName(s.tisch);
   $('eSterne').hidden = !s.sieg;
   $('eSterne').textContent = '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne);
   $('eSterneText').hidden = !s.sieg;
-  $('eSterneText').textContent = s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.';
+  $('eSterneText').textContent = uebersetze(s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.');
   $('eFrei').hidden = !s.neuFrei;
   if (s.neuFrei) {
     const n = LEVEL[levelNr(lv.id) + 1];
-    $('eFrei').textContent = (n.welt !== lv.welt ? 'Neue Welt frei: ' + THEMEN[n.welt].name + '!' : 'Neues Level frei: ' + n.name + '!');
+    $('eFrei').textContent = (n.welt !== lv.welt ? uebersetze('Neue Welt frei: {name}!', { name: THEMEN[n.welt].name }) : uebersetze('Neues Level frei: {name}!', { name: n.name }));
   }
   $('ePunkte').textContent = zahl(s.punkte);
   $('eRangZeile').hidden = !!lv;
   $('eRang').textContent = RAENGE[s.rang];
-  $('eAuftraegeName').textContent = lv ? 'Aufgaben' : 'Aufträge';
-  $('eAuftraege').textContent = lv ? Math.min(s.schritt, lv.aufgaben.length) + ' von ' + lv.aufgaben.length : s.auftraegeGeschafft;
+  $('eAuftraegeName').textContent = lv ? uebersetze('Aufgaben') : uebersetze('Aufträge');
+  $('eAuftraege').textContent = lv ? uebersetze('{a} von {b}', { a: Math.min(s.schritt, lv.aufgaben.length), b: lv.aufgaben.length }) : s.auftraegeGeschafft;
   $('eRampen').textContent = s.statistik.rampen;
   $('eKombo').textContent = s.statistik.maxKombo > 1 ? 'x' + s.statistik.maxKombo : '–';
   $('eRekord').textContent = zahl(bestwert(s.tisch, s.stufe));
@@ -4425,8 +4744,8 @@ function zeigeEnde() {
   $('eDuell').hidden = !passt;
   if (passt) {
     $('eDuell').textContent = s.punkte > d.punkte
-      ? 'Geschafft! Du hast ' + d.name + ' mit ' + zahl(s.punkte) + ' zu ' + zahl(d.punkte) + ' geschlagen.'
-      : d.name + ' liegt noch vorne: ' + zahl(d.punkte) + ' Punkte. Versuch es nochmal!';
+      ? uebersetze('Geschafft! Du hast {name} mit {du} zu {er} geschlagen.', { name: d.name, du: zahl(s.punkte), er: zahl(d.punkte) })
+      : uebersetze('{name} liegt noch vorne: {punkte} Punkte. Versuch es nochmal!', { name: d.name, punkte: zahl(d.punkte) });
   }
   zeigeFenster('fEnde');
   if (!$('weiterLevel').hidden && !tippGeraet) $('weiterLevel').focus({ preventScroll: true });
@@ -4529,7 +4848,7 @@ function weltFarben(el, hex) {
   el.style.setProperty('--weltTon', `rgba(${r},${g},${b},0.28)`);
   el.style.setProperty('--weltSchein', `rgba(${r},${g},${b},0.18)`);
 }
-const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>GESPERRT';
+const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>' + uebersetze('GESPERRT');
 
 function baueWelten() {
   const liste = $('weltListe');
@@ -4546,9 +4865,9 @@ function baueWelten() {
     knopf.append(bildElement(ersterIndex, 112, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
-    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = 'WELT ' + (WELTEN.indexOf(w) + 1);
+    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = uebersetze('WELT {nr}', { nr: WELTEN.indexOf(w) + 1 });
     const name = document.createElement('strong'); name.textContent = w.name.toUpperCase();
-    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + ' Schaff zuerst das letzte Level der Welt davor.';
+    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + uebersetze(' Schaff zuerst das letzte Level der Welt davor.');
     if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     info.prepend(nr);
     const merkmal = document.createElement('span'); merkmal.className = 'weltMerkmal'; merkmal.textContent = THEMEN[w.id].physik.text;
@@ -4564,9 +4883,9 @@ function baueWelten() {
 function baueLevel() {
   const w = WELTEN.find(x => x.id === gewaehlteWelt);
   const wNr = WELTEN.indexOf(w);
-  $('levelOber').textContent = 'WELT ' + (wNr + 1) + ' VON ' + WELTEN.length;
+  $('levelOber').textContent = uebersetze('WELT {nr} VON {n}', { nr: wNr + 1, n: WELTEN.length });
   $('levelTitel').textContent = w.name.toUpperCase();
-  $('levelText').textContent = w.text + ' ' + THEMEN[w.id].physik.text + ' Musik: „' + LIEDER[w.id].name + '“.';
+  $('levelText').textContent = w.text + ' ' + THEMEN[w.id].physik.text + uebersetze(' Musik: „{name}“.', { name: LIEDER[w.id].name });
   const kopf = $('weltKopf');
   kopf.textContent = '';
   kopf.append(bildElement(weltLevel(w.id)[0][1], 520));
@@ -4583,11 +4902,11 @@ function baueLevel() {
     info.className = 'weltInfo';
     const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
     const auf = document.createElement('span');
-    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : ' – Schaff zuerst das Level davor.');
+    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : uebersetze(' – Schaff zuerst das Level davor.'));
     if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     const st = daten.sterne[l.id] || 0;
     const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
-    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');
+    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   ' + uebersetze('Best:') + ' ' + zahl(bestwert(l.id)) : '');
     info.append(name, auf, zeile);
     knopf.append(info);
     knopf.disabled = !frei;
@@ -4600,8 +4919,8 @@ function baueStart() {
   const d = offenesDuell;
   $('duell').hidden = !d;
   if (d) {
-    $('duellTitel').textContent = d.name + ' FORDERT DICH HERAUS';
-    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf dem Tisch ' + tischName(d.tisch) + ', Stufe ' + STUFEN[d.stufe].name + '.' + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? ' Dieses Level musst du erst freischalten.' : '');
+    $('duellTitel').textContent = uebersetze('{name} FORDERT DICH HERAUS', { name: d.name });
+    $('duellText').textContent = uebersetze('Schlage {punkte} Punkte auf dem Tisch {tisch}, Stufe {stufe}.', { punkte: zahl(d.punkte), tisch: tischName(d.tisch), stufe: STUFEN[d.stufe].name }) + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? uebersetze(' Dieses Level musst du erst freischalten.') : '');
   }
 }
 
@@ -4617,7 +4936,7 @@ function baueListe() {
   const liste = $('liste');
   liste.textContent = '';
   const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe && x.tisch === tisch).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
-  zeilen.push({ name: daten.name || 'Du', punkte: bestwert(tisch), ich: true });
+  zeilen.push({ name: daten.name || uebersetze('Du'), punkte: bestwert(tisch), ich: true });
   zeilen.sort((a, b) => b.punkte - a.punkte);
   zeilen.forEach((z, i) => {
     const li = document.createElement('li');
@@ -4631,7 +4950,7 @@ function baueListe() {
     } else {
       const weg = document.createElement('button');
       weg.type = 'button'; weg.className = 'weg';
-      weg.setAttribute('aria-label', z.name + ' entfernen');
+      weg.setAttribute('aria-label', uebersetze('{name} entfernen', { name: z.name }));
       weg.textContent = '×';
       weg.addEventListener('click', () => {
         daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe && x.tisch === tisch));
@@ -4646,11 +4965,11 @@ function baueListe() {
 
 function baueHilfe() {
   $('hilfeSteuerung').textContent = tippGeraet
-    ? 'Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.'
-    : 'A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.';
+    ? uebersetze('Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.')
+    : uebersetze('A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.');
   $('hilfeKolben').textContent = tippGeraet
-    ? 'Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.'
-    : 'Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.';
+    ? uebersetze('Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.')
+    : uebersetze('Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.');
 }
 
 // --------------------------- Freunde herausfordern ---------------------------
@@ -4664,7 +4983,7 @@ function reinerName(text) {
 }
 let teilTisch = 'klassik';
 function linkBauen() {
-  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
+  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || uebersetze('Ein Freund'), punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
   return SPIEL_ADRESSE + '#' + teile.toString();
 }
 function oeffneTeilen(zurueck, tisch) {
@@ -4673,25 +4992,25 @@ function oeffneTeilen(zurueck, tisch) {
   $('nameFeld').value = daten.name;
   $('teilenStatus').textContent = '';
   $('linkFeld').hidden = true;
-  $('teilenText').textContent = 'Du teilst deinen Rekord auf dem Tisch ' + tischName(tisch) + ': ' + zahl(bestwert(tisch)) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
+  $('teilenText').textContent = uebersetze('Du teilst deinen Rekord auf dem Tisch {tisch}: {punkte} Punkte auf Stufe {stufe}. Wer den Link öffnet, kann dich herausfordern.', { tisch: tischName(tisch), punkte: zahl(bestwert(tisch)), stufe: STUFEN[daten.stufe].name });
   zeigeFenster('fTeilen');
 }
 async function teile() {
   daten.name = reinerName($('nameFeld').value);
   speichere();
   const adresse = linkBauen();
-  const text = 'Ich habe ' + zahl(bestwert(teilTisch)) + ' Punkte in Orbitflipper (' + tischName(teilTisch) + ', Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
+  const text = uebersetze('Ich habe {punkte} Punkte in Orbitflipper ({tisch}, Stufe {stufe}). Schaffst du mehr?', { punkte: zahl(bestwert(teilTisch)), tisch: tischName(teilTisch), stufe: STUFEN[daten.stufe].name });
   const status = $('teilenStatus');
   status.textContent = '';
   try {
     if (navigator.share) { await navigator.share({ title: 'Orbitflipper', text, url: adresse }); return; }
     await navigator.clipboard.writeText(text + ' ' + adresse);
-    status.textContent = 'Link kopiert! Füge ihn jetzt im Chat ein.';
+    status.textContent = uebersetze('Link kopiert! Füge ihn jetzt im Chat ein.');
   } catch (error) {
     if (error.name === 'AbortError') return;
     const feld = $('linkFeld');
     feld.value = adresse; feld.hidden = false; feld.select();
-    status.textContent = 'Kopiere diesen Link:';
+    status.textContent = uebersetze('Kopiere diesen Link:');
   }
 }
 function leseHerausforderung() {
@@ -4728,7 +5047,7 @@ function schalteTon() {
 }
 function zeigeTon() {
   $('tonKnopf').classList.toggle('stumm', !daten.ton);
-  $('tonKnopf').setAttribute('aria-label', daten.ton ? 'Ton ausschalten' : 'Ton einschalten');
+  $('tonKnopf').setAttribute('aria-label', daten.ton ? uebersetze('Ton ausschalten') : uebersetze('Ton einschalten'));
 }
 // Lautstärke-Regler für Musik und Effekte (es gibt sie in der Pause und unter "Ton und Musik")
 function zeigeRegler() {
@@ -4894,7 +5213,17 @@ function bild(jetzt) {
   requestAnimationFrame(bild);
 }
 
-leseHerausforderung();
+// Sprache und Portal-Version
+uebersetzeSeite();
+$('spracheKnopf').textContent = Sprache.aktuell === 'de' ? 'English' : 'Deutsch';
+$('spracheKnopf').lang = Sprache.aktuell === 'de' ? 'en' : 'de';
+$('spracheKnopf').addEventListener('click', () => Sprache.wechsle());
+if (PORTAL) {
+  // Auf Spieleportalen keine Links nach außen und kein Teilen
+  for (const id of ['pixelhafenLink', 'listeKnopf', 'endeTeilen']) $(id).remove();
+} else {
+  leseHerausforderung();
+}
 neuesSpiel();
 s.phase = 'menue';
 zeigeTon();
@@ -4904,7 +5233,7 @@ zeigeFenster('fStart');
 if (document.fonts && document.fonts.load) document.fonts.load("12px 'Press Start 2P'").then(() => { if (s) baueBilder(); }).catch(() => {});
 requestAnimationFrame(bild);
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
+if (!PORTAL && 'serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 

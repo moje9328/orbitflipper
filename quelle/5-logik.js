@@ -44,10 +44,10 @@ function neuesSpiel(modus = { art: 'klassik' }) {
   ballInBahn(false);
   if (level) {
     melde(level.name.toUpperCase(), THEMEN[level.welt].name + ' · Level ' + level.id.slice(-1), 2.4, s.thema.f.haupt);
-    melde('AUFGABE 1/' + level.aufgaben.length, aufgabeText(level.aufgaben[0]) + zeitHinweis(level.aufgaben[0]), 3, s.thema.f.gold);
+    melde(uebersetze('AUFGABE') + ' 1/' + level.aufgaben.length, aufgabeText(level.aufgaben[0]) + zeitHinweis(level.aufgaben[0]), 3, s.thema.f.gold);
   } else melde('ORBITFLIPPER', 'Halten zum Spannen, loslassen zum Abschießen', 3);
 }
-function zeitHinweis(a) { return a.zeit ? ' (in ' + a.zeit + ' s)' : ''; }
+function zeitHinweis(a) { return a.zeit ? uebersetze(' (in {z} s)', { z: a.zeit }) : ''; }
 
 // --------------------------- Hilfen ---------------------------
 
@@ -60,6 +60,7 @@ function punkte(n, x, y, farbe) {
 }
 function bonusDazu(n) { s.bonus += n; }
 function melde(titel, text = '', dauer = 2.2, farbe = '#7ef9ff') {
+  titel = uebersetze(titel); text = uebersetze(text);
   s.meldungen.push({ titel, text, dauer, farbe });
   if (!s.meldung) naechsteMeldung();
 }
@@ -160,7 +161,7 @@ function levelEreignis(art, menge = 1, wert) {
     if (art !== a.folge[s.schrittStand]) return;
     s.schrittStand++;
     ton.kombo(s.schrittStand + 1);
-    if (s.schrittStand < a.folge.length) melde('RICHTIG!', 'Jetzt: ' + SCHUSS_NAMEN[a.folge[s.schrittStand]], 1.5, s.thema.f.gold);
+    if (s.schrittStand < a.folge.length) melde('RICHTIG!', uebersetze('Jetzt:') + ' ' + SCHUSS_NAMEN[a.folge[s.schrittStand]], 1.5, s.thema.f.gold);
   } else if (a.art === art) {
     if (art === 'kombo') s.schrittStand = Math.max(s.schrittStand, wert);
     else if (art === 'punkte') s.schrittStand = s.schrittPunkte;
@@ -194,7 +195,7 @@ function schrittGeschafft() {
   }
   starteSchritt();
   const a = aufgabeJetzt();
-  melde('AUFGABE ' + (s.schritt + 1) + '/' + lv.aufgaben.length, aufgabeText(a) + zeitHinweis(a), 3, s.thema.f.gold);
+  melde(uebersetze('AUFGABE') + ' ' + (s.schritt + 1) + '/' + lv.aufgaben.length, aufgabeText(a) + zeitHinweis(a), 3, s.thema.f.gold);
 }
 
 // Zeitlimit läuft nur, solange eine Kugel im Spiel ist. Läuft es ab, beginnt die Aufgabe von vorn.
@@ -216,7 +217,7 @@ function schrittUhr(dt) {
 function spezial(art, sekunden) {
   s.effekt[art] = Math.max(s.effekt[art], sekunden);
   ton.spezial();
-  const namen = { schild: ['SCHILD AN', 'Verlorene Kugeln kommen zurück'], doppelt: ['DOPPELTE PUNKTE', 'Alles zählt doppelt'], zeitlupe: ['ZEITLUPE', 'Die Zeit läuft langsamer'] };
+  const namen = { schild: ['SCHILD AN', uebersetze('Verlorene Kugeln kommen zurück')], doppelt: ['DOPPELTE PUNKTE', uebersetze('Alles zählt doppelt')], zeitlupe: ['ZEITLUPE', uebersetze('Die Zeit läuft langsamer')] };
   melde(namen[art][0], namen[art][1] + ' (' + sekunden + ' s)', 2.2, '#ff7bf2');
 }
 
@@ -229,7 +230,7 @@ function kombiSchuss(art, x, y) {
     const p = punkte(5000 * s.kombo, x, y - 22, '#ffe46b');
     ton.kombo(s.kombo);
     musik.aktion(1.5);
-    melde('KOMBO X' + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
+    melde(uebersetze('KOMBO X') + s.kombo, '+' + zahl(p), 1.4, '#ffe46b');
     s.statistik.maxKombo = Math.max(s.statistik.maxKombo, s.kombo);
     ereignis('kombo', 0, s.kombo);
   }
@@ -319,7 +320,7 @@ const regeln = {
       s.T.roll.forEach(x => { x.an = false; x.blitz = 1; });
       s.multi = Math.min(6, s.multi + 1);
       spezial('doppelt', 20);
-      melde('O-R-B KOMPLETT', 'Bonus jetzt ' + s.multi + 'x', 2, '#7ef9ff');
+      melde('O-R-B KOMPLETT', uebersetze('Bonus jetzt {x}x', { x: s.multi }), 2, '#7ef9ff');
     }
   },
   spinner(b, k) {
@@ -568,7 +569,7 @@ function ballRaus(b) {
       ballInBahn(false);
     } else if (s.ballNr < BAELLE) {
       s.ballNr++;
-      melde('KUGEL ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : s.modus === 'level' ? aufgabeText(aufgabeJetzt()) : auftragText(), 2);
+      melde(uebersetze('KUGEL') + ' ' + s.ballNr, s.ballNr === BAELLE ? 'Die letzte Kugel!' : s.modus === 'level' ? aufgabeText(aufgabeJetzt()) : auftragText(), 2);
       ballInBahn(false);
     } else {
       spielEnde();

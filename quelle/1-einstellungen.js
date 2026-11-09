@@ -7,40 +7,40 @@ const $ = id => document.getElementById(id);
 const SPIEL_ADRESSE = 'https://moje9328.github.io/orbitflipper/';
 const SPEICHER = 'orbitflipper';
 const begrenzt = (w, a, b) => Math.max(a, Math.min(b, w));
-const zahl = n => Math.round(n).toLocaleString('de-DE');
+const zahl = n => Math.round(n).toLocaleString(Sprache.aktuell === 'en' ? 'en-US' : 'de-DE');
 const TEST = location.search.includes('test');
 
 // Schwierigkeit: Neigung des Tisches und wie lange der Ball nach dem Abschuss geschützt ist
 const STUFEN = {
-  leicht: { name: 'Leicht', schwerkraft: 1100, schutz: 15, text: 'Der Tisch ist flacher, und nach jedem Abschuss bist du 15 Sekunden lang geschützt.' },
-  normal: { name: 'Normal', schwerkraft: 1250, schutz: 8, text: 'Wie ein echter Automat in der Spielhalle. 8 Sekunden Schutz nach dem Abschuss.' },
-  schwer: { name: 'Schwer', schwerkraft: 1420, schutz: 3, text: 'Steiler Tisch, schnelle Kugel und kaum Schutz. Nur für Profis.' }
+  leicht: { name: uebersetze('Leicht'), schwerkraft: 1100, schutz: 15, text: uebersetze('Der Tisch ist flacher, und nach jedem Abschuss bist du 15 Sekunden lang geschützt.') },
+  normal: { name: uebersetze('Normal'), schwerkraft: 1250, schutz: 8, text: uebersetze('Wie ein echter Automat in der Spielhalle. 8 Sekunden Schutz nach dem Abschuss.') },
+  schwer: { name: uebersetze('Schwer'), schwerkraft: 1420, schutz: 3, text: uebersetze('Steiler Tisch, schnelle Kugel und kaum Schutz. Nur für Profis.') }
 };
 const STUFEN_NAMEN = Object.keys(STUFEN);
 const BAELLE = 3;
 
 // Aufträge: Einer ist immer aktiv. Sind alle geschafft, beginnt die Liste schwerer von vorn.
 const AUFTRAEGE = [
-  { name: 'RAMPEN-RAUSCH', text: 'Fahr {z} Rampen', art: 'rampe', ziel: 3 },
-  { name: 'BUMPER-STURM', text: 'Triff {z}-mal die Bumper', art: 'bumper', ziel: 25 },
-  { name: 'WIRBELWIND', text: 'Dreh den Spinner {z}-mal', art: 'spin', ziel: 30 },
-  { name: 'ZIELÜBUNG', text: 'Räum die Fallziele {z}-mal ab', art: 'fallbank', ziel: 2 },
-  { name: 'UMLAUFBAHN', text: 'Schaff {z} Orbits', art: 'orbit', ziel: 3 },
-  { name: 'WURMLOCH', text: 'Versenk die Kugel {z}-mal im Wurmloch', art: 'wurmloch', ziel: 2 },
-  { name: 'KOMBO-PILOT', text: 'Schaff eine {z}er-Kombo', art: 'kombo', ziel: 3 },
-  { name: 'SCHILDWACHE', text: 'Triff alle 3 Schild-Ziele', art: 'schild', ziel: 1 },
-  { name: 'REAKTOR', text: 'Starte den Multiball', art: 'multiball', ziel: 1 }
+  { name: uebersetze('RAMPEN-RAUSCH'), text: uebersetze('Fahr {z} Rampen'), art: 'rampe', ziel: 3 },
+  { name: uebersetze('BUMPER-STURM'), text: uebersetze('Triff {z}-mal die Bumper'), art: 'bumper', ziel: 25 },
+  { name: uebersetze('WIRBELWIND'), text: uebersetze('Dreh den Spinner {z}-mal'), art: 'spin', ziel: 30 },
+  { name: uebersetze('ZIELÜBUNG'), text: uebersetze('Räum die Fallziele {z}-mal ab'), art: 'fallbank', ziel: 2 },
+  { name: uebersetze('UMLAUFBAHN'), text: uebersetze('Schaff {z} Orbits'), art: 'orbit', ziel: 3 },
+  { name: uebersetze('WURMLOCH'), text: uebersetze('Versenk die Kugel {z}-mal im Wurmloch'), art: 'wurmloch', ziel: 2 },
+  { name: uebersetze('KOMBO-PILOT'), text: uebersetze('Schaff eine {z}er-Kombo'), art: 'kombo', ziel: 3 },
+  { name: uebersetze('SCHILDWACHE'), text: uebersetze('Triff alle 3 Schild-Ziele'), art: 'schild', ziel: 1 },
+  { name: uebersetze('REAKTOR'), text: uebersetze('Starte den Multiball'), art: 'multiball', ziel: 1 }
 ];
-const RAENGE = ['KADETT', 'PILOT', 'KAPITÄN', 'KOMMANDANT', 'ADMIRAL', 'STERNENLEGENDE'];
+const RAENGE = ['KADETT', 'PILOT', 'KAPITÄN', 'KOMMANDANT', 'ADMIRAL', 'STERNENLEGENDE'].map(r => uebersetze(r));
 
 // Preise der Kapsel, der Reihe nach
 const KAPSEL_PREISE = [
-  { name: 'ZEITLUPE', art: 'zeitlupe' },
-  { name: '25.000 PUNKTE', art: 'punkte' },
-  { name: 'SCHILD', art: 'schild' },
-  { name: 'DOPPELTE PUNKTE', art: 'doppelt' },
-  { name: 'BONUS +1X', art: 'multi' },
-  { name: 'LOCK BEREIT', art: 'lock' }
+  { name: uebersetze('ZEITLUPE'), art: 'zeitlupe' },
+  { name: uebersetze('25.000 PUNKTE'), art: 'punkte' },
+  { name: uebersetze('SCHILD'), art: 'schild' },
+  { name: uebersetze('DOPPELTE PUNKTE'), art: 'doppelt' },
+  { name: uebersetze('BONUS +1X'), art: 'multi' },
+  { name: uebersetze('LOCK BEREIT'), art: 'lock' }
 ];
 
 // --------------------------- Speichern ---------------------------

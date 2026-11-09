@@ -47,22 +47,22 @@ function merkeRekord() {
 
 function zeigeEnde() {
   const lv = s.level;
-  $('eTitel').textContent = s.sieg ? 'LEVEL GESCHAFFT' : 'GAME OVER';
+  $('eTitel').textContent = s.sieg ? uebersetze('LEVEL GESCHAFFT') : 'GAME OVER';
   $('eTisch').textContent = tischName(s.tisch);
   $('eSterne').hidden = !s.sieg;
   $('eSterne').textContent = '★'.repeat(s.sterne) + '☆'.repeat(3 - s.sterne);
   $('eSterneText').hidden = !s.sieg;
-  $('eSterneText').textContent = s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.';
+  $('eSterneText').textContent = uebersetze(s.sterne === 3 ? 'Ohne eine Kugel zu verlieren!' : s.sterne === 2 ? 'Nur eine Kugel verloren.' : 'Geschafft! Für mehr Sterne weniger Kugeln verlieren.');
   $('eFrei').hidden = !s.neuFrei;
   if (s.neuFrei) {
     const n = LEVEL[levelNr(lv.id) + 1];
-    $('eFrei').textContent = (n.welt !== lv.welt ? 'Neue Welt frei: ' + THEMEN[n.welt].name + '!' : 'Neues Level frei: ' + n.name + '!');
+    $('eFrei').textContent = (n.welt !== lv.welt ? uebersetze('Neue Welt frei: {name}!', { name: THEMEN[n.welt].name }) : uebersetze('Neues Level frei: {name}!', { name: n.name }));
   }
   $('ePunkte').textContent = zahl(s.punkte);
   $('eRangZeile').hidden = !!lv;
   $('eRang').textContent = RAENGE[s.rang];
-  $('eAuftraegeName').textContent = lv ? 'Aufgaben' : 'Aufträge';
-  $('eAuftraege').textContent = lv ? Math.min(s.schritt, lv.aufgaben.length) + ' von ' + lv.aufgaben.length : s.auftraegeGeschafft;
+  $('eAuftraegeName').textContent = lv ? uebersetze('Aufgaben') : uebersetze('Aufträge');
+  $('eAuftraege').textContent = lv ? uebersetze('{a} von {b}', { a: Math.min(s.schritt, lv.aufgaben.length), b: lv.aufgaben.length }) : s.auftraegeGeschafft;
   $('eRampen').textContent = s.statistik.rampen;
   $('eKombo').textContent = s.statistik.maxKombo > 1 ? 'x' + s.statistik.maxKombo : '–';
   $('eRekord').textContent = zahl(bestwert(s.tisch, s.stufe));
@@ -76,8 +76,8 @@ function zeigeEnde() {
   $('eDuell').hidden = !passt;
   if (passt) {
     $('eDuell').textContent = s.punkte > d.punkte
-      ? 'Geschafft! Du hast ' + d.name + ' mit ' + zahl(s.punkte) + ' zu ' + zahl(d.punkte) + ' geschlagen.'
-      : d.name + ' liegt noch vorne: ' + zahl(d.punkte) + ' Punkte. Versuch es nochmal!';
+      ? uebersetze('Geschafft! Du hast {name} mit {du} zu {er} geschlagen.', { name: d.name, du: zahl(s.punkte), er: zahl(d.punkte) })
+      : uebersetze('{name} liegt noch vorne: {punkte} Punkte. Versuch es nochmal!', { name: d.name, punkte: zahl(d.punkte) });
   }
   zeigeFenster('fEnde');
   if (!$('weiterLevel').hidden && !tippGeraet) $('weiterLevel').focus({ preventScroll: true });
@@ -180,7 +180,7 @@ function weltFarben(el, hex) {
   el.style.setProperty('--weltTon', `rgba(${r},${g},${b},0.28)`);
   el.style.setProperty('--weltSchein', `rgba(${r},${g},${b},0.18)`);
 }
-const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>GESPERRT';
+const SCHLOSS_TEXT = '<svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1.5v12h-15V10H6zm3 0h6V7a3 3 0 0 0-6 0v3z"/></svg>' + uebersetze('GESPERRT');
 
 function baueWelten() {
   const liste = $('weltListe');
@@ -197,9 +197,9 @@ function baueWelten() {
     knopf.append(bildElement(ersterIndex, 112, !frei));
     const info = document.createElement('span');
     info.className = 'weltInfo';
-    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = 'WELT ' + (WELTEN.indexOf(w) + 1);
+    const nr = document.createElement('span'); nr.className = 'weltNr'; nr.textContent = uebersetze('WELT {nr}', { nr: WELTEN.indexOf(w) + 1 });
     const name = document.createElement('strong'); name.textContent = w.name.toUpperCase();
-    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + ' Schaff zuerst das letzte Level der Welt davor.';
+    const text = document.createElement('span'); text.textContent = frei ? w.text : w.text + uebersetze(' Schaff zuerst das letzte Level der Welt davor.');
     if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     info.prepend(nr);
     const merkmal = document.createElement('span'); merkmal.className = 'weltMerkmal'; merkmal.textContent = THEMEN[w.id].physik.text;
@@ -215,9 +215,9 @@ function baueWelten() {
 function baueLevel() {
   const w = WELTEN.find(x => x.id === gewaehlteWelt);
   const wNr = WELTEN.indexOf(w);
-  $('levelOber').textContent = 'WELT ' + (wNr + 1) + ' VON ' + WELTEN.length;
+  $('levelOber').textContent = uebersetze('WELT {nr} VON {n}', { nr: wNr + 1, n: WELTEN.length });
   $('levelTitel').textContent = w.name.toUpperCase();
-  $('levelText').textContent = w.text + ' ' + THEMEN[w.id].physik.text + ' Musik: „' + LIEDER[w.id].name + '“.';
+  $('levelText').textContent = w.text + ' ' + THEMEN[w.id].physik.text + uebersetze(' Musik: „{name}“.', { name: LIEDER[w.id].name });
   const kopf = $('weltKopf');
   kopf.textContent = '';
   kopf.append(bildElement(weltLevel(w.id)[0][1], 520));
@@ -234,11 +234,11 @@ function baueLevel() {
     info.className = 'weltInfo';
     const name = document.createElement('strong'); name.textContent = l.id.slice(-1) + '. ' + l.name;
     const auf = document.createElement('span');
-    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : ' – Schaff zuerst das Level davor.');
+    auf.textContent = l.aufgaben.map(a => aufgabeText(a) + (a.zeit ? ' (' + a.zeit + ' s)' : '')).join(' · ') + (frei ? '' : uebersetze(' – Schaff zuerst das Level davor.'));
     if (!frei) { const zu = document.createElement('span'); zu.className = 'gesperrt'; zu.innerHTML = SCHLOSS_TEXT; info.append(zu); }
     const st = daten.sterne[l.id] || 0;
     const zeile = document.createElement('span'); zeile.className = 'sterneZeile';
-    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   Best: ' + zahl(bestwert(l.id)) : '');
+    zeile.textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + (bestwert(l.id) ? '   ' + uebersetze('Best:') + ' ' + zahl(bestwert(l.id)) : '');
     info.append(name, auf, zeile);
     knopf.append(info);
     knopf.disabled = !frei;
@@ -251,8 +251,8 @@ function baueStart() {
   const d = offenesDuell;
   $('duell').hidden = !d;
   if (d) {
-    $('duellTitel').textContent = d.name + ' FORDERT DICH HERAUS';
-    $('duellText').textContent = 'Schlage ' + zahl(d.punkte) + ' Punkte auf dem Tisch ' + tischName(d.tisch) + ', Stufe ' + STUFEN[d.stufe].name + '.' + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? ' Dieses Level musst du erst freischalten.' : '');
+    $('duellTitel').textContent = uebersetze('{name} FORDERT DICH HERAUS', { name: d.name });
+    $('duellText').textContent = uebersetze('Schlage {punkte} Punkte auf dem Tisch {tisch}, Stufe {stufe}.', { punkte: zahl(d.punkte), tisch: tischName(d.tisch), stufe: STUFEN[d.stufe].name }) + (d.tisch !== 'klassik' && !levelFrei(levelNr(d.tisch)) ? uebersetze(' Dieses Level musst du erst freischalten.') : '');
   }
 }
 
@@ -268,7 +268,7 @@ function baueListe() {
   const liste = $('liste');
   liste.textContent = '';
   const zeilen = daten.freunde.filter(x => x.stufe === daten.stufe && x.tisch === tisch).map(x => ({ name: x.name, punkte: x.punkte, ich: false }));
-  zeilen.push({ name: daten.name || 'Du', punkte: bestwert(tisch), ich: true });
+  zeilen.push({ name: daten.name || uebersetze('Du'), punkte: bestwert(tisch), ich: true });
   zeilen.sort((a, b) => b.punkte - a.punkte);
   zeilen.forEach((z, i) => {
     const li = document.createElement('li');
@@ -282,7 +282,7 @@ function baueListe() {
     } else {
       const weg = document.createElement('button');
       weg.type = 'button'; weg.className = 'weg';
-      weg.setAttribute('aria-label', z.name + ' entfernen');
+      weg.setAttribute('aria-label', uebersetze('{name} entfernen', { name: z.name }));
       weg.textContent = '×';
       weg.addEventListener('click', () => {
         daten.freunde = daten.freunde.filter(x => !(x.name === z.name && x.stufe === daten.stufe && x.tisch === tisch));
@@ -297,11 +297,11 @@ function baueListe() {
 
 function baueHilfe() {
   $('hilfeSteuerung').textContent = tippGeraet
-    ? 'Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.'
-    : 'A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.';
+    ? uebersetze('Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.')
+    : uebersetze('A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.');
   $('hilfeKolben').textContent = tippGeraet
-    ? 'Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.'
-    : 'Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.';
+    ? uebersetze('Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.')
+    : uebersetze('Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.');
 }
 
 // --------------------------- Freunde herausfordern ---------------------------
@@ -315,7 +315,7 @@ function reinerName(text) {
 }
 let teilTisch = 'klassik';
 function linkBauen() {
-  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || 'Ein Freund', punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
+  const teile = new URLSearchParams({ name: reinerName($('nameFeld').value) || uebersetze('Ein Freund'), punkte: bestwert(teilTisch), stufe: daten.stufe, tisch: teilTisch });
   return SPIEL_ADRESSE + '#' + teile.toString();
 }
 function oeffneTeilen(zurueck, tisch) {
@@ -324,25 +324,25 @@ function oeffneTeilen(zurueck, tisch) {
   $('nameFeld').value = daten.name;
   $('teilenStatus').textContent = '';
   $('linkFeld').hidden = true;
-  $('teilenText').textContent = 'Du teilst deinen Rekord auf dem Tisch ' + tischName(tisch) + ': ' + zahl(bestwert(tisch)) + ' Punkte auf Stufe ' + STUFEN[daten.stufe].name + '. Wer den Link öffnet, kann dich herausfordern.';
+  $('teilenText').textContent = uebersetze('Du teilst deinen Rekord auf dem Tisch {tisch}: {punkte} Punkte auf Stufe {stufe}. Wer den Link öffnet, kann dich herausfordern.', { tisch: tischName(tisch), punkte: zahl(bestwert(tisch)), stufe: STUFEN[daten.stufe].name });
   zeigeFenster('fTeilen');
 }
 async function teile() {
   daten.name = reinerName($('nameFeld').value);
   speichere();
   const adresse = linkBauen();
-  const text = 'Ich habe ' + zahl(bestwert(teilTisch)) + ' Punkte in Orbitflipper (' + tischName(teilTisch) + ', Stufe ' + STUFEN[daten.stufe].name + '). Schaffst du mehr?';
+  const text = uebersetze('Ich habe {punkte} Punkte in Orbitflipper ({tisch}, Stufe {stufe}). Schaffst du mehr?', { punkte: zahl(bestwert(teilTisch)), tisch: tischName(teilTisch), stufe: STUFEN[daten.stufe].name });
   const status = $('teilenStatus');
   status.textContent = '';
   try {
     if (navigator.share) { await navigator.share({ title: 'Orbitflipper', text, url: adresse }); return; }
     await navigator.clipboard.writeText(text + ' ' + adresse);
-    status.textContent = 'Link kopiert! Füge ihn jetzt im Chat ein.';
+    status.textContent = uebersetze('Link kopiert! Füge ihn jetzt im Chat ein.');
   } catch (error) {
     if (error.name === 'AbortError') return;
     const feld = $('linkFeld');
     feld.value = adresse; feld.hidden = false; feld.select();
-    status.textContent = 'Kopiere diesen Link:';
+    status.textContent = uebersetze('Kopiere diesen Link:');
   }
 }
 function leseHerausforderung() {
@@ -379,7 +379,7 @@ function schalteTon() {
 }
 function zeigeTon() {
   $('tonKnopf').classList.toggle('stumm', !daten.ton);
-  $('tonKnopf').setAttribute('aria-label', daten.ton ? 'Ton ausschalten' : 'Ton einschalten');
+  $('tonKnopf').setAttribute('aria-label', daten.ton ? uebersetze('Ton ausschalten') : uebersetze('Ton einschalten'));
 }
 // Lautstärke-Regler für Musik und Effekte (es gibt sie in der Pause und unter "Ton und Musik")
 function zeigeRegler() {
@@ -545,7 +545,17 @@ function bild(jetzt) {
   requestAnimationFrame(bild);
 }
 
-leseHerausforderung();
+// Sprache und Portal-Version
+uebersetzeSeite();
+$('spracheKnopf').textContent = Sprache.aktuell === 'de' ? 'English' : 'Deutsch';
+$('spracheKnopf').lang = Sprache.aktuell === 'de' ? 'en' : 'de';
+$('spracheKnopf').addEventListener('click', () => Sprache.wechsle());
+if (PORTAL) {
+  // Auf Spieleportalen keine Links nach außen und kein Teilen
+  for (const id of ['pixelhafenLink', 'listeKnopf', 'endeTeilen']) $(id).remove();
+} else {
+  leseHerausforderung();
+}
 neuesSpiel();
 s.phase = 'menue';
 zeigeTon();
@@ -555,7 +565,7 @@ zeigeFenster('fStart');
 if (document.fonts && document.fonts.load) document.fonts.load("12px 'Press Start 2P'").then(() => { if (s) baueBilder(); }).catch(() => {});
 requestAnimationFrame(bild);
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
+if (!PORTAL && 'serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
