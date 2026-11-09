@@ -297,10 +297,10 @@ function baueListe() {
 
 function baueHilfe() {
   $('hilfeSteuerung').textContent = tippGeraet
-    ? 'Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Halten hält den Flipper oben.'
+    ? 'Linke Bildschirmhälfte: linker Flipper. Rechte Hälfte: rechter Flipper. Mit mehreren Fingern gleichzeitig möglich. Halten hält den Flipper oben.'
     : 'A oder Pfeil links: linker Flipper. D oder Pfeil rechts: rechter Flipper. P ist Pause, M schaltet den Ton.';
   $('hilfeKolben').textContent = tippGeraet
-    ? 'Liegt die Kugel rechts in der Abschussbahn: Finger halten zum Spannen, loslassen zum Abschießen.'
+    ? 'Liegt die Kugel rechts in der Abschussbahn: Finger auf die schmale Bahn ganz rechts halten zum Spannen, loslassen zum Abschießen. Das löst keinen Flipper aus.'
     : 'Liegt die Kugel rechts in der Abschussbahn: Leertaste oder Pfeil runter halten zum Spannen, loslassen zum Abschießen.';
 }
 
@@ -430,7 +430,7 @@ $('teilenZurueck').addEventListener('click', () => zeigeFenster(vorTeilen));
 // Jeder Finger wird einzeln verfolgt. Ein Flipper ist oben, solange mindestens
 // ein Finger (oder eine Taste) auf seiner Seite gedrückt ist.
 
-const finger = new Map();          // pointerId -> 'links' | 'rechts'
+const finger = new Map();          // pointerId -> 'links' | 'rechts' | 'kolben' (bei Berührung festgelegt)
 const tasten = { links: new Set(), rechts: new Set(), kolben: new Set() };
 
 function imSpielAktiv() { return s && s.phase === 'lauf' && $('fenster').hidden; }
@@ -438,14 +438,16 @@ function imSpielAktiv() { return s && s.phase === 'lauf' && $('fenster').hidden;
 function aktualisiereFlipper() {
   if (!s) return;
   const halt = { links: tasten.links.size > 0, rechts: tasten.rechts.size > 0 };
-  for (const seite of finger.values()) halt[seite] = true;
+  for (const art of finger.values()) if (art !== 'kolben') halt[art] = true;
   for (const f of s.T.flipper) {
     const neu = imSpielAktiv() && halt[f.seite];
     if (neu && !f.gedrueckt) { ton.flipper(); bahnWechsel(f.seite); }
     f.gedrueckt = neu;
   }
-  // Kolben: Finger irgendwo oder Kolben-Taste, solange die Kugel in der Abschussbahn liegt
-  const kolben = imSpielAktiv() && (finger.size > 0 || tasten.kolben.size > 0);
+  // Kolben: nur ein Finger auf der Abschussbahn oder die Kolben-Taste, solange die Kugel in der Abschussbahn liegt
+  let kolbenFinger = false;
+  for (const art of finger.values()) if (art === 'kolben') kolbenFinger = true;
+  const kolben = imSpielAktiv() && (kolbenFinger || tasten.kolben.size > 0);
   if (kolben && !s.kolbenHalten && kugelImKolben()) { s.kolbenHalten = true; s.kolbenZug = 0; }
   if (!kolben && s.kolbenHalten) {
     s.kolbenHalten = false;
@@ -468,23 +470,25 @@ function loesAlles() {
   aktualisiereFlipper();
 }
 
+// Welche Aktion gehört zu einem Berührungspunkt? Die Abschussbahn (rechter Rand des Tisches)
+// bedient nur den Kolben, sonst entscheidet die Bildschirmhälfte. Die Wahl gilt, bis der Finger loslässt.
+function aktionFuer(e) {
+  const tx = (e.clientX - ansicht.ox) / ansicht.k, ty = (e.clientY - ansicht.oy) / ansicht.k;
+  if (tx >= SCHUSS.innen - 40 && tx <= TB + 4 && ty > HUDH + TH * 0.35) return 'kolben';
+  return e.clientX < window.innerWidth / 2 ? 'links' : 'rechts';
+}
 window.addEventListener('pointerdown', e => {
   if (!$('fenster').hidden || (e.target.closest && e.target.closest('button'))) return;
   ton.an();
   if (!imSpielAktiv()) return;
   e.preventDefault();
-  finger.set(e.pointerId, e.clientX < window.innerWidth / 2 ? 'links' : 'rechts');
+  finger.set(e.pointerId, aktionFuer(e));
   aktualisiereFlipper();
 }, { passive: false });
 const fingerWeg = e => { if (finger.delete(e.pointerId)) aktualisiereFlipper(); };
 window.addEventListener('pointerup', fingerWeg);
 window.addEventListener('pointercancel', fingerWeg);
-// Ein Finger, der über die Mitte rutscht, wechselt die Seite
-window.addEventListener('pointermove', e => {
-  if (!finger.has(e.pointerId)) return;
-  const seite = e.clientX < window.innerWidth / 2 ? 'links' : 'rechts';
-  if (finger.get(e.pointerId) !== seite) { finger.set(e.pointerId, seite); aktualisiereFlipper(); }
-});
+window.addEventListener('lostpointercapture', fingerWeg);
 window.addEventListener('contextmenu', e => { if ($('fenster').hidden) e.preventDefault(); });
 
 const TASTE = {
